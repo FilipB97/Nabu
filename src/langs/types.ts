@@ -30,6 +30,28 @@ export type ProductionMode = 'type' | 'kana' | 'jamo' | 'draw'
 /** Etapy nauki — sekcja 2a. */
 export type Stage = 'script' | 'core' | 'sentences' | 'production'
 
+/**
+ * Pozycja etapu 0 — pojedynczy znak pisma wraz z czytaniem.
+ *
+ * Inwentarz pisma jest zbiorem zamkniętym i nie ma go w żadnym korpusie: kana i hangul
+ * to po kilkadziesiąt znaków, które trzeba wypisać raz. Dlatego etap 0 nie pochodzi
+ * z pipeline'u danych, tylko z adaptera — to jest wiedza o języku, więc mieszka tam,
+ * gdzie reszta wiedzy o języku.
+ */
+export type ScriptItem = {
+  /** Znak w piśmie docelowym — to jest przód karty. */
+  s: string
+  /** Czytanie w transkrypcji łacińskiej — to jest odpowiedź. */
+  r: string
+  /**
+   * Zbiór, z którego w pierwszej kolejności biorą się dystraktory. Ma grupować znaki
+   * MYLONE, a nie pokrewne systematycznie: dla kany jest to kolumna samogłoski
+   * (か / さ / た różnią się spółgłoską przy tej samej samogłosce), dla hangulu klasa
+   * litery. Bez tego opcje są losowe i karta sprowadza się do rozpoznania kształtu.
+   */
+  group: string
+}
+
 export type LangAdapter = {
   /** Kod ISO 639-1, ten sam co katalog w `data/`. */
   code: string
@@ -160,6 +182,38 @@ export type LangAdapter = {
    * forma powierzchniowa wystarcza — tak jest dla klasy A.
    */
   lemmaCandidates?: (surface: string) => string[]
+
+  /**
+   * Inwentarz pisma dla etapu 0, w kolejności wprowadzania. Obecny dokładnie wtedy,
+   * gdy `hasScriptStage` jest prawdą — pilnuje tego test kontraktu adapterów.
+   */
+  scriptItems?: () => ScriptItem[]
+
+  /**
+   * Czy nad tym tokenem warto pokazać czytanie. Domyślnie: gdy różni się od zapisu.
+   *
+   * Japoński potrzebuje własnej reguły: czytanie `ねこ` nad `猫` niesie informację,
+   * ale to samo `ねこ` nad `ねこ` powtarza to, co użytkownik już widzi, i zjada
+   * interlinię w każdej linijce zdania. Chiński jest odwrotny — pinyin jest potrzebny
+   * ZAWSZE, bo z samego znaku wymowy nie da się odczytać.
+   */
+  showReading?: (surface: string, reading: string) => boolean
+
+  /**
+   * Klawiatura w aplikacji dla kart produkcji — sekcja 7.2.
+   *
+   * Obecna tam, gdzie klawiatura systemowa fałszuje test: japoński IME podaje listę
+   * kandydatów (użytkownik rozpoznaje zamiast przypominać), a koreańska wymaga osobnej
+   * instalacji. Języki łacińskie jej nie mają i mieć nie powinny — tam systemowa
+   * klawiatura testuje dokładnie to, co trzeba.
+   *
+   * `compose` składa naciśnięte klawisze w tekst: dla hangulu to arytmetyka sylab,
+   * dla kany doklejenie znaku dźwięczności do poprzedniej sylaby.
+   */
+  keyboard?: {
+    rows: readonly (readonly string[])[]
+    compose: (keys: readonly string[]) => string
+  }
 }
 
 /** Etapy, przez które prowadzimy użytkownika, w kolejności. */

@@ -83,21 +83,39 @@ export function selectFresh(
   known: ReadonlySet<string>,
   seen: ReadonlySet<string>,
   limit: number,
+  covered: ReadonlySet<string> = new Set(),
+  knownBand = 0,
 ): DeckItem[] {
   if (limit <= 0) return []
 
-  const scored: { item: DeckItem; unknown: number }[] = []
+  const scored: { item: DeckItem; lemma: string; unknown: number }[] = []
 
   for (const item of items) {
     if (seen.has(item.id)) continue
     const target = item.tokens[item.cloze]
     if (!target) continue
 
-    const lemmas = new Set(item.tokens.map((token) => token.lemma ?? token.s.toLocaleLowerCase()))
-    let unknown = 0
-    for (const lemma of lemmas) if (!known.has(lemma)) unknown += 1
+    // Jeden lemat, jedna karta. Talia ma po kilkanaście zdań na słowo, więc bez tego
+    // filtra „samochód" wchodzi jako nowa pozycja tyle razy, ile jest zdań z 車 —
+    // za każdym razem wyglądając na nowe słowo, choć uczy dokładnie tego samego.
+    const lemma = target.lemma ?? target.s.toLocaleLowerCase()
+    if (covered.has(lemma)) continue
 
-    scored.push({ item, unknown })
+    // Słowo jest znane, gdy użytkownik ma na nie utrwaloną kartę ALBO gdy mieści się
+    // w paśmie oszacowanym kalibracją (sekcja 3.1). Bez tego drugiego warunku konto
+    // zaawansowane widzi w każdym zdaniu pięć nowych słów i i+1 nie ma czego wybierać.
+    const seenLemmas = new Set<string>()
+    let unknown = 0
+    for (const token of item.tokens) {
+      const lemma = token.lemma ?? token.s.toLocaleLowerCase()
+      if (seenLemmas.has(lemma)) continue
+      seenLemmas.add(lemma)
+      if (known.has(lemma)) continue
+      if (knownBand > 0 && token.b > 0 && token.b <= knownBand) continue
+      unknown += 1
+    }
+
+    scored.push({ item, lemma, unknown })
   }
 
   // Dokładnie jedno nowe słowo jest ideałem; przy jego braku bierzemy najbliższe,
@@ -111,7 +129,41 @@ export function selectFresh(
     return a.item.band - b.item.band
   })
 
-  return scored.slice(0, limit).map((entry) => entry.item)
+  // Ten sam filtr w obrębie jednej partii: dwa zdania z tym samym słowem w luce nie mogą
+  // wejść razem do sesji.
+  const picked: DeckItem[] = []
+  const taken = new Set<string>()
+  for (const entry of scored) {
+    if (taken.has(entry.lemma)) continue
+    taken.add(entry.lemma)
+    picked.push(entry.item)
+    if (picked.length === limit) break
+  }
+
+  return picked
+}
+
+/**
+ * Lematy, na które użytkownik ma już kartę — niezależnie od tego, jak dobrze je zna.
+ * To NIE to samo co `knownLemmas`: tam chodzi o wiedzę (i+1), tutaj o to, żeby nie
+ * wprowadzić drugi raz słowa, które jest już w harmonogramie.
+ */
+export function cardedLemmas(
+  cards: readonly CardState[],
+  items: ReadonlyMap<string, DeckItem>,
+): Set<string> {
+  const out = new Set<string>()
+  for (const card of cards) {
+    if (card.lemma) {
+      out.add(card.lemma)
+      continue
+    }
+    // Karty sprzed pola `lemma` — do odzyskania tylko wtedy, gdy zdanie i tak jest wczytane.
+    const item = items.get(card.id)
+    const target = item?.tokens[item.cloze]
+    if (target) out.add(target.lemma ?? target.s.toLocaleLowerCase())
+  }
+  return out
 }
 
 /**
@@ -123,6 +175,10 @@ export function knownLemmas(cards: readonly CardState[], items: ReadonlyMap<stri
   const known = new Set<string>()
   for (const card of cards) {
     if (card.interval < 1) continue
+    if (card.lemma) {
+      known.add(card.lemma)
+      continue
+    }
     const item = items.get(card.id)
     const target = item?.tokens[item.cloze]
     if (target) known.add(target.lemma ?? target.s.toLocaleLowerCase())

@@ -1,0 +1,29 @@
+{
+  "lang": "zh",
+  "version": "2026-08-12",
+  "license": "Tatoeba CC BY 2.0 FR; FrequencyWords CC BY-SA 3.0; Wikisłownik (plwiktionary) CC BY-SA 3.0",
+  "sentences": 1481,
+  "lexicon": 416,
+  "script": 0,
+  "core": 100,
+  "packs": [
+    {
+      "file": "sentences-000.json",
+      "from": 72,
+      "to": 1505,
+      "count": 500
+    },
+    {
+      "file": "sentences-001.json",
+      "from": 1505,
+      "to": 4088,
+      "count": 500
+    },
+    {
+      "file": "sentences-002.json",
+      "from": 4088,
+      "to": 12000,
+      "count": 481
+    }
+  ]
+}

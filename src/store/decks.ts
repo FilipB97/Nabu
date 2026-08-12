@@ -35,6 +35,10 @@ export type DeckMeta = {
   license: string
   sentences: number
   lexicon: number
+  /** Liczebność etapu 0. Brak oznacza język bez obcego pisma. */
+  script?: number
+  /** Liczebność etapu 1 — mianownik bramy „opanowany" (sekcja 2a). */
+  core?: number
   packs: { file: string; from: number; to: number; count: number }[]
 }
 
@@ -107,6 +111,65 @@ export async function loadByIds(lang: string, ids: readonly string[]): Promise<M
   }
 
   return found
+}
+
+/**
+ * Etapy 0 i 1 — sekcja 2a.
+ *
+ * Oba pliki mają własny kształt w `data/`, bo pozycja etapu to znak albo słowo, a nie
+ * zdanie z luką. Do sesji wchodzą jednak jako `DeckItem`: cała maszyneria — kolejka,
+ * dobór opcji, ocena — działa na jednym typie i nie ma powodu jej rozdwajać. Zamiana
+ * jest tutaj, na granicy wczytywania, i to jest jedyne miejsce, które zna oba kształty.
+ *
+ * Umowa jest ta sama co przy zdaniach: `tokens[0].s` to rzecz w piśmie docelowym,
+ * `tokens[0].gloss` to etykieta odpowiedzi — czytanie przy etapie 0, polska glosa
+ * przy etapie 1.
+ */
+type ScriptEntry = { id: string; s: string; r: string; distractors: string[]; quiz: boolean }
+type CoreEntry = {
+  id: string
+  s: string
+  r?: string
+  pl: string
+  band: number
+  distractors: string[]
+  quiz: boolean
+}
+
+export type StageDeck = { items: DeckItem[]; lexicon: Lexicon }
+
+const stageCache = new Map<string, Promise<StageDeck>>()
+
+export function loadStage(lang: string, stage: 'script' | 'core'): Promise<StageDeck> {
+  const key = `${lang}/${stage}`
+  const cached = stageCache.get(key)
+  if (cached) return cached
+
+  const promise = fetchJson<{ items: (ScriptEntry | CoreEntry)[]; lexicon: Lexicon }>(
+    `${BASE}/${lang}/${stage}.json`,
+  ).then(({ items, lexicon }) => ({
+    lexicon,
+    items: items.map((entry, index): DeckItem => {
+      const label = 'pl' in entry ? entry.pl : entry.r
+      const band = 'band' in entry ? entry.band : index + 1
+      return {
+        id: entry.id,
+        text: entry.s,
+        tokens: [{ s: entry.s, b: band, gloss: label, ...(entry.r ? { r: entry.r } : {}) }],
+        // Pozycja etapu nie ma zdania, więc nie ma czego tłumaczyć. Ekran nie rysuje
+        // wtedy wiersza tłumaczenia — nie pokazuje pustego.
+        pl: '',
+        src: 'direct',
+        band,
+        cloze: 0,
+        distractors: entry.distractors,
+        quiz: entry.quiz,
+      }
+    }),
+  }))
+
+  stageCache.set(key, promise)
+  return promise
 }
 
 /** Czy talia jest już w pamięci podręcznej przeglądarki — do stanu „talia niepobrana". */

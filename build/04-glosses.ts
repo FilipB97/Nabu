@@ -64,8 +64,19 @@ const FORM_OF = /\bod:\s/i
 /** Znaczniki gramatyczne w nawiasach i kwalifikatory na początku glosy. */
 const QUALIFIER = /^\([^)]*\)\s*/
 
+/**
+ * Hasła japońskie Wikisłownik zapisuje jako „czytanie → znaczenie" (`かいぎ → spotkanie,
+ * konferencja`). Czytanie stoi po lewej stronie strzałki i nie jest częścią znaczenia:
+ * na opcji quizu byłoby podpowiedzią wymowy, przy dystraktorze samym szumem, a w liczeniu
+ * długości glosy zjadało jedno z czterech dozwolonych słów. Dotyczy 642 z 1 321 haseł
+ * japońskich; w pozostałych językach strzałka nie występuje ani razu.
+ */
+const READING_ARROW = '→'
+
 function cleanGloss(raw: string): string | null {
-  const gloss = raw.replace(QUALIFIER, '').trim()
+  const withoutQualifier = raw.replace(QUALIFIER, '').trim()
+  const arrow = withoutQualifier.lastIndexOf(READING_ARROW)
+  const gloss = arrow >= 0 ? withoutQualifier.slice(arrow + 1).trim() : withoutQualifier
   if (gloss.length === 0 || gloss.length > 60) return null
   if (REDIRECT.test(gloss) || FORM_OF.test(gloss)) return null
   // Definicje opisowe („taki, który…") nie nadają się na opcję w quizie.

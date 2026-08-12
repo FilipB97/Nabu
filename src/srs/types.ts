@@ -35,6 +35,13 @@ export type CardState = {
   reps: number
   lapses: number
   suspended: boolean
+  /**
+   * Lemat, którego uczy ta karta. Zapisany przy tworzeniu, bo bez niego nie da się
+   * odpowiedzieć na pytanie „czy to słowo już mam" bez wczytania całej talii —
+   * a od tego zależy, czy dobór nowych pozycji wprowadzi je drugi raz.
+   * Karty sprzed tego pola go nie mają.
+   */
+  lemma?: string
   /** Epoch ms — klucz do rozstrzygania konfliktów przy synchronizacji (sekcja 5.5). */
   updatedAt: number
 }
@@ -67,11 +74,18 @@ export type CardType =
   | 'reveal'
 
 /** Nowa karta, jeszcze nieodpowiadana. */
-export function newCard(id: string, lang: string, stage: Stage, now: number): CardState {
+export function newCard(
+  id: string,
+  lang: string,
+  stage: Stage,
+  now: number,
+  lemma?: string,
+): CardState {
   return {
     id,
     lang,
     stage,
+    ...(lemma ? { lemma } : {}),
     due: new Date(now).toISOString(),
     interval: 0,
     step: 0,

@@ -127,34 +127,39 @@ describe('quiz → ocena, ochrona przed strzałem', () => {
   const tempo = { medianMs: 4000 }
 
   it('pudło to zawsze „Nie pamiętam"', () => {
-    expect(gradeFromQuiz(card({ reps: 9, interval: 40 }), { correct: false, ms: 500, markedHard: false }, tempo)).toBe(AGAIN)
+    expect(gradeFromQuiz(card({ reps: 9, interval: 40 }), { correct: false, ms: 500 }, tempo)).toBe(AGAIN)
   })
 
   it('nowa karta nigdy nie dostaje „Łatwe", choćby trafiona błyskawicznie', () => {
     // To jest sedno ochrony: trafienie 1 z 4 po 300 ms wygląda jak wiedza,
     // a przy nowej karcie jest nieodróżnialne od strzału.
     const fresh = card({ reps: 1, interval: 30 })
-    expect(gradeFromQuiz(fresh, { correct: true, ms: 300, markedHard: false }, tempo)).toBe(GOOD)
+    expect(gradeFromQuiz(fresh, { correct: true, ms: 300 }, tempo)).toBe(GOOD)
   })
 
   it('trafienie wolniejsze niż 2,5× własnej mediany schodzi do „Trudne"', () => {
     const known = card({ reps: 5, interval: 10 })
-    expect(gradeFromQuiz(known, { correct: true, ms: 11_000, markedHard: false }, tempo)).toBe(HARD)
-    expect(gradeFromQuiz(known, { correct: true, ms: 5_000, markedHard: false }, tempo)).toBe(GOOD)
+    expect(gradeFromQuiz(known, { correct: true, ms: 11_000 }, tempo)).toBe(HARD)
+    expect(gradeFromQuiz(known, { correct: true, ms: 5_000 }, tempo)).toBe(GOOD)
   })
 
   it('bez mediany reguła wolnego trafienia się nie stosuje', () => {
     const known = card({ reps: 5, interval: 10 })
-    expect(gradeFromQuiz(known, { correct: true, ms: 30_000, markedHard: false }, { medianMs: null })).toBe(GOOD)
+    expect(gradeFromQuiz(known, { correct: true, ms: 30_000 }, { medianMs: null })).toBe(GOOD)
   })
 
   it('szybkie trafienie na dojrzałej karcie to „Łatwe", na młodej nie', () => {
-    expect(gradeFromQuiz(card({ reps: 9, interval: MATURE_INTERVAL }), { correct: true, ms: 900, markedHard: false }, tempo)).toBe(EASY)
-    expect(gradeFromQuiz(card({ reps: 9, interval: 5 }), { correct: true, ms: 900, markedHard: false }, tempo)).toBe(GOOD)
+    expect(gradeFromQuiz(card({ reps: 9, interval: MATURE_INTERVAL }), { correct: true, ms: 900 }, tempo)).toBe(EASY)
+    expect(gradeFromQuiz(card({ reps: 9, interval: 5 }), { correct: true, ms: 900 }, tempo)).toBe(GOOD)
   })
 
-  it('„było trudne" nadpisuje wszystko powyżej', () => {
-    expect(gradeFromQuiz(card({ reps: 9, interval: 40 }), { correct: true, ms: 300, markedHard: true }, tempo)).toBe(HARD)
+  // Deklaracja „było trudne" była kiedyś czwartą regułą i wygrywała z pozostałymi.
+  // Zniknęła razem z przyciskiem: samoocena wraca do aplikacji tylnymi drzwiami,
+  // a „trudne" i tak powstaje z czasu odpowiedzi, czyli z pomiaru zamiast z deklaracji.
+  it('trudność bierze się z czasu, nie z deklaracji użytkownika', () => {
+    const known = card({ reps: 9, interval: 40 })
+    expect(gradeFromQuiz(known, { correct: true, ms: 300 }, tempo)).not.toBe(HARD)
+    expect(gradeFromQuiz(known, { correct: true, ms: 11_000 }, tempo)).toBe(HARD)
   })
 })
 

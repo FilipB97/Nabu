@@ -4,6 +4,7 @@ import { pt } from './pt/index.ts'
 import { sv } from './sv/index.ts'
 import { ko } from './ko/index.ts'
 import { ja } from './ja/index.ts'
+import { zh } from './zh/index.ts'
 
 /**
  * Rejestr adapterów — jedyne miejsce, które zna komplet obsługiwanych języków.
@@ -12,7 +13,7 @@ import { ja } from './ja/index.ts'
  * potem języki z obcym pismem. To nie jest przypadek — trzy pierwsze kosztują razem
  * mniej niż jeden japoński i dają natychmiastowy dowód, że rdzeń jest neutralny.
  */
-const ADAPTERS = [es, pt, sv, ko, ja] as const
+const ADAPTERS = [es, pt, sv, ko, ja, zh] as const
 
 export const LANGS: Record<string, LangAdapter> = Object.fromEntries(
   ADAPTERS.map((adapter) => [adapter.code, adapter]),
@@ -38,7 +39,7 @@ export function interferesWith(code: string): string[] {
 
 // Eksport po nazwie, żeby reszta aplikacji mogła sięgnąć po konkretny adapter
 // bez wpisywania kodu języka jako literału (patrz reguła ESLint).
-export { es, pt, sv, ko, ja }
+export { es, pt, sv, ko, ja, zh }
 
-export type { LangAdapter } from './types.ts'
+export type { LangAdapter, ProductionMode, ScriptItem, Stage } from './types.ts'
 export { stagesFor } from './types.ts'

@@ -18,6 +18,20 @@ export type LangSettings = {
    */
   active: boolean
   intensity: 'short' | 'normal' | 'long'
+  /** Poziom wejściowy — sekcja 3.1. Wybierany raz, przy dodaniu języka. */
+  level: 'zero' | 'basics' | 'ok' | 'advanced'
+  /**
+   * Granica pasma, do której zakładamy znajomość słownictwa — wynik kalibracji.
+   * Zero znaczy „nic nie zakładamy" i tak startuje konto od zera.
+   */
+  knownBand: number
+  /** Czy kalibracja została przeprowadzona albo świadomie pominięta. */
+  calibrated: boolean
+  /**
+   * Ręcznie wybrany etap — sekcja 2a: „etapy nie blokują sztywno". `null` znaczy,
+   * że etap wyznacza brama opanowania, i tak jest domyślnie.
+   */
+  stageOverride: 'script' | 'core' | 'sentences' | null
   /** Liczba opcji w quizie: 3, 4 albo 6. */
   quizOptions: number
   /** Przejście dalej po trafieniu, bez dotykania „Dalej". Pudło zawsze czeka. */
@@ -56,6 +70,20 @@ class NabuDb extends Dexie {
       log: '++seq, ts, id, lang, [lang+ts]',
       settings: 'lang',
     })
+
+    // Wersja 2 nie zmienia schematu, tylko wartość ustawienia. `autoAdvance` startowało
+    // jako `true` w czasach, gdy ekran sesji w ogóle nie miał odsłonięcia — trafienie
+    // przewijało kartę natychmiast i nie dało się zobaczyć, czy było dobrze. Ustawienia
+    // nigdy nie było jak zmienić, więc `true` w bazie nie jest wyborem użytkownika,
+    // tylko śladem po tamtym błędzie.
+    this.version(2).upgrade((tx) =>
+      tx
+        .table<LangSettings>('settings')
+        .toCollection()
+        .modify((row) => {
+          row.autoAdvance = false
+        }),
+    )
   }
 }
 
@@ -64,8 +92,14 @@ export const db = new NabuDb()
 const DEFAULTS: Omit<LangSettings, 'lang' | 'addedAt'> = {
   active: true,
   intensity: 'normal',
+  level: 'zero',
+  knownBand: 0,
+  calibrated: false,
+  stageOverride: null,
   quizOptions: 4,
-  autoAdvance: true,
+  // Domyślnie czekamy na dotknięcie. Odsłonięcie niesie treść do nauczenia się —
+  // poprawne słowo, jego czytanie i glosę — więc nie może znikać samo.
+  autoAdvance: false,
   production: 'mature',
   furigana: 'after',
   romaji: true,

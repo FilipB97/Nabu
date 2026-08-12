@@ -1,8 +1,19 @@
 import { describe, expect, it } from 'vitest'
 import { newCard, type CardState } from '@/srs/types'
 import type { DeckItem, Lexicon } from '@/store/decks'
-import { SessionQueue, knownLemmas, selectFresh, type QueueEntry } from './queue.ts'
+import {
+  SessionQueue,
+  cardedLemmas,
+  knownLemmas,
+  selectFresh,
+  type QueueEntry,
+} from './queue.ts'
 import { buildConfusions, buildOptions } from './options.ts'
+import { layoutAroundCloze, splitAroundCloze } from './cloze.ts'
+import { currentStage, isMastered, stageProgress } from './stages.ts'
+import { modeFor } from './useSession.ts'
+import { ja, es } from '@/langs'
+import type { DeckMeta } from '@/store/decks'
 
 const NOW = Date.UTC(2026, 7, 12, 12, 0, 0)
 
@@ -93,6 +104,93 @@ describe('dobór nowych pozycji metodą i+1', () => {
 
   it('nie zwraca nic, gdy limit to zero — to jest stan „zaległości powyżej progu"', () => {
     expect(selectFresh([item('a', 100, ['x'])], known, new Set(), 0)).toEqual([])
+  })
+})
+
+describe('zdanie wokół luki', () => {
+  function sentence(text: string, surfaces: string[], cloze: number): DeckItem {
+    return {
+      ...item('x', 100, surfaces, cloze),
+      text,
+      tokens: surfaces.map((s) => ({ s, b: 100, lemma: s })),
+    }
+  }
+
+  it('zachowuje interpunkcję, której nie ma w tokenach', () => {
+    const it_ = sentence('那人是谁？', ['那', '人', '是', '谁'], 1)
+    expect(splitAroundCloze(it_, '')).toEqual({ before: '那', after: '是谁？' })
+  })
+
+  it('zachowuje przecinki i kropkę w zdaniu ze spacjami', () => {
+    const it_ = sentence('Lo hecho, hecho está.', ['Lo', 'hecho', 'hecho', 'está'], 2)
+    expect(splitAroundCloze(it_, ' ')).toEqual({ before: 'Lo hecho, ', after: ' está.' })
+  })
+
+  it('bierze właściwe wystąpienie, gdy forma powtarza się wcześniej', () => {
+    const it_ = sentence('a b a b', ['a', 'b', 'a', 'b'], 2)
+    expect(splitAroundCloze(it_, ' ')).toEqual({ before: 'a b ', after: ' b' })
+  })
+
+  it('gdy tokenu nie ma w zdaniu, wraca do sklejania — zdanie uboższe, ale poprawne', () => {
+    const it_ = sentence('Całkiem inne zdanie.', ['ala', 'ma', 'kota'], 1)
+    expect(splitAroundCloze(it_, ' ')).toEqual({ before: 'ala', after: 'kota' })
+  })
+
+  it('rozkład na kawałki niesie interpunkcję między wyrazami', () => {
+    const it_ = sentence('Lo hecho, hecho está.', ['Lo', 'hecho', 'hecho', 'está'], 2)
+    const layout = layoutAroundCloze(it_, ' ')
+    expect(layout.exact).toBe(true)
+    expect(layout.before.map((p) => [p.glue, p.token.s])).toEqual([
+      ['', 'Lo'],
+      [' ', 'hecho'],
+    ])
+    expect(layout.after.map((p) => [p.glue, p.token.s])).toEqual([[' ', 'está']])
+    expect(layout.tail).toBe('.')
+  })
+
+  it('gdy luka jest ostatnia, ogon trzyma znak końca zdania', () => {
+    const it_ = sentence('那人是谁？', ['那', '人', '是', '谁'], 3)
+    const layout = layoutAroundCloze(it_, '')
+    expect(layout.after).toEqual([])
+    expect(layout.tail).toBe('？')
+  })
+
+  it('rozkład ma tę samą ścieżkę odwrotu co sklejanie', () => {
+    const it_ = sentence('Całkiem inne zdanie.', ['ala', 'ma', 'kota'], 1)
+    const layout = layoutAroundCloze(it_, ' ')
+    expect(layout.exact).toBe(false)
+    expect(layout.before.map((p) => p.token.s)).toEqual(['ala'])
+    expect(layout.after.map((p) => p.token.s)).toEqual(['kota'])
+  })
+})
+
+describe('jeden lemat, jedna karta', () => {
+  const known = new Set(['woda'])
+
+  it('dwa zdania z tym samym słowem w luce nie wchodzą do sesji razem', () => {
+    const pool = [
+      item('samochód-1', 100, ['samochód', 'woda']),
+      item('samochód-2', 110, ['samochód', 'woda']),
+      item('dom', 120, ['dom', 'woda']),
+    ]
+    expect(selectFresh(pool, known, new Set(), 2).map((i) => i.id)).toEqual(['samochód-1', 'dom'])
+  })
+
+  it('słowo, na które jest już karta, nie wraca jako nowe w kolejnej sesji', () => {
+    const pool = [item('samochód-2', 110, ['samochód', 'woda']), item('dom', 120, ['dom', 'woda'])]
+    const covered = new Set(['samochód'])
+    expect(selectFresh(pool, known, new Set(), 5, covered).map((i) => i.id)).toEqual(['dom'])
+  })
+
+  it('lemat czyta się z karty, bez wczytywania zdania', () => {
+    const card: CardState = { ...newCard('x', 'ja', 'sentences', NOW, '車'), interval: 0 }
+    expect(cardedLemmas([card], new Map()).has('車')).toBe(true)
+  })
+
+  it('karty sprzed pola `lemma` odzyskują je ze zdania, gdy jest pod ręką', () => {
+    const card = newCard('a', 'es', 'sentences', NOW)
+    const items = new Map([['a', item('a', 100, ['woda'])]])
+    expect(cardedLemmas([card], items).has('woda')).toBe(true)
   })
 })
 
@@ -195,5 +293,86 @@ describe('mylone pary z logu', () => {
 
   it('pomija wpisy bez wybranej opcji — produkcja i `reveal` nie mają czego mylić', () => {
     expect(buildConfusions([{ id: 's1', grade: 0 }], correctOf).size).toBe(0)
+  })
+})
+
+
+describe('etapy i brama opanowania', () => {
+  const meta = (over: Partial<DeckMeta> = {}): DeckMeta => ({
+    lang: 'ja',
+    version: '2026-08-12',
+    license: '',
+    sentences: 18_490,
+    lexicon: 1_456,
+    script: 10,
+    core: 10,
+    packs: [],
+    ...over,
+  })
+
+  const cards = (stage: CardState['stage'], count: number, interval: number): CardState[] =>
+    Array.from({ length: count }, (_, i) => ({
+      ...newCard(`${stage}-${i}`, 'ja', stage, NOW),
+      interval,
+    }))
+
+  it('nowe konto z obcym pismem startuje od etapu 0', () => {
+    expect(currentStage(ja, [], meta())).toBe('script')
+  })
+
+  it('język łaciński nie ma etapu 0 i startuje od rdzenia', () => {
+    expect(currentStage(es, [], meta({ script: 0 }))).toBe('core')
+  })
+
+  it('konto bez kart nie zalicza etapu — zero z zera to nie sto procent', () => {
+    expect(isMastered([], meta(), 'script')).toBe(false)
+  })
+
+  it('brama otwiera się przy 90% pozycji etapu', () => {
+    expect(isMastered(cards('script', 8, 30), meta(), 'script')).toBe(false)
+    expect(isMastered(cards('script', 9, 30), meta(), 'script')).toBe(true)
+  })
+
+  it('karta w krokach nauki nie liczy się do bramy', () => {
+    expect(isMastered(cards('script', 10, 0), meta(), 'script')).toBe(false)
+  })
+
+  it('opanowany etap 0 przepuszcza do rdzenia, ale nie dalej', () => {
+    expect(currentStage(ja, cards('script', 10, 30), meta())).toBe('core')
+  })
+
+  it('ręczne odblokowanie ma pierwszeństwo przed bramą', () => {
+    expect(currentStage(ja, [], meta(), 'sentences')).toBe('sentences')
+  })
+
+  it('postęp etapu podaje mianownik, a nie sam procent', () => {
+    expect(stageProgress(cards('core', 4, 30), meta(), 'core')).toEqual({ solid: 4, needed: 9 })
+  })
+})
+
+describe('kiedy karta idzie ze słuchu', () => {
+  const card = (over: Partial<CardState>): CardState => ({
+    ...newCard('x', 'ja', 'sentences', NOW),
+    ...over,
+  })
+
+  it('nowa karta jest czytana, nie słuchana — bez zapisu nie ma czego rozpoznawać', () => {
+    expect(modeFor(card({ reps: 0 }), true)).toBe('quiz-cloze')
+    expect(modeFor(card({ reps: 2 }), true)).toBe('quiz-cloze')
+  })
+
+  it('od trzeciej powtórki co druga idzie ze słuchu', () => {
+    expect(modeFor(card({ reps: 3 }), true)).toBe('quiz-listen')
+    expect(modeFor(card({ reps: 4 }), true)).toBe('quiz-cloze')
+    expect(modeFor(card({ reps: 5 }), true)).toBe('quiz-listen')
+  })
+
+  it('bez głosu w systemie karta zostaje czytana', () => {
+    expect(modeFor(card({ reps: 5 }), false)).toBe('quiz-cloze')
+  })
+
+  it('etapy 0 i 1 nie mają wariantu ze słuchu', () => {
+    expect(modeFor(card({ reps: 9, stage: 'script' }), true)).toBe('script')
+    expect(modeFor(card({ reps: 9, stage: 'core' }), true)).toBe('quiz-word')
   })
 })

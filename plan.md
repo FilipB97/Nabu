@@ -18,7 +18,7 @@ z czterema ocenami wystawianymi przez użytkownika. Obowiązuje wersja poniżej:
 | Samoocena zostaje **wyłącznie** na karcie `reveal`, jako cichy fallback | 7.1 |
 | Dystraktory liczone w buildzie, ze słownictwa talii; nowy krok `06` | 5.1, 10.1b |
 | Log zapisuje, **co** użytkownik wybrał — bez tego nie ma mylonych par | 5.3, 8.6 |
-| Motyw to warstwa 13 tokenów i presety barw, z testem kontrastu w CI | 9.1 |
+| Motyw to warstwa tokenów i presety barw, z testem kontrastu w CI | 9.1 |
 | Kroje pisma hostowane u siebie i subsetowane; nowy krok `07` | 9.2 |
 | Test audio przechodzi z M5 do M0, bo jego wynik zmienia pipeline — **wykonany, mowa działa** | 11 |
 
@@ -482,8 +482,14 @@ Reguły w kolejności sprawdzania:
 | trafienie przy `reps <= 1` | Dobrze, ale tylko **następny krok nauki** | nigdy skok na 1 dzień |
 | trafienie wolniejsze niż 2,5× mediany użytkownika dla tego typu karty | Trudne | mediana krocząca z ostatnich 200 odpowiedzi |
 | trafienie poniżej 2 s przy `interval >= 21` | Łatwe | |
-| dotknięcie „było trudne" po trafieniu | Trudne | nadpisuje ocenę wyżej |
 | pozostałe trafienia | Dobrze | |
+
+**Skreślone 12.08.2026: „było trudne" po trafieniu.** Reguła była w tabeli od pierwszej
+rewizji i miała pozwalać użytkownikowi zgłosić, że trafił z trudem. Przy pierwszym użyciu
+okazało się, że przycisk stoi obok „Dalej" na najczęściej dotykanym ekranie aplikacji
+i przeczy zasadzie, dla której cały ten quiz powstał: **ocenę wystawia silnik, nie
+użytkownik**. Do tego dubluje sygnał, który i tak mierzymy — trafienie wolniejsze niż
+2,5× mediany schodzi do „Trudne" samo. Samoocena zostaje wyłącznie na karcie `reveal`.
 
 **Pomiar `ms` jest elementem nośnym**, a nie statystyką: liczymy od wyrenderowania karty
 do dotknięcia, odejmujemy czas automatycznego odtworzenia dźwięku, obcinamy wartości
@@ -785,6 +791,22 @@ semantycznych** i to jest cały kontrakt motywu. Żaden komponent nie zna warto�
 | `--wrong-border` | `#3A2A33` | `#D8C9C4` | obrys błędnie wybranej opcji |
 | `--wrong-text` | `#6E7788` | `#8A8078` | tekst błędnie wybranej opcji |
 
+**Rozszerzenie z 12.08.2026 — cztery tokeny materiału.** Wygląd poszedł w stronę
+„nowocześnie, lekko": zaokrąglenia, wypełnienia i cień zamiast samych obrysów. Trzy rzeczy,
+których powyższa lista nie potrafiła wyrazić, dostały własne tokeny, bo każda z nich
+potrzebuje wartości koloru — a kolor nie może wyjść poza warstwę motywu.
+
+| token | ciemny (Atrament) | jasny (Atrament) | użycie |
+|---|---|---|---|
+| `--surface-2` | `#222A39` | `#F6F7F9` | warstwa nad kartą: trafiona opcja, arkusz |
+| `--accent-2` | `#A09FF4` | `#4434C4` | drugi kraniec gradientu akcentu |
+| `--accent-text` | `#000000` | `#FFFFFF` | tekst na wypełnieniu akcentem |
+| `--shadow` | `#000000` | `#171D2B` | baza cienia, zawsze z przezroczystością |
+
+Gradient nie łamie zasady jednego akcentu: `--accent-2` to ten sam akcent obrócony o 16°
+i przesunięty jasnością, konsekwentnie w stronę oddalającą od czerwieni. Kontrakt liczy
+teraz siedemnaście wartości, a bramka 178 asercji — szczegóły i granice w `docs/ADR-002-motywy.md`.
+
 **Czego w tej liście nie ma: czerwieni.** Pudło jest oznaczone znakiem `×`, wygaszeniem
 i ledwie ciepłym obrysem, a błędy na pasku postępu mają kolor akcentu. Zasada „dokładnie
 jeden kolor akcentu" jest w makiecie dotrzymana i preset jej nie łamie — **preset to inna
@@ -844,7 +866,7 @@ pokazuje tekst japoński krojem systemowym albo nie pokazuje go wcale.
 | `adapter.tokenizer` | Implementacja | Języki |
 |---|---|---|
 | `space` | podział regexem `\p{L}+`, lemat = forma z małej litery | es, pt, sv, ko (z hakami adaptera) |
-| `dict` | zachłanne najdłuższe dopasowanie do słownika | zh (po v1) |
+| `dict` | dopasowanie dwukierunkowe do słownika CC-CEDICT | zh |
 | `morph` | analizator morfologiczny | ja (kuromoji + IPADIC) |
 
 **Korekta wobec pierwszej wersji planu.** Pisało tu, że koreański obsłuży `space`, bo
@@ -862,6 +884,15 @@ ale dopiero z trzema hakami w adapterze:
 
 Podniesienie koreańskiego do `morph` (mecab-ko) zostaje zadaniem po v1. Te haki
 doprowadzają go do stanu używalnego, ale nie zastępują analizy morfologicznej.
+
+**Chiński: dopasowanie musi być dwukierunkowe.** Zachłanne dopasowanie od lewej myli się
+przewidywalnie i zawsze w tę samą stronę: w `打网球` („grać w tenisa") bierze rzadkie `打网`
+i zostawia `球` („kula") jako osobne słowo, które trafia potem do luki w zdaniu o tenisie.
+Tniemy więc raz od lewej, raz od prawej i wybieramy wynik z mniejszą liczbą tokenów, potem
+z mniejszą liczbą tokenów jednoznakowych (pojedynczy znak zwykle jest resztką po złym cięciu),
+a przy remisie rozstrzygamy częstością słów. Bez tego ostatniego kroku `马上去` tnie się na
+`马` + `上去` zamiast `马上` + `去` — oba warianty mają po dwa tokeny, różnią się tym, że
+`马上` jest słowem pospolitym.
 
 Wtyczka zwraca zawsze ten sam kształt: `{ s, r, b, pos, lemma }`. Dla języków łacińskich
 `r` jest `null` — pipeline i UI muszą to znosić bez rozgałęzień. `pos` przestaje być
@@ -1079,10 +1110,16 @@ uruchamiany tą samą komendą z innym kodem języka.
 | szwedzki | 2 323 | 974 | 15% | 56% | 1 | 50–11 973 |
 | koreański | 761 | 301 | 16% | 79% | 4% | 85–29 831 |
 | japoński | 16 699 | 1 323 | 8% | 55% | 0% | 57–19 998 |
+| chiński | 1 481 | 416 | 18% | 58% | 1% | 72–12 000 |
 
-Bramka przechodzi we wszystkich pięciu językach. Talia waży 22 MB w paczkach po 500 zdań;
-kroje zsubsetowane do znaków z `data/` mieszczą się w 1,25 MB, z czego Noto Serif JP
-878 kB przy 2032 znakach (pełny krój ma 12,9 MB).
+Bramka przechodzi we wszystkich sześciu językach. Talia waży 22 MB w paczkach po 500 zdań;
+kroje zsubsetowane do znaków z `data/` mieszczą się w 1,34 MB, z czego Noto Serif JP
+970 kB przy 2539 znakach (pełny krój ma 12,9 MB).
+
+Chiński ma osobną kategorię odrzutu, której nie ma nigdzie indziej: **5 219 zdań w zapisie
+tradycyjnym**. Tatoeba trzyma oba warianty pisma pod jednym kodem `cmn`, a uczący się wybiera
+jeden — talia z obydwoma naraz uczyłaby dwóch systemów pod jedną nazwą. Odrzut idzie do
+`innyZapis`, obok `pozaZasięgiem`, a nie do jakości: to nie jest wada zdania (patrz 10.2).
 
 Koreański i japoński weszły wcześniej, niż przewidywał plan (M3 i M4), i to celowo:
 uruchomienie pipeline'u na obcym piśmie ujawniło osiem założeń zaszytych pod klasę A,
@@ -1111,12 +1148,61 @@ Przy okazji wyszła wada danych niewidoczna w samych danych: zdanie „Lo hecho,
 z luką na pierwszym `hecho` zostawiało drugie widoczne obok — odpowiedź stała w pytaniu.
 Krok `05` odrzuca teraz zdania, w których lemat luki nie jest jedyny.
 
+**Poprawka po pierwszym użyciu na telefonie (12.08.2026).** Sesja przechodziła do następnej
+karty natychmiast po dotknięciu opcji. Testy tego nie łapały, bo zapis, ocena i kolejka
+działały poprawnie — brakowało jedynej rzeczy, dla której ten quiz w ogóle istnieje:
+**odsłonięcia**. Użytkownik nie widział, czy trafił, co znaczyło słowo ani czym różniło się
+od tego, które wybrał, więc karta nie uczyła niczego, a nieznajomość języka czyniła wynik
+nierozpoznawalnym. Trzy zmiany:
+
+- między odpowiedzią a następną kartą jest stan pośredni: luka wypełnia się poprawnym słowem,
+  opcje przechodzą w stany `correct` / `chosen-wrong` / `dimmed`, pod zdaniem pojawia się
+  czytanie i glosa. Dalej idzie się dotknięciem;
+- `autoAdvance` domyślnie **wyłączone** (było `true` z czasów, gdy ekran nie miał odsłonięcia,
+  czyli oznaczało „przewiń natychmiast"); migracja bazy do wersji 2 zeruje je także tam,
+  gdzie zdążyło się zapisać. Przy włączonym trafienie znika po 1,4 s, pudło zawsze czeka;
+- „było trudne" po trafieniu wróciło i zaraz wypadło. Zbudowane zgodnie z sekcją 6.2,
+  odrzucone po jednym spojrzeniu na ekran: samoocena wraca tylnymi drzwiami, a „Trudne"
+  i tak powstaje z czasu odpowiedzi. Reguła skreślona w 6.2.
+
+Druga wada z tej samej sesji: dwa zdania z tym samym słowem w luce weszły jako dwie osobne
+nowe pozycje. Karta niesie lemat (`CardState.lemma`), a dobór nowych pozycji pomija lematy,
+na które karta już istnieje — także takie w krokach nauki, które `knownLemmas` celowo pomija.
+
+To już czwarty raz, gdy wada widoczna wyłącznie na wyrenderowanej karcie przechodzi przez
+dane i testy (poprzednie: `見 = けん opinia`, „Lo ___ hecho está", CC-CEDICT z CRLF).
+Ręczny przegląd na urządzeniu jest osobną bramką, nie formalnością.
+
 ### M3 — koreański: etap 0 i obce pismo (0,5 dnia)
 Karty `script` (hangul), etapy i bramy, `hasScriptStage` w adapterze.
 Koreański jest tu celowo przed japońskim: wprowadza obcy alfabet, ale bez segmentacji
 i bez problemu czytań. Rozdziela dwie trudności, które inaczej debugowałbyś naraz.
 **Bramka:** nowe konto koreańskie przechodzi hangul → rdzeń → zdania, bramy działają,
 język łaciński nadal startuje od `core`.
+
+**Wynik (12.08.2026):** etapy 0 i 1 powstają w buildzie, bez nowego pobrania. Inwentarz
+pisma jest w adapterze (`scriptItems`), bo kana i hangul to zbiory zamknięte, których nie ma
+w żadnym korpusie: 92 znaki kany (46 hiragany + 46 katakany, bez dakuten — `が` to `か`
+ze znakiem dźwięczności, czyli reguła, nie osobna pozycja) i 40 liter hangulu w romanizacji
+poprawionej. Rdzeń to setka najczęstszych słów talii, wzięta z puli luk — ma już glosę,
+część mowy, pasmo i czytanie, więc nie kosztuje nic. Cena: dziedziczy `clozePos`, czyli
+dla japońskiego i chińskiego są to same rzeczowniki.
+
+Etap wyznacza brama „90% pozycji etapu ma `interval >= 7`", z liczebnością etapu jako
+mianownikiem — bez tego konto bez ani jednej karty spełniałoby warunek (0 z 0 to 100%).
+Powtórki przychodzą ze wszystkich etapów naraz, nowe pozycje tylko z bieżącego.
+Ręczne odblokowanie jest w ustawieniach języka, zgodnie z sekcją 2a.
+
+Dwie wady wyszły dopiero na kartach:
+
+- **token bez rangi trafiał do luki z pasmem 0.** Sekcja 10.1 mówi wprost, że słowo spoza
+  listy częstości nie może być luką, ale kod podstawiał za brak rangi zero — a zero jest
+  w tej skali NAJCZĘSTSZYM słowem. Na zdaniach było niewidoczne; rdzeń, który sortuje
+  po paśmie, otwierał się na `홈페이지` i `통역사` jako najpospolitszych słowach koreańskiego;
+- **okno pasma dla dystraktorów jest mnożnikowe**, więc na czele listy niemal puste:
+  dla słowa o randze 14 zakres 0,4–2,5× to rangi 6–35. Rdzeń składa się dokładnie z takich
+  słów, więc pierwsza karta etapu 1 (`人`) miała jednego dystraktora i spadła na samoocenę.
+  Doszedł próg bezwzględny: rozpiętość do 60 rang jest zawsze dopuszczalna.
 
 ### M4 — japoński: segmentacja i furigana (1,5 dnia)
 kuromoji jako wtyczka `morph` w `02-tokenize`, czytania, renderowanie `<ruby>`.
@@ -1133,11 +1219,55 @@ więc bramka jest przeglądem tego, co reguła przepuściła, a nie szukaniem od
 Trzecia: dystraktory `kanji-components` na 20 losowych kartach. To jedyny język, w którym
 podobieństwo kształtu naprawdę decyduje o trudności karty.
 
+**Wynik (12.08.2026):** furigana renderuje się przez `<ruby>`, nad wyrazami w zdaniu i nad
+odsłoniętą luką. Kiedy się pojawia, decyduje ustawienie `furigana`: `always` od razu,
+`after` (domyślnie) dopiero po odpowiedzi — inaczej czytanie jest ściągą, a nie nauką.
+Nad CZYM się pojawia, decyduje adapter (`showReading`): japoński pokazuje je tylko nad kanji,
+bo `ねこ` nad `ねこ` powtarza to, co widać; chiński nad wszystkim, bo pinyinu nie da się
+odczytać ze znaku. Interlinia adaptera rezerwuje miejsce z góry, więc pojawienie się czytania
+nie przesuwa zdania.
+
+Wymagało to zmiany sposobu składania zdania: zamiast dwóch napisów wokół luki ekran dostaje
+listę tokenów wraz z tym, co je rozdziela (`layoutAroundCloze`). Interpunkcja zostaje na
+swoim miejscu, a każdy wyraz może dostać własne czytanie.
+
+Przegląd dwunastu zdań rozłożonych po całym paśmie: czytania poprawne w kontekście
+(`仕事{しごと}`, `歯医者{はいしゃ}`, `頻繁{ひんぱん}`), segmentacja daje słowa a nie znaki
+(`両方`, `風景`, `とり上げ`), a dystraktory trafiają w kształt bez wymuszania:
+`歯医者` dostaje `医師` i `記者` (wspólny `者`), `地図` dostaje `地面` (wspólny `地`),
+`カナダ` dostaje `サッカー` i `コート`, czyli katakanę do katakany.
+
 ### M5 — dźwięk (0,5 dnia)
 Implementacja `speak(text, lang, rate)` na `speechSynthesis` (ścieżka potwierdzona
 w M0, ADR-001), karta `quiz-listen`, wykrycie braku głosu systemowego dla języka
 wraz z instrukcją jego pobrania.
 **Bramka:** japoński czyta się poprawnie w zainstalowanym PWA.
+
+**Wynik (12.08.2026):** `speak(text, {locale, rate})` w `src/audio/`, przed nim nic więcej
+nie ma. Trzy rzeczy, bez których dźwięk zawodzi po cichu, i wszystkie trzy siedzą w tej
+jednej warstwie:
+
+- **lista głosów zapełnia się asynchronicznie.** Safari zwraca z `getVoices()` pustą tablicę
+  przy pierwszym wywołaniu i dosyła głosy zdarzeniem `voiceschanged`. Pytanie „czy jest głos
+  japoński" zadane za wcześnie odpowiada „nie", więc ekran startu nasłuchuje, a nie odczytuje
+  raz;
+- **iOS wymaga gestu.** Pierwsze `speak()` musi wyjść z dotknięcia użytkownika, inaczej
+  kolejne wywołania programowe są ignorowane — bez błędu i bez zdarzenia. Pusta wypowiedź
+  wysłana z przycisku „Zacznij" odblokowuje resztę sesji;
+- **dopasowanie locale jest dwustopniowe.** Systemy podają warianty, których nie da się
+  przewidzieć (`zh-Hans-CN` zamiast `zh-CN`, `ko_KR` z podkreślnikiem), więc po pełnym kodzie
+  próbujemy samego języka.
+
+Karta `quiz-listen` wchodzi od `reps >= 3`, ale co DRUGĄ powtórkę — inaczej dojrzała karta
+przestaje być czytana i ćwiczy się rozpoznawanie brzmienia bez zapisu. Zdanie odtwarza się
+samo po pokazaniu karty, a zegar odpowiedzi rusza dopiero po ucichnięciu (sekcja 6.2 wymaga
+odjęcia czasu odtwarzania, bo `ms` jest wielkością nośną). Tekst pojawia się przy odsłonięciu,
+żeby dało się sprawdzić, co się usłyszało.
+
+**Ryzyko „brak głosu TTS" (sekcja 14) domknięte.** Bez głosu dla języka karty ze słuchu
+w ogóle się nie pojawiają — nie ma pustych ekranów — a ekran startu mówi wprost, że są
+pomijane, i podaje ścieżkę do pobrania głosu w ustawieniach iOS. Pozostałe karty czyta
+przycisk przy tłumaczeniu, więc brak głosu nie odbiera niczego poza jednym typem karty.
 
 ### M6 — konto i sync (1 dzień)
 Firebase Auth anonimowo + upgrade, Firestore, reguły w repo, kolejka offline,
@@ -1151,6 +1281,31 @@ Kalibracja jest bez quizu — pytanie „znasz to słowo?" z odpowiedzią tak/ni
 Tu chodzi o zasięg słownictwa, nie o test.
 **Bramka:** nowe konto z poziomem „radzę sobie" dostaje zdania i+1 od pierwszej sesji.
 
+**Wynik (12.08.2026):** poziom wybiera się przy dodawaniu języka i ustawia trzy rzeczy naraz:
+pasmo doboru, to czy zaczynamy od pisma, i to czy w ogóle pytamy o zasięg. Kalibracja rusza
+od razu po wyborze — jej sens jest w tym, żeby PIERWSZA sesja miała właściwy materiał, więc
+odłożenie jej na później czyniłoby ją bezużyteczną.
+
+**Wynikiem kalibracji nie jest lista słów, tylko granica pasma.** Dwadzieścia pięć odpowiedzi
+nie wystarczy na listę, ale w zupełności wystarczy na granicę: częstość jest uporządkowana,
+więc znajomość słowa o randze 3 000 mówi coś o wszystkich częstszych. Zbiór znanych lematów
+rośnie potem sam, z kart faktycznie przerobionych, a `selectFresh` traktuje jako znane
+jedno i drugie.
+
+Sondy rozkładamy logarytmicznie, nie równomiernie: różnica między rangą 100 a 600 jest dla
+uczącego się przepaścią, a między 11 000 a 11 500 — niczym. Pokrycie liczymy narastająco,
+bo punktowo wystarczyłby jeden szczęśliwy strzał w rzadkim paśmie, żeby uznać za znane
+wszystko poniżej.
+
+Jedna wada wyszła w teście, zanim zdążyła wyjść na ekranie: granica potrafiła stanąć
+na słowie, o którym użytkownik właśnie powiedział, że go nie zna — samo pokrycie na to
+pozwala, bo trzy „tak" i jedno „nie" to nadal 75%.
+
+Ekran kalibracji celowo **nie wygląda jak test**: bez licznika trafień, bez informacji
+zwrotnej po odpowiedzi, z jawnym „pomiń" i zdaniem o tym, po co to jest. Użytkownik, który
+poczuje się egzaminowany, zacznie zgadywać na korzyść — a wtedy dostanie materiał za trudny
+i porzuci aplikację, nie wiedząc dlaczego.
+
 ### M8 — produkcja (1,5 dnia)
 Karty `produce-*` z sekcji 7. Kolejno: `produce-type` dla klasy A (najtańsze, weryfikuje
 mapowanie ocen z 6.4), klawiatura jamo i `produce-jamo`, klawiatura kana i `produce-kana`,
@@ -1162,6 +1317,28 @@ klawiatura jamo składa 물 z ㅁ + ㅜ + ㄹ.
 ### M9 — dopracowanie (1 dzień)
 Statystyki z mylonymi parami, pełne ustawienia, wybór presetu motywu, wszystkie stany
 brzegowe, cofanie odpowiedzi, obsługa klawiatury na desktopie, dostępność.
+
+**Wynik (12.08.2026):** ekran postępu (`#/postep/:lang`) odpowiada na trzy pytania, które
+użytkownik faktycznie zadaje: ile już umiem, kiedy to wróci, co mi się myli. **Bez passy
+i serii dni** — sekcja 1 odrzuca je świadomie, bo zamieniają cel „umieć" na cel
+„nie przerwać", a jeden opuszczony dzień nie może być porażką.
+
+Mylone **pary**, nie mylone słowa: nie „nie znasz 氷", tylko „mylisz 氷 z 水". To jest
+jedyna rzecz, której samoocena nie potrafi powiedzieć, a quiz tak — i bez pola `chosen`
+w logu (sekcja 5.3) tego ekranu nie dałoby się zrobić wstecz. Pierwsza sesja japońska
+pokazała pary `う → つ` i `え → あ`, czyli dokładnie kany mylone kształtem.
+
+Ustawienia globalne (`#/ustawienia`) mają wyłącznie motyw, bo tylko on nie należy do
+żadnego języka; reszta siedzi przy języku, którego dotyczy. Preset pokazujemy JEGO
+kolorami, w wariancie aktualnie widocznym — nazwa „Mech" nie mówi nic, dopóki nie zobaczy
+się rampy.
+
+Dwa stany brzegowe, które dotąd kończyły się zawieszeniem albo brakiem wyjścia:
+
+- **talia niepobrana** — pierwsze otwarcie języka bez sieci kończyło się napisem
+  „wczytuję talię…" bez końca. Teraz jest komunikat i droga powrotna;
+- **cofnięcie odpowiedzi** istniało wyłącznie pod klawiszem `Z`, czyli na telefonie
+  nie istniało — a nietrafione dotknięcie zdarza się właśnie tam. Jest na odsłonięciu.
 
 ### Później
 Chiński (tokenizer `dict` + pinyin z CC-CEDICT), arabski (RTL, zależny od pewnej warstwy audio),

@@ -28,8 +28,6 @@ export type QuizOutcome = {
   correct: boolean
   /** Czas od wyrenderowania karty do dotknięcia, już po korektach z `measure()`. */
   ms: number
-  /** Czy użytkownik dotknął „było trudne" po trafieniu. */
-  markedHard: boolean
 }
 
 export type ProductionOutcome = {
@@ -58,7 +56,6 @@ export type Tempo = {
  */
 export function gradeFromQuiz(card: CardState, outcome: QuizOutcome, tempo: Tempo): Grade {
   if (!outcome.correct) return AGAIN
-  if (outcome.markedHard) return HARD
 
   // Nowa karta nigdy nie dostaje „Łatwe". Skok na cztery dni po jednym trafieniu
   // z czterech opcji to dokładnie ten przypadek, w którym strzał wygląda jak wiedza.

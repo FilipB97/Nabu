@@ -14,7 +14,13 @@ import { ROLES, TOKENS, requiredRatio, type Token } from './tokens'
  * w audycie na końcu pliku, żeby nie zniknęły z oczu.
  */
 
-const SURFACES = ['bg', 'surface'] as const satisfies readonly Token[]
+/**
+ * Powierzchnie, na których wolno postawić tekst. `accent` i `accent-2` są tu, bo
+ * przycisk główny ma wypełnienie gradientem — a wtedy tekst stoi na obu krańcach
+ * naraz i oba muszą go unieść.
+ */
+const SURFACES = ['bg', 'surface', 'surface-2', 'accent', 'accent-2'] as const satisfies
+  readonly Token[]
 
 describe('kontrakt tokenów', () => {
   it.each(PRESETS_IDS)('preset %s ma komplet tokenów w obu wariantach', (preset) => {
@@ -87,7 +93,11 @@ describe('audyt tokenów dekoracyjnych', () => {
    * pół roku. Jeśli któraś zjedzie poniżej 1.2:1, element przestaje być widoczny
    * w ogóle i wtedy to już nie jest wybór estetyczny.
    */
-  const decorative = TOKENS.filter((t) => ROLES[t].role === 'decorative')
+  // `shadow` jest jedynym tokenem, który NIGDY nie występuje w pełnej mocy: wchodzi
+  // wyłącznie przez `color-mix` z przezroczystością, więc mierzenie go wobec tła
+  // odpowiadałoby na pytanie, którego interfejs nie zadaje. Cień w ciemnym motywie
+  // z założenia jest czernią na prawie czerni — to nie jest usterka, tylko jego rola.
+  const decorative = TOKENS.filter((t) => ROLES[t].role === 'decorative' && t !== 'shadow')
 
   it.each(PRESETS_IDS)('preset %s: tokeny dekoracyjne pozostają widoczne', (preset) => {
     for (const variant of VARIANTS) {

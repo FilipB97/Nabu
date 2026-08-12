@@ -7,6 +7,10 @@ import type { LangAdapter } from '@/langs'
  * `×`, wygaszone tracą kontrast. Kolor jest trzecim sygnałem, nie jedynym — te elementy
  * dotyka się setki razy, często bez patrzenia (sekcja 9, ograniczenia).
  *
+ * Opcja jest kartą: ma wypełnienie, zaokrąglenie i cień, więc czyta się jako rzecz
+ * do dotknięcia, zanim użytkownik zdąży przeczytać jej treść. Poprawna po odpowiedzi
+ * unosi się o warstwę wyżej — to samo, co dzieje się z arkuszem nad treścią.
+ *
  * Tłumaczenie przy opcji jest ukryte do momentu wyboru. Widoczne od razu zamieniłoby
  * kartę w test czytania po polsku.
  */
@@ -18,10 +22,10 @@ export type OptionState =
   | 'dimmed' // pozostałe, po odpowiedzi
 
 const STATE_CLASSES: Record<OptionState, string> = {
-  idle: 'border-border text-text',
-  correct: 'border-accent bg-surface text-accent',
-  'chosen-wrong': 'border-wrong-border text-wrong-text',
-  dimmed: 'border-border-quiet text-text-3',
+  idle: 'nabu-card text-text',
+  correct: 'nabu-card nabu-card-raised text-accent',
+  'chosen-wrong': 'nabu-card border-wrong-border text-wrong-text',
+  dimmed: 'nabu-card text-text-3 opacity-70 shadow-none',
 }
 
 const FONT_CLASS: Record<LangAdapter['display']['font'], string> = {
@@ -67,13 +71,14 @@ export function QuizOption({
       aria-disabled={answered}
       onClick={answered ? undefined : onSelect}
       aria-label={answered ? `${term} — ${gloss}` : term}
-      className={`flex min-h-[62px] w-full items-center justify-between gap-3 border px-[18px] text-start
-        select-none ${answered ? 'cursor-default' : 'cursor-pointer'} ${STATE_CLASSES[state]}`}
+      className={`nabu-press flex min-h-[68px] w-full items-center justify-between gap-3 px-5
+        text-start transition-colors duration-150 select-none
+        ${answered ? 'cursor-default' : 'cursor-pointer'} ${STATE_CLASSES[state]}`}
     >
-      <span className="flex items-baseline gap-[10px]">
-        <span className={`${FONT_CLASS[font]} text-[24px] leading-[1.35]`}>{term}</span>
+      <span className="flex min-w-0 flex-wrap items-baseline gap-x-[10px] gap-y-1">
+        <span className={`${FONT_CLASS[font]} text-[25px] leading-[1.3]`}>{term}</span>
         <span
-          className={`font-ui text-[12.5px] leading-none transition-opacity duration-150
+          className={`font-ui text-[13px] leading-tight transition-opacity duration-200
             ${answered ? 'opacity-100' : 'opacity-0'}`}
           aria-hidden={!answered}
         >
@@ -81,10 +86,14 @@ export function QuizOption({
         </span>
       </span>
 
-      <span className="flex items-center gap-3">
-        {mark && <span className="font-mono text-[15px] leading-none">{mark}</span>}
+      <span className="flex shrink-0 items-center gap-3">
+        {mark && <span className="font-mono text-[16px] leading-none">{mark}</span>}
         {shortcut !== undefined && !answered && (
-          <span className="font-mono text-[11px] leading-none text-text-3" aria-hidden>
+          <span
+            className="font-mono flex h-6 w-6 items-center justify-center rounded-full
+              bg-bg text-[11px] leading-none text-text-3"
+            aria-hidden
+          >
             {shortcut}
           </span>
         )}

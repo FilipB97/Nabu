@@ -30,6 +30,19 @@ const CANDIDATES = 8
 /** Dopuszczalny stosunek rang. Za szeroko — opcja odpada „na oko", za wąsko — brak kandydatów. */
 const BAND_RATIO = 2.5
 
+/**
+ * Najmniejsza dopuszczalna rozpiętość rang, niezależnie od stosunku.
+ *
+ * Samo kryterium mnożnikowe załamuje się na czole listy: dla słowa o randze 14 okno
+ * 0,4–2,5× to rangi 6–35, czyli garść wyrazów w całym języku. Rdzeń słownictwa składa
+ * się DOKŁADNIE z takich słów, więc bez tego progu setka najczęstszych wyrazów zostaje
+ * bez dystraktorów i spada na kartę z samooceną — wyszło na pierwszej karcie etapu 1.
+ *
+ * Na dalszych rangach próg nie robi nic: przy randze 3 000 to samo okno ma szerokość
+ * kilku tysięcy, więc rozstrzyga stosunek.
+ */
+const BAND_SPAN = 60
+
 export type Candidate = {
   lemma: string
   surface: string
@@ -101,6 +114,14 @@ export function glossesCollide(a: string, b: string): boolean {
   return false
 }
 
+/** Czy dwie rangi są na tyle bliskie, żeby słowa mogły stać obok siebie w quizie. */
+export function bandsClose(a: number, b: number): boolean {
+  const hi = Math.max(a, b)
+  const lo = Math.min(a, b)
+  if (hi - lo <= BAND_SPAN) return true
+  return hi / Math.max(1, lo) <= BAND_RATIO
+}
+
 function scoreOf(target: Candidate, other: Candidate, shape: ShapeSimilarity): number {
   // Bliskość pasma: 1 przy identycznej randze, spada wraz ze stosunkiem rang.
   const ratio = Math.max(target.band, other.band) / Math.max(1, Math.min(target.band, other.band))
@@ -137,17 +158,43 @@ export function buildPool(items: Item[]): Map<string, Candidate> {
   return pool
 }
 
-export async function assignDistractors(items: Item[], lang: string): Promise<void> {
-  const adapter: LangAdapter = adapterFor(lang)
-  await prepareShape(adapter.quiz.shape)
-  const pool = buildPool(items)
-  const byPos = new Map<string, Candidate[]>()
+/**
+ * Kandydaci na dystraktory dla jednego celu, od najlepszego. Wydzielone, bo tej samej
+ * reguły używa etap 1 (rdzeń słownictwa), gdzie kartą jest samo słowo, a nie zdanie z luką.
+ */
+export function candidatesFor(
+  target: Candidate,
+  byPos: ReadonlyMap<string, Candidate[]>,
+  shape: ShapeSimilarity,
+): string[] {
+  return (byPos.get(target.pos) ?? [])
+    .filter((other) => {
+      if (other.lemma === target.lemma) return false
+      if (!bandsClose(target.band, other.band)) return false
+      return !glossesCollide(target.pl, other.pl)
+    })
+    .map((other) => ({ other, score: scoreOf(target, other, shape) }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, CANDIDATES)
+    .map((entry) => entry.other.lemma)
+}
 
+/** Grupuje pulę po części mowy — dystraktor musi być tą samą częścią mowy co cel. */
+export function groupByPos(pool: ReadonlyMap<string, Candidate>): Map<string, Candidate[]> {
+  const byPos = new Map<string, Candidate[]>()
   for (const candidate of pool.values()) {
     const list = byPos.get(candidate.pos)
     if (list) list.push(candidate)
     else byPos.set(candidate.pos, [candidate])
   }
+  return byPos
+}
+
+export async function assignDistractors(items: Item[], lang: string): Promise<void> {
+  const adapter: LangAdapter = adapterFor(lang)
+  await prepareShape(adapter.quiz.shape)
+  const pool = buildPool(items)
+  const byPos = groupByPos(pool)
 
   const needed = adapter.quiz.minOptions - 1
   const cache = new Map<string, string[]>()
@@ -173,18 +220,7 @@ export async function assignDistractors(items: Item[], lang: string): Promise<vo
       continue
     }
 
-    const scored = (byPos.get(target.pos) ?? [])
-      .filter((other) => {
-        if (other.lemma === target.lemma) return false
-        const ratio =
-          Math.max(target.band, other.band) / Math.max(1, Math.min(target.band, other.band))
-        if (ratio > BAND_RATIO) return false
-        return !glossesCollide(target.pl, other.pl)
-      })
-      .map((other) => ({ other, score: scoreOf(target, other, adapter.quiz.shape) }))
-      .sort((a, b) => b.score - a.score)
-      .slice(0, CANDIDATES)
-      .map((entry) => entry.other.lemma)
+    const scored = candidatesFor(target, byPos, adapter.quiz.shape)
 
     cache.set(lemma, scored)
     item.distractors = scored

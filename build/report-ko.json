@@ -1,11 +1,12 @@
 {
   "lang": "ko",
-  "zdań": 759,
+  "zdań": 752,
   "kandydatów": 2300,
   "odrzuconychNaJakości": 360,
   "odsetekOdrzutówJakościowych": 16,
-  "odsetekNieprzydatnychNaKartę": 51,
+  "odsetekNieprzydatnychNaKartę": 52,
   "pozaZasięgiem": 13573,
+  "innyZapis": 0,
   "powodyJakość": {
     "pasmo powyżej progu języka": 243,
     "za dużo tokenów spoza listy częstości": 104,
@@ -13,21 +14,21 @@
     "wulgaryzm": 4
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 588,
+    "brak tokenu nadającego się na lukę": 595,
     "za krótkie": 579,
     "za długie": 14
   },
   "tłumaczenia": {
     "bezpośrednie": 20,
-    "przezAngielski": 739
+    "przezAngielski": 732
   },
   "pasma": {
     "min": 85,
-    "mediana": 6215,
+    "mediana": 6253,
     "p90": 23076,
     "max": 29831
   },
-  "quizNiedostępny": 29,
+  "quizNiedostępny": 3,
   "próbka": [
     {
       "text": "오늘이 며칠이지?",
@@ -42,8 +43,8 @@
       ]
     },
     {
-      "text": "개가 짖네.",
-      "pl": "Psy szczekają.",
+      "text": "개가 있어요?",
+      "pl": "Czy ma pan psa?",
       "luka": "개",
       "band": 726,
       "src": "pivot",
@@ -69,7 +70,9 @@
         "정말",
         "해",
         "못",
-        "날"
+        "날",
+        "이",
+        "수"
       ]
     },
     {
@@ -107,25 +110,25 @@
       ]
     },
     {
-      "text": "아무도 거짓말을 안 했어.",
-      "pl": "Nikt nie kłamał.",
-      "luka": "거짓말",
+      "text": "톰이 앓는 소리를 했어.",
+      "pl": "Tom jęknął.",
+      "luka": "소리",
       "band": 5374,
       "src": "pivot",
       "dystraktory": [
-        "얼마",
-        "길",
-        "기억",
-        "딸",
-        "가족",
-        "사진",
-        "달",
-        "물"
+        "손",
+        "이리",
+        "사람들",
+        "사실",
+        "생각",
+        "돈",
+        "아버지",
+        "이야기"
       ]
     },
     {
-      "text": "감기에 걸려서 열이 나.",
-      "pl": "Przeziębiłem się i mam gorączkę.",
+      "text": "감기 안 걸리도록 조심해.",
+      "pl": "Uważaj, abyś się nie przeziębił.",
       "luka": "감기",
       "band": 8267,
       "src": "pivot",
@@ -158,34 +161,37 @@
       ]
     },
     {
-      "text": "그녀는 힘든 삶을 살았다.",
-      "pl": "Miała ciężkie życie.",
-      "luka": "삶",
+      "text": "너 없인 못 살아.",
+      "pl": "Nie mogę żyć bez ciebie.",
+      "luka": "못",
       "band": 14967,
       "src": "pivot",
       "dystraktory": [
-        "섬",
-        "사과",
-        "사자",
-        "자살",
-        "사기",
-        "도망",
-        "소설",
-        "시계"
+        "말",
+        "것",
+        "날",
+        "정말",
+        "해",
+        "게",
+        "엄마",
+        "이"
       ]
     },
     {
-      "text": "톰은 낯을 가리는 것처럼 보여.",
-      "pl": "Tom wydaje się wstydliwy.",
-      "luka": "것",
+      "text": "브라이언은 케이트와 학교에 갔어.",
+      "pl": "Brian poszedł do szkoły z Kate.",
+      "luka": "학교",
       "band": 19326,
       "src": "pivot",
       "dystraktory": [
-        "게",
-        "정말",
-        "해",
-        "못",
-        "날"
+        "딸",
+        "약",
+        "가족",
+        "사진",
+        "바보",
+        "달",
+        "사랑",
+        "얼굴"
       ]
     },
     {
