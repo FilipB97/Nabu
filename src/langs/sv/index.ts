@@ -1,4 +1,4 @@
-import type { LangAdapter } from '../types'
+import type { LangAdapter } from '../types.ts'
 
 /** Szwedzki — klasa A. */
 export const sv: LangAdapter = {
@@ -11,6 +11,7 @@ export const sv: LangAdapter = {
   hasScriptStage: false,
   needsReading: false,
   needsTranslit: false,
+  blocklist: /knulla|fitta|kuk|jävla|helvete|skit/iu,
   tokenizer: 'space',
   display: { font: 'display', size: 30, lineHeight: 1.55 },
   tts: { locale: 'sv-SE', rate: 0.6 },

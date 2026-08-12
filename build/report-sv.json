@@ -1,0 +1,235 @@
+{
+  "lang": "sv",
+  "zdań": 2323,
+  "kandydatów": 8080,
+  "odrzuconychNaJakości": 1212,
+  "odsetekOdrzutówJakościowych": 15,
+  "odsetekNieprzydatnychNaKartę": 56,
+  "pozaZasięgiem": 48738,
+  "powodyJakość": {
+    "pasmo powyżej 12000": 726,
+    "token spoza listy częstości": 295,
+    "nazwa własna": 174,
+    "wulgaryzm": 15,
+    "znaki spoza zestawu języka": 2
+  },
+  "powodyPrzydatność": {
+    "za krótkie": 2375,
+    "brak tokenu nadającego się na lukę": 2155,
+    "za długie": 15
+  },
+  "tłumaczenia": {
+    "bezpośrednie": 693,
+    "przezAngielski": 1630
+  },
+  "pasma": {
+    "min": 50,
+    "mediana": 1243,
+    "p90": 6126,
+    "max": 11973
+  },
+  "quizNiedostępny": 1,
+  "próbka": [
+    {
+      "text": "Vad vill du då?",
+      "pl": "Czego zatem chcesz?",
+      "luka": "då",
+      "band": 50,
+      "src": "pivot",
+      "dystraktory": [
+        "igen",
+        "mycket",
+        "lite",
+        "tillbaka",
+        "nog"
+      ]
+    },
+    {
+      "text": "Han är min vän.",
+      "pl": "Jest moim przyjacielem.",
+      "luka": "vän",
+      "band": 227,
+      "src": "pivot",
+      "dystraktory": [
+        "väg",
+        "hand",
+        "problem",
+        "sak",
+        "kväll",
+        "far",
+        "gud",
+        "pengar"
+      ]
+    },
+    {
+      "text": "Du bor här, eller hur?",
+      "pl": "Mieszkasz tu, czyż nie?",
+      "luka": "bor",
+      "band": 417,
+      "src": "direct",
+      "dystraktory": [
+        "bror",
+        "dotter",
+        "fort",
+        "rör",
+        "ord",
+        "bil",
+        "hus",
+        "bad"
+      ]
+    },
+    {
+      "text": "Tom är min man.",
+      "pl": "Tom jest moim mężem.",
+      "luka": "Tom",
+      "band": 659,
+      "src": "pivot",
+      "dystraktory": [
+        "skyldig",
+        "dum",
+        "trött",
+        "sjuk",
+        "snäll",
+        "annorlunda",
+        "full",
+        "orolig"
+      ]
+    },
+    {
+      "text": "Du vet att det här är annorlunda.",
+      "pl": "Wiesz, że to różnica.",
+      "luka": "annorlunda",
+      "band": 735,
+      "src": "pivot",
+      "dystraktory": [
+        "ung",
+        "orolig",
+        "dum",
+        "dålig",
+        "tvungen",
+        "sjuk",
+        "trött",
+        "skyldig"
+      ]
+    },
+    {
+      "text": "Jag kan inte dansa heller.",
+      "pl": "Ja też nie umiem tańczyć.",
+      "luka": "dansa",
+      "band": 1032,
+      "src": "pivot",
+      "dystraktory": [
+        "lösa",
+        "byta",
+        "ändra",
+        "välja",
+        "bevisa",
+        "glömma",
+        "säkra",
+        "arbeta"
+      ]
+    },
+    {
+      "text": "Mina föräldrar förstår mig inte — bara mormor förstår mig.",
+      "pl": "Moi rodzice mnie nie rozumieją - tylko babcia (od strony mamy) mnie rozumie.",
+      "luka": "mormor",
+      "band": 1435,
+      "src": "direct",
+      "dystraktory": [
+        "pris",
+        "form",
+        "papper",
+        "hot",
+        "sekund",
+        "självmord",
+        "exempel",
+        "lärare"
+      ]
+    },
+    {
+      "text": "Äntligen är det fredag.",
+      "pl": "Nareszcie piątek.",
+      "luka": "fredag",
+      "band": 2071,
+      "src": "pivot",
+      "dystraktory": [
+        "lördag",
+        "färg",
+        "alternativ",
+        "tyska",
+        "mening",
+        "fiende",
+        "stig",
+        "franska"
+      ]
+    },
+    {
+      "text": "Jag spelade fotboll igår.",
+      "pl": "Grałem wczoraj w piłkę nożną.",
+      "luka": "fotboll",
+      "band": 2816,
+      "src": "pivot",
+      "dystraktory": [
+        "morbror",
+        "antal",
+        "flygplan",
+        "otur",
+        "fågel",
+        "tjuv",
+        "hatt",
+        "kopia"
+      ]
+    },
+    {
+      "text": "Det är fortfarande lite för tidigt för snö.",
+      "pl": "Wciąż trochę za wcześnie na śnieg.",
+      "luka": "snö",
+      "band": 4139,
+      "src": "direct",
+      "dystraktory": [
+        "pension",
+        "brand",
+        "sport",
+        "anställd",
+        "kinesiska",
+        "undantag",
+        "våning",
+        "trädgård"
+      ]
+    },
+    {
+      "text": "Alla måste anpassa sig.",
+      "pl": "Każdy musi się dostosować.",
+      "luka": "anpassa",
+      "band": 6434,
+      "src": "pivot",
+      "dystraktory": [
+        "reparera",
+        "undervisa",
+        "frysa",
+        "drunkna",
+        "anställa",
+        "kila",
+        "skruva",
+        "reagera"
+      ]
+    },
+    {
+      "text": "Hon skrattade med illa dolt förakt i rösten.",
+      "pl": "Śmiała się ze źle skrywaną wzgardą w głosie.",
+      "luka": "förakt",
+      "band": 11973,
+      "src": "direct",
+      "dystraktory": [
+        "förkylning",
+        "turist",
+        "yoghurt",
+        "kam",
+        "sköldpadda",
+        "mjöl",
+        "polska",
+        "oljud"
+      ]
+    }
+  ]
+}

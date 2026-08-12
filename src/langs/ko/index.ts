@@ -1,4 +1,4 @@
-import type { LangAdapter } from '../types'
+import type { LangAdapter } from '../types.ts'
 
 /**
  * Koreański — klasa B. Hangul jest w pełni fonetyczny i ma spacje, więc potrzebny
@@ -19,6 +19,7 @@ export const ko: LangAdapter = {
   hasScriptStage: true,
   needsReading: false,
   needsTranslit: true,
+  blocklist: /씨발|개새끼|좋리/iu,
   tokenizer: 'space',
   display: { font: 'ko', size: 32, lineHeight: 1.75 },
   tts: { locale: 'ko-KR', rate: 0.5 },

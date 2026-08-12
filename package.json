@@ -12,6 +12,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint .",
+    "build:data": "node --max-old-space-size=4096 build/05-assemble.ts",
+    "build:fonts": "node build/07-fonts.ts",
     "check": "npm run lint && npm run test && npm run build"
   },
   "dependencies": {

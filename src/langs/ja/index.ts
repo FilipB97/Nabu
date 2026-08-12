@@ -1,4 +1,4 @@
-import type { LangAdapter } from '../types'
+import type { LangAdapter } from '../types.ts'
 
 /**
  * Japoński — klasa C. Brak spacji wymusza segmentację morfologiczną, a kanji mają
@@ -21,6 +21,7 @@ export const ja: LangAdapter = {
   hasScriptStage: true,
   needsReading: true,
   needsTranslit: true,
+  blocklist: /クソ|ちんこ|べっちょ|セックス/iu,
   tokenizer: 'morph',
   display: { font: 'ja', size: 34, lineHeight: 2 },
   tts: { locale: 'ja-JP', rate: 0.4 },

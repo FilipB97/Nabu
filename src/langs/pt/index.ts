@@ -1,4 +1,4 @@
-import type { LangAdapter } from '../types'
+import type { LangAdapter } from '../types.ts'
 
 /** Portugalski — klasa A. Ostrzegamy przy jednoczesnym uruchomieniu z hiszpańskim. */
 export const pt: LangAdapter = {
@@ -11,6 +11,7 @@ export const pt: LangAdapter = {
   hasScriptStage: false,
   needsReading: false,
   needsTranslit: false,
+  blocklist: /foder|caralho|puta|merda|buceta|porra|cacete|viado/iu,
   tokenizer: 'space',
   display: { font: 'display', size: 30, lineHeight: 1.55 },
   tts: { locale: 'pt-PT', rate: 0.6 },

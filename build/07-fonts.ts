@@ -9,16 +9,17 @@
  * dokładnie do podanych znaków. Dla pism CJK to różnica między kilkoma megabajtami
  * a kilkudziesięcioma kilobajtami — czyli między psuciem precache'a a jego brakiem.
  *
- * STAN NA M0: zestaw znaków CJK jest wpisany na sztywno, bo `data/` jeszcze nie istnieje.
- * W M1, gdy powstaną talie, `cjkCharsFor()` ma czytać unię znaków z `data/{lang}/`
- * zamiast stałej — reszta skryptu zostaje bez zmian.
+ * Zestaw znaków bierzemy z `data/`: skrypt czyta wszystkie talie i buduje unię znaków,
+ * które faktycznie występują. Dzięki temu subset regeneruje się razem z danymi i nie ma
+ * ryzyka, że talia urośnie o znak, którego krój nie zawiera.
  *
  * Uruchomienie:  node build/07-fonts.ts
  */
 
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { DATA } from './lib/io.ts'
 
 const OUT_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../public/fonts')
 
@@ -37,8 +38,8 @@ const LATIN =
   ' .,;:!?¡¿·—–-–…„“”‘’"\'()[]{}/\\@#%&*+=<>|~^$€£×÷°'
 
 /**
- * Kana w całości (etap 0 japońskiego) plus kanji z demo M0.
- * W M1 zastąpić unią znaków z `data/ja/`.
+ * Kana w całości — etap 0 japońskiego wymaga wszystkich znaków niezależnie od tego,
+ * co akurat jest w talii. Kanji dochodzą z danych.
  */
 const KANA =
   'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん' +
@@ -46,10 +47,37 @@ const KANA =
   'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン' +
   'ガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポッャュョァィゥェォ' +
   '、。「」・'
-const KANJI_M0 = '水氷湯米建物確認'
+/** Znaki z dema M0, zanim powstaną talie japońska i koreańska (M3, M4). */
+const DEMO_CJK = '水氷湯米建物確認물불밀말좀주세요안녕하십니까'
 
-/** Sylaby hangul z demo M0. W M1 zastąpić unią znaków z `data/ko/`. */
-const HANGUL_M0 = '물불밀말좀주세요안녕하십니까'
+/**
+ * Zbiera wszystkie znaki występujące w taliach. Bez tego subset trzeba by utrzymywać
+ * ręcznie i rozjechałby się przy pierwszej przebudowie danych.
+ */
+async function charsFromData(): Promise<string> {
+  const chars = new Set<string>()
+  let langs: string[]
+  try {
+    langs = await readdir(DATA)
+  } catch {
+    return ''
+  }
+
+  for (const lang of langs) {
+    let files: string[]
+    try {
+      files = await readdir(resolve(DATA, lang))
+    } catch {
+      continue
+    }
+    for (const file of files) {
+      if (!file.endsWith('.json')) continue
+      const raw = await readFile(resolve(DATA, lang, file), 'utf8')
+      for (const char of raw) chars.add(char)
+    }
+  }
+  return [...chars].join('')
+}
 
 type FontJob = {
   /** Nazwa pliku wynikowego, bez rozszerzenia. */
@@ -62,13 +90,20 @@ type FontJob = {
   text?: string
 }
 
+const dataChars = await charsFromData()
+
 const JOBS: FontJob[] = [
-  { file: 'archivo-latin', family: 'Archivo', weight: '100..900', text: LATIN },
-  { file: 'spectral-300-latin', family: 'Spectral', weight: 300, text: LATIN },
-  { file: 'spectral-400-latin', family: 'Spectral', weight: 400, text: LATIN },
+  { file: 'archivo-latin', family: 'Archivo', weight: '100..900', text: LATIN + dataChars },
+  { file: 'spectral-300-latin', family: 'Spectral', weight: 300, text: LATIN + dataChars },
+  { file: 'spectral-400-latin', family: 'Spectral', weight: 400, text: LATIN + dataChars },
   { file: 'plex-mono-400-latin', family: 'IBM Plex Mono', weight: 400, text: LATIN },
-  { file: 'noto-serif-jp', family: 'Noto Serif JP', weight: 400, text: KANA + KANJI_M0 + LATIN },
-  { file: 'noto-serif-kr', family: 'Noto Serif KR', weight: 400, text: HANGUL_M0 + LATIN },
+  {
+    file: 'noto-serif-jp',
+    family: 'Noto Serif JP',
+    weight: 400,
+    text: KANA + DEMO_CJK + LATIN + dataChars,
+  },
+  { file: 'noto-serif-kr', family: 'Noto Serif KR', weight: 400, text: DEMO_CJK + LATIN + dataChars },
 ]
 
 function cssUrl({ family, weight, text }: FontJob): string {
@@ -77,7 +112,9 @@ function cssUrl({ family, weight, text }: FontJob): string {
     family: `${family}:${axis}`,
     display: 'swap',
   })
-  if (text) params.set('text', text)
+  // Parametr `text` przechodzi przez URL, więc powtórzone znaki są czystą stratą —
+  // a przy taliach idą w setki tysięcy powtórzeń.
+  if (text) params.set('text', [...new Set(text)].sort().join(''))
   return `https://fonts.googleapis.com/css2?${params.toString()}`
 }
 

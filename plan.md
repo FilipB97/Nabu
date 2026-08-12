@@ -326,7 +326,15 @@ segmentację do cloze i informację, które słowo jest nowe.
 **`r` podajemy tylko wtedy, gdy różni się od `s`** — dla kany i alfabetu łacińskiego jest `null`,
 co oszczędza ~40% wagi pliku.
 
-`cloze` wskazuje lemat, który zasłaniamy luką. `distractors` to 6–8 kandydatów na błędne opcje
+Zapis na dysku różni się od powyższego w trzech drobiazgach, które warto znać:
+`cloze` jest **indeksem tokenu**, nie identyfikatorem; glosa polska siedzi na tokenie luki
+(reszta jej nie potrzebuje); pole `src` mówi, czy tłumaczenie jest bezpośrednie, czy przez
+angielski. Talia leży w paczkach `sentences-NNN.json` po 500 zdań, a `meta.json` trzyma
+indeks paczek z zakresem pasm — dzięki temu pierwsze uruchomienie ściąga kilkaset kilobajtów,
+nie kilkanaście megabajtów. Osobny `lexicon.json` mapuje lemat na glosę, część mowy i pasmo;
+`distractors` to lematy, które runtime rozwiązuje przez ten plik.
+
+`cloze` wskazuje słowo, które zasłaniamy luką. `distractors` to 6–8 kandydatów na błędne opcje
 policzonych w buildzie (sekcja 10.1b); runtime losuje z nich `n − 1`, więc zestaw opcji nie
 powtarza się między powtórkami tej samej karty. `quiz: false` ustawia build, gdy kandydatów
 jest mniej niż `adapter.quiz.minOptions − 1` — taka pozycja spada na kartę `reveal`
@@ -825,9 +833,9 @@ pokazuje tekst japoński krojem systemowym albo nie pokazuje go wcale.
 | `01-fetch` | Tatoeba downloads (bz2) | surowe TSV w `cache/` | na laptopie, nie w przeglądarce — CORS znika |
 | `02-tokenize` | zdania + kod języka | tokeny, czytania, lematy | wtyczka wg `adapter.tokenizer` (poniżej) |
 | `03-frequency` | FrequencyWords `{lang}_50k` | mapa lemat → ranga | lemat z tokenizera, fallback na formę powierzchniową |
-| `04-glosses` | glosy EN | glosy PL | LLM wsadowo, 50 na wywołanie, z walidacją liczby linii |
+| `04-glosses` | polski Wikisłownik | glosy PL + części mowy | **bez modelu językowego**, patrz 10.3 |
 | `05-assemble` | powyższe | `data/{lang}/*.json` | filtry jakości, sortowanie po `band` |
-| `06-distractors` | złożona talia | `distractors[]` + flaga `quiz` | osadzenia lokalnie, bez API (10.1b) |
+| `06-distractors` | złożona talia | `distractors[]` + flaga `quiz` | część mowy, pasmo, kształt (10.1b) |
 | `07-fonts` | zestaw znaków z `data/` | `public/fonts/*.woff2` | subset, patrz 9.2 |
 | `08-strokes` | KanjiVG | `data/ja/strokes.json` | tylko japoński, do `produce-draw` |
 
@@ -893,29 +901,72 @@ powyżej 15% oznacza za ostry próg albo za małą talię.
 
 ### 10.2 Filtry jakości w `05-assemble`
 
-Odrzucamy zdanie, jeśli: krótsze niż 4 lub dłuższe niż 18 tokenów; zawiera nazwę własną
-spoza listy dozwolonych; zawiera znaki spoza zestawu języka; nie ma tłumaczenia angielskiego;
-któryś token nie dostał czytania; `band` przekracza 12000.
+Odrzucamy zdanie, jeśli: krótsze niż `minTokens` lub dłuższe niż `maxTokens`; zawiera nazwę
+własną; zawiera znaki spoza zestawu języka; trafia w `adapter.blocklist` albo w listę
+wulgaryzmów po stronie polskiej; nie ma tłumaczenia polskiego; któryś token nie dostał
+czytania ani rangi; `band` przekracza 12000; nie ma w nim słowa nadającego się na lukę.
 
-Raport z odrzutów zapisujemy do `build/report.json` — po pierwszym przebiegu warto go
-przejrzeć ręcznie, bo tam widać, który filtr jest za ostry.
+**Luka musi być najrzadszym słowem zdania** i mieć glosę. To jest zasada i+1 z sekcji 3.1
+przeniesiona do builda: skoro zdanie ma zawierać jedno nowe słowo, to pytanie musi dotyczyć
+właśnie jego. Gdyby luka wypadła na słowie łatwiejszym, trudność karty byłaby gdzie indziej
+niż pytanie. Liczebniki wykluczamy — Wikisłownik tagguje je jako przymiotniki, przez co
+powstawały karty rozwiązywalne samą składnią.
 
-### 10.3 Tłumaczenia
+**Odrzuty dzielą się na trzy rodzaje i mieszanie ich czyni bramkę bezużyteczną:**
 
-Model tłumaczy **z angielskiego na polski, mając japoński oryginał jako kontekst**.
-Sam angielski gubi rejestr i liczbę. Format wejścia i wyjścia: lista numerowana,
-walidacja zgodności liczby pozycji, ponowienie przy niezgodności, odrzut po drugiej próbie.
+| rodzaj | co znaczy | mierzone |
+|---|---|---|
+| poza zasięgiem | korpus nie ma polskiego tłumaczenia | nie, to granica źródła |
+| jakość | zdanie jest wadliwe: obce znaki, nazwa własna, wulgaryzm, zbyt rzadkie słowo | **tak, bramka M1** |
+| przydatność | zdanie poprawne, ale nie nadaje się na tę kartę | nie, to świadomy wybór |
 
-Rdzeń słownictwa (etap 1, ~80 pozycji na język) **tłumaczymy ręcznie i commitujemy**.
-To zbyt ważne, żeby zostawić modelowi — te słowa użytkownik zobaczy setki razy.
+Raport `build/report-{lang}.json` podaje wszystkie trzy osobno, wraz z próbką dwunastu
+zdań rozłożoną po całym paśmie — po pierwszym przebiegu trzeba go przejrzeć ręcznie.
+
+### 10.3 Tłumaczenia i glosy — bez modelu językowego
+
+**ZMIANA WZGLĘDEM PIERWOTNEGO PLANU, potwierdzona danymi w M1.** Plan zakładał, że model
+tłumaczy glosy z angielskiego na polski, wsadowo, z walidacją liczby linii i ponowieniami.
+Okazało się to niepotrzebne — oba potrzebne teksty istnieją już po polsku, napisane
+przez ludzi:
+
+**Tłumaczenia zdań pochodzą z samej Tatoeby**, w dwóch warstwach zaufania:
+
+| warstwa | co to | es | pt | sv |
+|---|---|---|---|---|
+| `direct` | zdanie ma wprost powiązanie z polskim | 11 336 | 1 550 | 2 421 |
+| `pivot` | powiązanie przez angielski, **tylko gdy prowadzi do dokładnie jednego** zdania polskiego | +31 800 | +30 600 | +5 760 |
+
+Łańcuchy prowadzące do kilku zdań polskich odrzucamy w całości. To 13–15% puli i akurat
+te przypadki, w których angielski jest wieloznaczny, czyli gdzie znaczenie najłatwiej
+dryfuje. Bez warstwy `pivot` portugalski miałby 1 550 zdań i dobór i+1 nie miałby z czego
+wybierać — to jest jedyny powód, dla którego ją wprowadzamy.
+
+**Glosy słów pochodzą z polskiego Wikisłownika** (przez kaikki.org): zawiera hasła
+obcojęzyczne z polskimi definicjami — `hund` → `pies`, `agua` → `woda` — i pokrywa wszystkie
+pięć języków v1 oraz chiński i arabski na później. Daje przy okazji część mowy, bez której
+nie da się dobierać dystraktorów.
+
+**Wybór znaczenia jest zależny od kontekstu.** Wikisłownik podaje kilka znaczeń; bierzemy
+to, które pojawia się w polskim tłumaczeniu danego zdania (porównanie po rdzeniu, bo polski
+odmienia), a przy braku lub wielu dopasowaniach — pierwsze. Bez tego szwedzkie `slav`
+w zdaniu „Jag är en slav" dostaje glosę „Słowianin" zamiast „niewolnik". Nie ujednoznaczniamy
+na siłę: błędny wybór jest gorszy od domyślnego.
+
+Co odpada razem z modelem: klucz API, koszt wywołań, walidacja odpowiedzi, ponowienia,
+ryzyko jakości tłumaczeń z sekcji 14, a przede wszystkim **niemożność powtórzenia builda
+przez kogokolwiek bez własnego klucza**.
+
+Rdzeń słownictwa (etap 1, ~80 pozycji na język) nadal **tłumaczymy ręcznie i commitujemy**.
+Definicja słownikowa bywa dla tych słów za szeroka, a użytkownik zobaczy je setki razy.
 
 ### 10.4 Licencje
 
 `data/ATTRIBUTION.md` w repo, link ze stopki aplikacji:
-Tatoeba — CC BY 2.0 FR; FrequencyWords — CC BY-SA 3.0; JMdict/EDRDG — CC BY-SA;
-KRADFILE/EDRDG — CC BY-SA; KanjiVG — CC BY-SA 3.0; kuromoji — Apache 2.0.
-Dane pochodne od list częstości, KRADFILE i KanjiVG dziedziczą SA — dotyczy to katalogu
-`data/`, nie kodu aplikacji.
+Tatoeba — CC BY 2.0 FR; FrequencyWords — CC BY-SA 3.0; **polski Wikisłownik — CC BY-SA 3.0**;
+JMdict/EDRDG — CC BY-SA; KRADFILE/EDRDG — CC BY-SA; KanjiVG — CC BY-SA 3.0;
+kuromoji — Apache 2.0. Dane pochodne dziedziczą SA — dotyczy to katalogu `data/`,
+nie kodu aplikacji.
 
 Kroje pisma mają własne licencje i też trafiają do pliku: Spectral, Archivo, Noto Serif JP,
 Noto Serif KR — SIL OFL 1.1; IBM Plex Mono — SIL OFL 1.1. Subsetowanie jest przez OFL
@@ -980,9 +1031,21 @@ z kroku `06` i zsubsetowanymi krojami z kroku `07`.
 Trzy języki naraz, a nie jeden, bo **trzeci kosztuje dziesięć minut i natychmiast ujawnia
 wszystko, co zostało zaszyte na sztywno** w pierwszym.
 
-**Bramka:** po 400 zdań na język, `report.json` przejrzany, odrzuty poniżej 30%, `quiz: false`
-poniżej 15%, **20 losowych zestawów dystraktorów na język przejrzanych ręcznie** (sekcja 10.1b),
-`05-assemble` uruchamiany tą samą komendą z innym kodem języka.
+**Bramka:** po 400 zdań na język, `report-{lang}.json` przejrzany, **odrzuty jakościowe**
+poniżej 30% (nie mylić z odrzutami przydatności — patrz 10.2), `quiz: false` poniżej 15%,
+20 losowych zestawów dystraktorów na język przejrzanych ręcznie (10.1b), `05-assemble`
+uruchamiany tą samą komendą z innym kodem języka.
+
+**Wynik (12.08.2026):**
+
+| | zdań | leksykon | odrzuty jakościowe | nieprzydatne na kartę | `quiz: false` | pasma |
+|---|---|---|---|---|---|---|
+| hiszpański | 10 949 | 2 445 | 25% | 50% | 0 | 63–11 998 |
+| portugalski | 8 423 | 1 771 | 24% | 50% | 0 | 57–11 978 |
+| szwedzki | 2 323 | 974 | 15% | 56% | 1 | 50–11 973 |
+
+Bramka przechodzi. Talia waży 10 MB w paczkach po 500 zdań; kroje zsubsetowane
+do znaków z `data/` mieszczą się w 190 kB.
 
 ### M2 — silnik SRS + sesja quizowa (2 dni)
 Czysty TS, testy jednostkowe na kroki nauki, przejścia interwałów **oraz mapowanie wyniku
@@ -1069,6 +1132,7 @@ tryb słuchania w tle.
 - Aplikacja działa i jest obsługiwalna z klawiatury na desktopie 1280
 - Logowanie Google, synchronizacja między dwoma urządzeniami, eksport do pliku
 - Repo publiczne, README z instrukcją builda, `ATTRIBUTION.md`, reguły Firestore w repo
+- **Build danych powtarzalny przez każdego, bez klucza API** — całość ze źródeł otwartych
 - **Zero sekretów serwerowych w repo i w bundlu.** Konfiguracja webowa Firebase, w tym
   `apiKey`, jest z założenia publiczna i musi być w kliencie — chronią jej reguły
   bezpieczeństwa, a nie tajność. Dodatkowo App Check, żeby darmowy limit nie był otwarty
@@ -1086,8 +1150,9 @@ tryb słuchania w tle.
 | Dystraktory za łatwe albo dwuznaczne | **wysokie** | ręczny przegląd 20 zestawów na język (10.1b); odrzucanie synonimów po glosie |
 | Quiz podbija interwały przez trafione strzały | średnie | reguły z 6.2, testy jednostkowe w M2, produkcja od `interval >= 21` |
 | Waga krojów psuje precache | średnie | subset z kroku `07-fonts`, bramka M0 |
-| Jakość glos PL z modelu | średnie | rdzeń ręcznie, reszta z walidacją i próbką kontrolną |
-| Talia rośnie ponad limit cache Safari | niskie | dziel `sentences.json` na paczki po 500, ładuj na żądanie |
+| ~~Jakość glos PL z modelu~~ | **zamknięte** | model nie bierze udziału — glosy z Wikisłownika, tłumaczenia zdań z Tatoeby (10.3) |
+| Glosa nie pasuje do kontekstu zdania | średnie | wybór znaczenia po polskim tłumaczeniu zdania (10.3); reszta to znane ograniczenie, `data/ATTRIBUTION.md` |
+| Talia rośnie ponad limit cache Safari | niskie | **zrobione w M1** — paczki po 500 zdań plus `meta.json` z indeksem |
 | Free tier Firestore | bardzo niskie | paczkowanie po 400 kart, 1–2 zapisy na sesję |
 | Kod zaszywa się pod japoński | **wysokie** | trzy języki w M1, przegląd `grep` w M4, procedura z sekcji 15 |
 | Brak głosu TTS dla języka w systemie | niskie | **otwarte** — wykrycie przy dodaniu języka + instrukcja pobrania głosu, M5 |
@@ -1104,7 +1169,7 @@ czy architektura naprawdę jest wielojęzyczna.
    i `production`
 2. Sprawdź dostępność źródeł: kod Tatoeba, lista częstości `{code}_50k`, głos TTS w systemie
 3. Przetłumacz ręcznie rdzeń słownictwa (~80 pozycji) → `build/core/{code}.tsv`
-4. `npm run build:data -- {code}` → `data/{code}/` (kroki 01–07)
+4. `npm run build:data {code}` → `data/{code}/`, potem `npm run build:fonts`
 5. Przejrzyj `build/report.json`: odrzuty, rozkład pasm, 20 losowych zdań,
    **20 losowych zestawów dystraktorów i odsetek `quiz: false`**
 6. Dopisz język do listy w `src/langs/index.ts` i do ekranu wyboru

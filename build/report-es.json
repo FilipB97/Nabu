@@ -1,0 +1,236 @@
+{
+  "lang": "es",
+  "zdań": 10949,
+  "kandydatów": 43142,
+  "odrzuconychNaJakości": 10667,
+  "odsetekOdrzutówJakościowych": 25,
+  "odsetekNieprzydatnychNaKartę": 50,
+  "pozaZasięgiem": 398091,
+  "powodyJakość": {
+    "pasmo powyżej 12000": 6007,
+    "nazwa własna": 2872,
+    "token spoza listy częstości": 1631,
+    "wulgaryzm": 146,
+    "znaki spoza zestawu języka": 11
+  },
+  "powodyPrzydatność": {
+    "brak tokenu nadającego się na lukę": 11700,
+    "za krótkie": 9626,
+    "za długie": 200
+  },
+  "tłumaczenia": {
+    "bezpośrednie": 3188,
+    "przezAngielski": 7761
+  },
+  "pasma": {
+    "min": 63,
+    "mediana": 2029,
+    "p90": 7429,
+    "max": 11998
+  },
+  "quizNiedostępny": 0,
+  "próbka": [
+    {
+      "text": "¿Ser o no ser?",
+      "pl": "Być albo nie być?",
+      "luka": "Ser",
+      "band": 63,
+      "src": "pivot",
+      "dystraktory": [
+        "hacer",
+        "ver",
+        "decir",
+        "ir",
+        "hecho",
+        "hablar"
+      ]
+    },
+    {
+      "text": "Necesito un coche nuevo.",
+      "pl": "Potrzebuję nowy samochód.",
+      "luka": "coche",
+      "band": 408,
+      "src": "pivot",
+      "dystraktory": [
+        "clase",
+        "doctor",
+        "sangre",
+        "llama",
+        "equipo",
+        "haya",
+        "guerra",
+        "punto"
+      ]
+    },
+    {
+      "text": "Esta película estuvo buena.",
+      "pl": "Ten film był dobry.",
+      "luka": "película",
+      "band": 641,
+      "src": "direct",
+      "dystraktory": [
+        "llamada",
+        "presidente",
+        "resto",
+        "perro",
+        "ropa",
+        "cambio",
+        "puesto",
+        "cielo"
+      ]
+    },
+    {
+      "text": "Ella me dio un buen consejo.",
+      "pl": "Dała mi dobrą radę.",
+      "luka": "consejo",
+      "band": 998,
+      "src": "direct",
+      "dystraktory": [
+        "intento",
+        "piso",
+        "honor",
+        "contacto",
+        "infierno",
+        "abuelo",
+        "cocina",
+        "sorpresa"
+      ]
+    },
+    {
+      "text": "Mañana no iré al cine.",
+      "pl": "Jutro nie idę do kina.",
+      "luka": "cine",
+      "band": 1406,
+      "src": "pivot",
+      "dystraktory": [
+        "vacaciones",
+        "pantalones",
+        "movimiento",
+        "opción",
+        "visita",
+        "defensa",
+        "bosque",
+        "testigo"
+      ]
+    },
+    {
+      "text": "¿Podría hablar más despacio?",
+      "pl": "Mógłbyś mówić wolniej?",
+      "luka": "despacio",
+      "band": 1760,
+      "src": "pivot",
+      "dystraktory": [
+        "directamente",
+        "últimamente",
+        "perfectamente",
+        "normalmente",
+        "deprisa",
+        "suficientemente",
+        "claramente",
+        "solamente"
+      ]
+    },
+    {
+      "text": "El autobús está vacío.",
+      "pl": "Autobus jest pusty.",
+      "luka": "vacío",
+      "band": 2247,
+      "src": "pivot",
+      "dystraktory": [
+        "famoso",
+        "parecido",
+        "sucio",
+        "corto",
+        "efectivo",
+        "helado",
+        "precioso",
+        "quieto"
+      ]
+    },
+    {
+      "text": "Después, ella ha estado viviendo todo el tiempo en el exterior.",
+      "pl": "Potem mieszkała cały czas za granicą.",
+      "luka": "exterior",
+      "band": 2984,
+      "src": "direct",
+      "dystraktory": [
+        "experto",
+        "detenido",
+        "extranjero",
+        "emocionante",
+        "caro",
+        "feo",
+        "urgente",
+        "distinto"
+      ]
+    },
+    {
+      "text": "Él toca la guitarra muy bien.",
+      "pl": "On gra bardzo dobrze na gitarze.",
+      "luka": "guitarra",
+      "band": 3832,
+      "src": "pivot",
+      "dystraktory": [
+        "tarta",
+        "alianza",
+        "hierro",
+        "industria",
+        "existencia",
+        "barra",
+        "masa",
+        "estrategia"
+      ]
+    },
+    {
+      "text": "Él quiere ser jugador de tenis.",
+      "pl": "On chce być tenisistą.",
+      "luka": "tenis",
+      "band": 5300,
+      "src": "pivot",
+      "dystraktory": [
+        "iris",
+        "ausencia",
+        "temor",
+        "avenida",
+        "término",
+        "sándwich",
+        "comentario",
+        "toalla"
+      ]
+    },
+    {
+      "text": "¡Ah, allí hay una mariposa!",
+      "pl": "Och, tam jest motyl!",
+      "luka": "mariposa",
+      "band": 7774,
+      "src": "pivot",
+      "dystraktory": [
+        "madrugada",
+        "amabilidad",
+        "manga",
+        "paloma",
+        "ruinas",
+        "lava",
+        "milla",
+        "ferrocarril"
+      ]
+    },
+    {
+      "text": "La universidad lleva el nombre de su fundador.",
+      "pl": "Uniwersytet nosi imię swego założyciela.",
+      "luka": "fundador",
+      "band": 11998,
+      "src": "pivot",
+      "dystraktory": [
+        "mudanza",
+        "dinosaurio",
+        "panza",
+        "aprendizaje",
+        "intensidad",
+        "morada",
+        "maratón",
+        "recado"
+      ]
+    }
+  ]
+}

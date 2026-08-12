@@ -1,4 +1,4 @@
-import type { LangAdapter } from '../types'
+import type { LangAdapter } from '../types.ts'
 
 /** Hiszpański — klasa A: alfabet łaciński, spacje, brak czytań i transkrypcji. */
 export const es: LangAdapter = {
@@ -11,6 +11,7 @@ export const es: LangAdapter = {
   hasScriptStage: false,
   needsReading: false,
   needsTranslit: false,
+  blocklist: /follar|joder|coño|puta|puto|mierda|polla|cojones|gilipollas|cabrón/iu,
   tokenizer: 'space',
   display: { font: 'display', size: 30, lineHeight: 1.55 },
   tts: { locale: 'es-ES', rate: 0.6 },

@@ -50,6 +50,13 @@ export type LangAdapter = {
   needsTranslit: boolean
   tokenizer: Tokenizer
 
+  /**
+   * Słowa, po których odrzucamy całe zdanie. Tatoeba jest korpusem otwartym i zawiera
+   * zdania wulgarne — 0,3% dla hiszpańskiego. Aplikacja ma się nadawać do pokazania
+   * komuś przez ramię, więc filtrujemy je w buildzie, a nie tłumaczymy się z nich potem.
+   */
+  blocklist: RegExp
+
   display: {
     /** Nazwa rodziny z `@theme` w `index.css`, nie konkretny krój. */
     font: 'ui' | 'display' | 'ja' | 'ko'

@@ -6,19 +6,33 @@ czytaniami i wymową, działa offline i mieści się w dziesięciu minutach dzie
 Pełna specyfikacja — model danych, silnik powtórek, pipeline i kolejność prac z bramkami —
 jest w [`plan.md`](plan.md). Ten plik opisuje tylko, jak uruchomić repo.
 
-## Stan: M0
+## Stan: M1
 
-Szkielet aplikacji z warstwą motywów i kartą z makiety odtworzoną na żywych tokenach.
-Nie ma jeszcze danych, silnika powtórek ani logowania — te wchodzą od M1.
+Szkielet aplikacji z warstwą motywów, karta z makiety na żywych tokenach oraz **komplet
+danych dla trzech języków klasy A**. Nie ma jeszcze silnika powtórek ani logowania.
 
 | jest | nie ma |
 |---|---|
-| Vite + React + TypeScript, PWA z precache | `data/` — talie powstają w M1 |
-| 13 tokenów motywu, 5 presetów × jasny/ciemny/systemowy | silnika SRS i kolejki sesji |
-| bramka kontrastu AA w CI (118 asercji) | Firebase, kont, synchronizacji |
-| karta quizu w trzech systemach pisma, obsługa klawiatury | kart produkcji i rysowania |
-| adaptery pięciu języków wg kontraktu z sekcji 2.1 | dystraktorów (krok `06`) |
-| kroje hostowane u siebie i zsubsetowane, razem 188 kB | |
+| Vite + React + TypeScript, PWA z precache | silnika SRS i kolejki sesji |
+| 13 tokenów motywu, 5 presetów × jasny/ciemny/systemowy | Firebase, kont, synchronizacji |
+| bramka kontrastu AA w CI | kart produkcji i rysowania |
+| karta quizu w trzech systemach pisma, obsługa klawiatury | japońskiego i koreańskiego (M3, M4) |
+| adaptery pięciu języków wg kontraktu z sekcji 2.1 | podpięcia danych pod sesję (M2) |
+| pipeline danych 01–07, `data/{es,pt,sv}` z dystraktorami | |
+| kroje zsubsetowane do znaków z talii, razem 190 kB | |
+
+### Dane
+
+| język | zdań | leksykon | odrzuty jakościowe | pasma |
+|---|---|---|---|---|
+| hiszpański | 10 949 | 2 445 | 25% | 63–11 998 |
+| portugalski | 8 423 | 1 771 | 24% | 57–11 978 |
+| szwedzki | 2 323 | 974 | 15% | 50–11 973 |
+
+**Nic w `data/` nie jest napisane maszynowo.** Zdania i ich polskie tłumaczenia pochodzą
+z Tatoeby, glosy z polskiego Wikisłownika, rangi z list częstości napisów filmowych.
+Build nie wymaga klucza API i da się go powtórzyć w całości — szczegóły w
+[`data/ATTRIBUTION.md`](data/ATTRIBUTION.md) i sekcji 10.3 planu.
 
 ## Uruchomienie
 
@@ -27,7 +41,7 @@ npm install
 npm run dev          # http://localhost:5173/#/demo
 ```
 
-Trasy w M0:
+Trasy w M1:
 
 - `#/demo` — trzy stany karty, trzy systemy pisma, przełącznik presetów
 - `#/audio` — test warstwy dźwięku z sekcji 11 planu, do wykonania na iPhonie
@@ -42,7 +56,8 @@ Trasy w M0:
 | `npm test` | Vitest — kontrast presetów, arytmetyka hangulu, spójność tokenów |
 | `npm run lint` | ESLint, w tym reguła o kodach języków i kolorach |
 | `npm run check` | wszystko naraz, tak jak w CI |
-| `node build/07-fonts.ts` | pobiera i subsetuje kroje do `public/fonts/` |
+| `npm run build:data es` | pełny pipeline danych dla języka → `data/es/` |
+| `npm run build:fonts` | subsetuje kroje do znaków obecnych w `data/` |
 
 ## Dwie reguły, których pilnuje CI
 
