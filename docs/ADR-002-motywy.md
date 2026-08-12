@@ -1,16 +1,16 @@
 # ADR-002 — motywy, tokeny i kontrast
 
-**Status:** przyjęte
+**Status:** przyjęte, rozszerzone 12.08.2026 (materiał: kształt, głębia, gradient)
 **Kontekst:** sekcja 9.1 planu, M0
 
 ## Decyzja
 
-Motyw to trzynaście wartości semantycznych i nic więcej. Komponenty nie znają wartości
+Motyw to siedemnaście wartości semantycznych i nic więcej. Komponenty nie znają wartości
 heksowych — sięgają po `var(--nabu-*)` przez klasy Tailwinda, a reguła ESLint odrzuca
 każdy kolor wpisany poza `src/theme/`.
 
 Preset zmienia rampę neutralną i barwę akcentu. Nie dokłada kolorów, nie zmienia układu,
-nie wprowadza wyjątków. Dzięki temu piąty preset kosztuje tyle, co wpisanie trzynastu
+nie wprowadza wyjątków. Dzięki temu piąty preset kosztuje tyle, co wpisanie siedemnastu
 wartości, a nie przegląd całego interfejsu.
 
 Ustawienie ma dwie niezależne osie: **preset** (Atrament, Grafit, Mech, Piasek, Wysoki
@@ -21,7 +21,7 @@ to osobne pojęcia i tylko `variant` trafia do DOM.
 ## Bramka kontrastu
 
 `src/theme/contrast.test.ts` liczy proporcję każdej pary token–powierzchnia we wszystkich
-presetach i obu wariantach — 118 asercji. Preset łamiący AA nie przechodzi CI.
+presetach i obu wariantach — 178 asercji. Preset łamiący AA nie przechodzi CI.
 
 Polityka wynika z ról przypisanych tokenom w `tokens.ts`:
 
@@ -90,6 +90,41 @@ i token wraca do roli `ui`. Test wypisuje te proporcje przy każdym przebiegu w�
 `--border-quiet` w czterech presetach (grafit, mech, piasek — jasne; kontrast — ciemny)
 schodziło poniżej 1.2:1, czyli zlewało się z tłem całkowicie. Podniesione do ~1.26:1.
 Wartości z makiety (1.21:1) zostały nietknięte — próg jest skalibrowany właśnie na nie.
+
+## Rozszerzenie kontraktu — cztery tokeny (12.08.2026)
+
+Pierwsza wersja makiety była brutalistyczna: zero zaokrągleń, zero wypełnień, obrysy
+grubości włosa. Po pierwszym użyciu na telefonie kierunek zmienił się na „nowocześnie,
+lekko" — a to znaczy trzy rzeczy, których trzynaście tokenów nie potrafiło wyrazić:
+**warstwę** (co jest nad czym), **głębię** (cień) i **wypełnienie akcentem** (gradient
+z tekstem na sobie).
+
+Wszystkie trzy potrzebują wartości koloru, więc alternatywą było wpisanie ich do
+komponentów — czyli złamanie jedynej reguły, która trzyma tę warstwę w ryzach.
+
+| token | co opisuje | rola | dlaczego nie dało się bez niego |
+|---|---|---|---|
+| `--surface-2` | warstwa nad `--surface`: trafiona opcja, arkusz | `background` | `--surface` jest tłem karty; wyróżnienie potrzebuje drugiego stopnia, a nie przezroczystości nałożonej na nieznany kolor |
+| `--accent-2` | drugi kraniec gradientu akcentu | `background` | gradient ma dwa końce i **oba** muszą unieść tekst, nie tylko ten, na który padnie środek |
+| `--accent-text` | tekst na wypełnieniu akcentem | `text` (na `accent` i `accent-2`) | dotąd akcent był zawsze tekstem na tle; wypełniony przycisk odwraca tę relację |
+| `--shadow` | baza cienia | `decorative` | cień musi mieć barwę presetu, inaczej ciepłe palety dostają zimny cień |
+
+Dwie konsekwencje warte zapisania:
+
+**`--shadow` jest jedynym tokenem poza audytem widoczności.** Wchodzi wyłącznie przez
+`color-mix` z przezroczystością, więc mierzenie go wobec tła odpowiada na pytanie,
+którego interfejs nie zadaje — w ciemnym motywie cień z założenia jest czernią na prawie
+czerni. Audyt sprawdza pozostałe tokeny dekoracyjne bez zmian.
+
+**`--wrong-text` musiało pójść w górę drugi raz.** Błędnie wybrana opcja stoi teraz na
+karcie (`--surface`), a nie na gołym tle, a to jest inny kontrast: w Atramencie ciemnym
+4.35:1 zamiast 4.92:1. Podniesione we wszystkich dziesięciu paletach do ≥4.6:1 na obu
+powierzchniach. To dokładnie ten przypadek, przed którym ostrzega akapit „granica tej
+decyzji" wyżej: zmiana układu unieważnia pomiar kontrastu, nawet gdy kolory zostają.
+
+Gradient nie łamie zasady „dokładnie jeden kolor akcentu": `--accent-2` powstaje z obrotu
+barwy o 16° i przesunięcia jasności — jest tym samym akcentem, nie drugim. Obrót idzie
+konsekwentnie w stronę oddalającą od czerwieni, bo w tej aplikacji nie ma koloru błędu.
 
 ## Czego M0 nie rozwiązuje
 

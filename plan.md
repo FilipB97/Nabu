@@ -18,7 +18,7 @@ z czterema ocenami wystawianymi przez użytkownika. Obowiązuje wersja poniżej:
 | Samoocena zostaje **wyłącznie** na karcie `reveal`, jako cichy fallback | 7.1 |
 | Dystraktory liczone w buildzie, ze słownictwa talii; nowy krok `06` | 5.1, 10.1b |
 | Log zapisuje, **co** użytkownik wybrał — bez tego nie ma mylonych par | 5.3, 8.6 |
-| Motyw to warstwa 13 tokenów i presety barw, z testem kontrastu w CI | 9.1 |
+| Motyw to warstwa tokenów i presety barw, z testem kontrastu w CI | 9.1 |
 | Kroje pisma hostowane u siebie i subsetowane; nowy krok `07` | 9.2 |
 | Test audio przechodzi z M5 do M0, bo jego wynik zmienia pipeline — **wykonany, mowa działa** | 11 |
 
@@ -482,8 +482,14 @@ Reguły w kolejności sprawdzania:
 | trafienie przy `reps <= 1` | Dobrze, ale tylko **następny krok nauki** | nigdy skok na 1 dzień |
 | trafienie wolniejsze niż 2,5× mediany użytkownika dla tego typu karty | Trudne | mediana krocząca z ostatnich 200 odpowiedzi |
 | trafienie poniżej 2 s przy `interval >= 21` | Łatwe | |
-| dotknięcie „było trudne" po trafieniu | Trudne | nadpisuje ocenę wyżej |
 | pozostałe trafienia | Dobrze | |
+
+**Skreślone 12.08.2026: „było trudne" po trafieniu.** Reguła była w tabeli od pierwszej
+rewizji i miała pozwalać użytkownikowi zgłosić, że trafił z trudem. Przy pierwszym użyciu
+okazało się, że przycisk stoi obok „Dalej" na najczęściej dotykanym ekranie aplikacji
+i przeczy zasadzie, dla której cały ten quiz powstał: **ocenę wystawia silnik, nie
+użytkownik**. Do tego dubluje sygnał, który i tak mierzymy — trafienie wolniejsze niż
+2,5× mediany schodzi do „Trudne" samo. Samoocena zostaje wyłącznie na karcie `reveal`.
 
 **Pomiar `ms` jest elementem nośnym**, a nie statystyką: liczymy od wyrenderowania karty
 do dotknięcia, odejmujemy czas automatycznego odtworzenia dźwięku, obcinamy wartości
@@ -784,6 +790,22 @@ semantycznych** i to jest cały kontrakt motywu. Żaden komponent nie zna warto�
 | `--tick-current` | `#E7EAF2` | `#1B2233` | bieżąca karta |
 | `--wrong-border` | `#3A2A33` | `#D8C9C4` | obrys błędnie wybranej opcji |
 | `--wrong-text` | `#6E7788` | `#8A8078` | tekst błędnie wybranej opcji |
+
+**Rozszerzenie z 12.08.2026 — cztery tokeny materiału.** Wygląd poszedł w stronę
+„nowocześnie, lekko": zaokrąglenia, wypełnienia i cień zamiast samych obrysów. Trzy rzeczy,
+których powyższa lista nie potrafiła wyrazić, dostały własne tokeny, bo każda z nich
+potrzebuje wartości koloru — a kolor nie może wyjść poza warstwę motywu.
+
+| token | ciemny (Atrament) | jasny (Atrament) | użycie |
+|---|---|---|---|
+| `--surface-2` | `#222A39` | `#F6F7F9` | warstwa nad kartą: trafiona opcja, arkusz |
+| `--accent-2` | `#A09FF4` | `#4434C4` | drugi kraniec gradientu akcentu |
+| `--accent-text` | `#000000` | `#FFFFFF` | tekst na wypełnieniu akcentem |
+| `--shadow` | `#000000` | `#171D2B` | baza cienia, zawsze z przezroczystością |
+
+Gradient nie łamie zasady jednego akcentu: `--accent-2` to ten sam akcent obrócony o 16°
+i przesunięty jasnością, konsekwentnie w stronę oddalającą od czerwieni. Kontrakt liczy
+teraz siedemnaście wartości, a bramka 178 asercji — szczegóły i granice w `docs/ADR-002-motywy.md`.
 
 **Czego w tej liście nie ma: czerwieni.** Pudło jest oznaczone znakiem `×`, wygaszeniem
 i ledwie ciepłym obrysem, a błędy na pasku postępu mają kolor akcentu. Zasada „dokładnie
@@ -1139,8 +1161,9 @@ nierozpoznawalnym. Trzy zmiany:
 - `autoAdvance` domyślnie **wyłączone** (było `true` z czasów, gdy ekran nie miał odsłonięcia,
   czyli oznaczało „przewiń natychmiast"); migracja bazy do wersji 2 zeruje je także tam,
   gdzie zdążyło się zapisać. Przy włączonym trafienie znika po 1,4 s, pudło zawsze czeka;
-- „było trudne" po trafieniu przelicza kartę od stanu sprzed odpowiedzi i nadpisuje ostatni
-  wpis logu — sekcja 6.2 przewidywała ten przycisk, ale nie miał gdzie stać.
+- „było trudne" po trafieniu wróciło i zaraz wypadło. Zbudowane zgodnie z sekcją 6.2,
+  odrzucone po jednym spojrzeniu na ekran: samoocena wraca tylnymi drzwiami, a „Trudne"
+  i tak powstaje z czasu odpowiedzi. Reguła skreślona w 6.2.
 
 Druga wada z tej samej sesji: dwa zdania z tym samym słowem w luce weszły jako dwie osobne
 nowe pozycje. Karta niesie lemat (`CardState.lemma`), a dobór nowych pozycji pomija lematy,

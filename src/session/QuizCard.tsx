@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { LangAdapter } from '@/langs'
 import { QuizOption, type OptionState } from '@/ui/QuizOption'
+import { Button } from '@/ui/Button'
 import { Mono } from '@/ui/Mono'
-import { Ticks } from '@/ui/Ticks'
+import { Progress } from '@/ui/Ticks'
 
 /**
  * Karta `quiz-cloze` — sekcja 7 i 8.4 planu.
  *
- * Jedno dotknięcie kończy odpowiedź: bez potwierdzania, bez cofania wyboru. Trafienie
- * może przejść dalej samo po 900 ms, pudło zawsze czeka na „Dalej" i pokazuje, czym
- * wybrane słowo różni się od poprawnego.
+ * Jedno dotknięcie kończy odpowiedź, po czym karta przechodzi w ODSŁONIĘCIE: luka
+ * wypełnia się poprawnym słowem, opcje ujawniają glosy, a dalej idzie się dotknięciem.
  *
  * W M0 to jest demonstracja układu na prawdziwej treści w trzech systemach pisma —
  * silnik SRS, kolejka i dobór dystraktorów wchodzą w M2. Wszystko, co dotyczy oceny,
@@ -67,7 +67,6 @@ export function QuizCard({
   onNext,
 }: QuizCardProps) {
   const [pick, setPick] = useState<number | null>(initialPick)
-  const [hard, setHard] = useState(false)
 
   const answered = pick !== null
   const right = answered && pick === content.correct
@@ -80,7 +79,6 @@ export function QuizCard({
 
   const next = useCallback(() => {
     setPick(null)
-    setHard(false)
     onNext?.()
   }, [onNext])
 
@@ -140,7 +138,7 @@ export function QuizCard({
     <div className="flex h-full w-full flex-col bg-bg">
       {progress && (
         <div className="px-6 pt-[22px]">
-          <Ticks
+          <Progress
             total={progress.total}
             done={progress.done}
             {...(progress.lapses ? { lapses: progress.lapses } : {})}
@@ -172,8 +170,8 @@ export function QuizCard({
 
         {answered && (
           <div className="nabu-reveal mt-[30px] flex flex-col gap-[7px] border-t border-border-quiet pt-5">
-            <Mono>
-              {right ? (hard ? 'trudne · 10 min' : 'dobrze · 1 dzień') : 'nie pamiętam · 1 min'}
+            <Mono tone={right ? 'accent' : 'normal'}>
+              {right ? 'dobrze · 1 dzień' : 'nie pamiętam · 1 min'}
               {content.band !== undefined && ` · ranga ${content.band}`}
             </Mono>
             <p className={`${fontClass} text-[20px] leading-[1.4] text-text`}>
@@ -187,7 +185,7 @@ export function QuizCard({
         )}
       </div>
 
-      <div className="flex flex-col gap-2 px-6 pb-[34px]">
+      <div className="flex flex-col gap-[10px] px-5 pb-[34px]">
         {content.options.map((option, index) => (
           <QuizOption
             key={option.term}
@@ -202,27 +200,9 @@ export function QuizCard({
         ))}
 
         {answered && (
-          <div className="mt-2 flex items-center justify-between">
-            {right ? (
-              <button
-                type="button"
-                onClick={() => setHard((value) => !value)}
-                className={`font-ui border-b pb-[3px] text-[12.5px]
-                  ${hard ? 'border-accent text-accent' : 'border-border text-text-2'}`}
-              >
-                było trudne
-              </button>
-            ) : (
-              <Mono>wróci za minutę</Mono>
-            )}
-            <button
-              type="button"
-              onClick={next}
-              className="font-ui border-b border-border pb-[3px] text-[12.5px] text-text"
-            >
-              Dalej
-            </button>
-          </div>
+          <Button variant="primary" full onClick={next} className="mt-3">
+            Dalej
+          </Button>
         )}
       </div>
     </div>

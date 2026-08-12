@@ -54,6 +54,49 @@ export function Ticks({ total, done, lapses = [], height = 13, className, label 
   )
 }
 
+type ProgressProps = {
+  total: number
+  done: number
+  /** Indeksy kart, na których było pudło. */
+  lapses?: readonly number[]
+  className?: string
+  label?: string
+}
+
+/**
+ * Postęp sesji jako ciągła linia.
+ *
+ * Wersja segmentowa (`Ticks`) rozpadała się przy dłuższych sesjach: pięćdziesiąt kart
+ * to pięćdziesiąt kresek po dwa piksele, czyli szum zamiast informacji. Linia znosi
+ * dowolną długość, a pudła są na niej nacięciami w kolorze tła — nadal widoczne,
+ * nadal na swoich miejscach.
+ *
+ * Znaczniki zostają tam, gdzie mają sens: znak marki i liczniki opanowanych znaków.
+ */
+export function Progress({ total, done, lapses = [], className, label }: ProgressProps) {
+  const filled = total > 0 ? Math.min(1, done / total) : 0
+
+  return (
+    <div
+      className={`relative h-[5px] w-full overflow-hidden rounded-full bg-tick-future ${className ?? ''}`}
+      role="img"
+      aria-label={label ?? `${done} z ${total}`}
+    >
+      <div
+        className="nabu-accent-fill h-full rounded-full transition-[width] duration-300 ease-out"
+        style={{ width: `${filled * 100}%` }}
+      />
+      {lapses.map((index) => (
+        <span
+          key={index}
+          className="absolute top-0 h-full w-[2px] bg-bg"
+          style={{ left: `${((index + 0.5) / Math.max(1, total)) * 100}%` }}
+        />
+      ))}
+    </div>
+  )
+}
+
 type BarsProps = {
   /** Wartości słupków. Pierwszy jest wyróżniony akcentem — to „dziś". */
   values: readonly number[]

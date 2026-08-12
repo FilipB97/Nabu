@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import { LANG_CODES, adapterFor, interferesWith } from '@/langs'
 import {
   BACKLOG_LIMIT,
@@ -14,6 +14,7 @@ import {
 import { Mark } from '@/ui/Ticks'
 import { Mono } from '@/ui/Mono'
 import { Choice } from '@/ui/Choice'
+import { Button } from '@/ui/Button'
 
 /**
  * Ekran startu sesji — sekcja 8.3 planu.
@@ -21,6 +22,9 @@ import { Choice } from '@/ui/Choice'
  * Ma odpowiadać na trzy pytania w jednym spojrzeniu: ile jest do zrobienia, ile to
  * potrwa, co się dzieje dalej. Przełącznik języka jest na wierzchu, nie w ustawieniach,
  * a języki aktywne są oddzielone od utrzymywanych (sekcja 2.4).
+ *
+ * Liczba do powtórki jest największym elementem na ekranie i stoi na karcie razem
+ * z przyciskiem startu — to jest jedyna rzecz, po którą użytkownik tu przychodzi.
  */
 
 type Row = { settings: LangSettings; due: number; backlog: number }
@@ -99,14 +103,22 @@ export function Start() {
   const maintained = rows.filter((r) => !r.settings.active)
   const chosen = rows.find((r) => r.settings.lang === selected) ?? null
   const missing = LANG_CODES.filter((code) => !rows.some((r) => r.settings.lang === code))
+  const fresh = chosen && chosen.backlog >= BACKLOG_LIMIT
+    ? 0
+    : chosen
+      ? INTENSITY[chosen.settings.intensity].fresh
+      : 0
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-[430px] flex-col gap-8 bg-bg px-6 py-10">
+    <div
+      className="mx-auto flex min-h-screen w-full max-w-[460px] flex-col gap-8 bg-bg px-6
+        pt-[calc(env(safe-area-inset-top)+32px)] pb-[calc(env(safe-area-inset-bottom)+32px)]"
+    >
       <Mark height={18} />
 
       {rows.length === 0 ? (
-        <div className="flex flex-col gap-5">
-          <h1 className="font-display text-[26px] leading-[1.3] text-text">
+        <div className="flex flex-col gap-4">
+          <h1 className="font-display text-[30px] leading-[1.25] text-text">
             Czego chcesz się uczyć?
           </h1>
           <p className="font-ui text-[14px] leading-[1.6] text-text-2">
@@ -115,38 +127,42 @@ export function Start() {
         </div>
       ) : (
         <>
-          <div className="flex flex-col gap-3">
-            <Mono>aktywne</Mono>
-            <div className="flex flex-wrap gap-3">
-              {active.map((row) => (
-                <button
-                  key={row.settings.lang}
-                  type="button"
-                  onClick={() => setSelected(row.settings.lang)}
-                  aria-pressed={selected === row.settings.lang}
-                  className={`font-display border-b pb-1 text-[20px] ${
-                    selected === row.settings.lang
-                      ? 'border-accent text-text'
-                      : 'border-transparent text-text-3'
-                  }`}
-                >
-                  {adapterFor(row.settings.lang).name}
-                  {row.due > 0 && (
-                    <span className="font-mono ms-2 text-[12px] text-text-2">{row.due}</span>
-                  )}
-                </button>
-              ))}
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap gap-2">
+              {active.map((row) => {
+                const isSelected = selected === row.settings.lang
+                return (
+                  <button
+                    key={row.settings.lang}
+                    type="button"
+                    onClick={() => setSelected(row.settings.lang)}
+                    aria-pressed={isSelected}
+                    className={`nabu-press font-ui flex min-h-[44px] items-center gap-2 rounded-full
+                      px-5 text-[15px] ${
+                        isSelected
+                          ? 'nabu-accent-fill'
+                          : 'nabu-card text-text-2'
+                      }`}
+                  >
+                    {adapterFor(row.settings.lang).name}
+                    {row.due > 0 && (
+                      <span className="font-mono text-[12px] opacity-80">{row.due}</span>
+                    )}
+                  </button>
+                )
+              })}
             </div>
 
             {maintained.length > 0 && (
-              <div className="mt-2 flex flex-wrap items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 <Mono>utrzymywane</Mono>
                 {maintained.map((row) => (
                   <button
                     key={row.settings.lang}
                     type="button"
                     onClick={() => setSelected(row.settings.lang)}
-                    className="font-ui text-[13px] text-text-3"
+                    aria-pressed={selected === row.settings.lang}
+                    className="nabu-press font-ui rounded-full text-[13px] text-text-3"
                   >
                     {adapterFor(row.settings.lang).name} {row.due}
                   </button>
@@ -156,41 +172,42 @@ export function Start() {
           </div>
 
           {chosen && (
-            <div className="flex flex-col gap-6 border-t border-border-quiet pt-8">
-              <div className="flex flex-col gap-1">
-                <div className="flex items-baseline gap-3">
-                  <span className="font-display text-[44px] leading-none text-text">
-                    {chosen.due}
-                  </span>
-                  <span className="font-ui text-[14px] text-text-2">do powtórki</span>
+            <div className="flex flex-col gap-6">
+              <div className="nabu-card flex flex-col gap-5 px-6 py-7">
+                <div className="flex items-end justify-between gap-4">
+                  <div className="flex items-baseline gap-3">
+                    <span className="font-display text-[56px] leading-none text-text">
+                      {chosen.due}
+                    </span>
+                    <span className="font-ui text-[14px] text-text-2">do powtórki</span>
+                  </div>
+                  {fresh > 0 && (
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-display text-[22px] leading-none text-accent">
+                        +{fresh}
+                      </span>
+                      <span className="font-ui text-[13px] text-text-2">nowych</span>
+                    </div>
+                  )}
                 </div>
-                <div className="flex items-baseline gap-3">
-                  <span className="font-display text-[22px] leading-none text-accent">
-                    +{' '}
-                    {chosen.backlog >= BACKLOG_LIMIT
-                      ? 0
-                      : INTENSITY[chosen.settings.intensity].fresh}
-                  </span>
-                  <span className="font-ui text-[14px] text-text-2">nowych</span>
-                </div>
+
+                {chosen.backlog >= BACKLOG_LIMIT && (
+                  <p className="font-ui text-[13px] leading-[1.6] text-text-2">
+                    Czeka {chosen.backlog} rozpoczętych pozycji. Nie dokładamy kolejnych, dopóki
+                    nie zejdziesz poniżej {BACKLOG_LIMIT} — inaczej zaległość rośnie szybciej,
+                    niż da się ją nadrobić.
+                  </p>
+                )}
+
+                <Button
+                  variant="primary"
+                  full
+                  disabled={chosen.due === 0 && fresh === 0}
+                  onClick={() => navigate(`/sesja/${chosen.settings.lang}`)}
+                >
+                  Zacznij
+                </Button>
               </div>
-
-              {chosen.backlog >= BACKLOG_LIMIT && (
-                <p className="font-ui text-[13px] leading-[1.6] text-text-2">
-                  Czeka {chosen.backlog} rozpoczętych pozycji. Nie dokładamy kolejnych, dopóki nie
-                  zejdziesz poniżej {BACKLOG_LIMIT} — inaczej zaległość rośnie szybciej, niż da się
-                  ją nadrobić.
-                </p>
-              )}
-
-              <button
-                type="button"
-                onClick={() => navigate(`/sesja/${chosen.settings.lang}`)}
-                disabled={chosen.due === 0 && chosen.backlog >= BACKLOG_LIMIT}
-                className="min-h-[62px] border border-border text-[17px] text-text disabled:text-text-3"
-              >
-                Zacznij
-              </button>
 
               <Choice
                 label="sesja"
@@ -204,12 +221,16 @@ export function Start() {
 
               {/* Pełny ekran ustawień jest w M9. Tutaj są trzy rzeczy, które zmienia się
                   w trakcie nauki, a nie raz na zawsze — reszta może poczekać. */}
-              <details className="flex flex-col gap-6 border-t border-border-quiet pt-6">
-                <summary className="cursor-pointer list-none">
+              <details className="group">
+                <summary className="nabu-press flex cursor-pointer list-none items-center gap-2 py-2">
                   <Mono>ustawienia języka</Mono>
+                  <span className="font-mono text-[11px] text-text-3 group-open:hidden">+</span>
+                  <span className="font-mono hidden text-[11px] text-text-3 group-open:inline">
+                    −
+                  </span>
                 </summary>
 
-                <div className="mt-6 flex flex-col gap-6">
+                <div className="mt-5 flex flex-col gap-6">
                   <Choice
                     label="opcji w quizie"
                     value={chosen.settings.quizOptions}
@@ -251,15 +272,16 @@ export function Start() {
       )}
 
       {missing.length > 0 && (
-        <div className="flex flex-col gap-3 border-t border-border-quiet pt-6">
+        <div className="flex flex-col gap-3 pt-2">
           <Mono>dodaj język</Mono>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             {missing.map((code) => (
               <button
                 key={code}
                 type="button"
                 onClick={() => void addLanguage(code)}
-                className="font-ui border border-border-quiet px-4 py-2 text-[13px] text-text-2"
+                className="nabu-press nabu-card font-ui min-h-[44px] rounded-full px-5 text-[13px]
+                  text-text-2"
               >
                 {adapterFor(code).name}
               </button>
@@ -267,6 +289,17 @@ export function Start() {
           </div>
         </div>
       )}
+
+      {/* Narzędzia deweloperskie zostają dostępne z telefonu — test dźwięku z sekcji 11
+          wykonuje się na urządzeniu, nie na desktopie — ale nie zajmują paska u góry. */}
+      <nav className="mt-auto flex gap-5 pt-8">
+        <Link to="/demo">
+          <Mono>demo</Mono>
+        </Link>
+        <Link to="/audio">
+          <Mono>test dźwięku</Mono>
+        </Link>
+      </nav>
     </div>
   )
 }

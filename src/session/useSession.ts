@@ -3,7 +3,6 @@ import { gradeFromQuiz, measure, medianOf, type QuizOutcome } from '@/srs/grade'
 import { review } from '@/srs/sm2'
 import {
   AGAIN,
-  HARD,
   newCard,
   type CardState,
   type CardType,
@@ -68,13 +67,6 @@ export type Reveal = {
   answer: Option | null
   /** Czytanie: furigana dla japońskiego, pinyin dla chińskiego. */
   reading?: string
-  /** Czy ocenę da się jeszcze zmienić na „Trudne". */
-  canMarkHard: boolean
-  /**
-   * Użytkownik dotknął czegoś na odsłonięciu, więc automatyczne przejście dalej
-   * jest wstrzymane. Bez tego „było trudne" znikałoby razem z kartą.
-   */
-  held: boolean
 }
 
 export type SessionSummary = {
@@ -256,7 +248,7 @@ export function useSession(lang: string) {
       const { ms } = measure(now - shownAt.current)
       const correct = card.options ? chosen === card.options.correct : revealGrade !== AGAIN
 
-      const outcome: QuizOutcome = { correct, ms, markedHard: false }
+      const outcome: QuizOutcome = { correct, ms }
       const grade =
         card.options === null && revealGrade !== undefined
           ? revealGrade
@@ -300,35 +292,10 @@ export function useSession(lang: string) {
         grade,
         answer: card.options.options[card.options.correct] ?? null,
         ...(reading ? { reading } : {}),
-        canMarkHard: grade !== AGAIN,
-        held: false,
       })
     },
     [current, lang, next, settings],
   )
-
-  /**
-   * „Było trudne" po trafieniu — sekcja 6.2. Zapis poszedł już do bazy, więc zamiast
-   * odkładać go do „Dalej" (co kosztowałoby odpowiedź przy zamknięciu aplikacji
-   * w trakcie odsłonięcia) przeliczamy kartę od stanu sprzed odpowiedzi i nadpisujemy
-   * ostatni wpis logu. Ta sama ścieżka co przy cofnięciu, tylko bez powrotu do karty.
-   */
-  const markHard = useCallback(async () => {
-    const done = pending.current
-    const previous = undo.current
-    if (!done || !previous || done.log.grade === AGAIN || done.log.grade === HARD) return
-
-    await db.cards.put(previous.before)
-    const last = await db.log.orderBy('seq').last()
-    if (last?.seq !== undefined && last.id === previous.before.id) await db.log.delete(last.seq)
-
-    const result = review(previous.before, HARD, done.log.ts)
-    const log: LogEntry = { ...done.log, grade: HARD }
-    await recordAnswer(result.card, log)
-
-    pending.current = { ...done, result, log }
-    setReveal((prev) => (prev ? { ...prev, grade: HARD, canMarkHard: false, held: true } : prev))
-  }, [])
 
   /**
    * Cofnięcie ostatniej odpowiedzi. Jeden poziom wystarczy: nietrafione dotknięcie
@@ -358,7 +325,6 @@ export function useSession(lang: string) {
     settings,
     answer,
     next,
-    markHard,
     undoLast,
     canUndo: undo.current !== null,
   }

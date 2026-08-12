@@ -27,18 +27,19 @@ export function Choice<T extends string | number | boolean>({
   return (
     <div className="flex flex-col gap-2">
       <Mono>{label}</Mono>
-      <div className="flex flex-wrap gap-5" role="group" aria-label={label}>
+      <div className="flex flex-wrap gap-2" role="group" aria-label={label}>
         {options.map((option) => (
           <button
             key={String(option.value)}
             type="button"
             onClick={() => onChange(option.value)}
             aria-pressed={option.value === value}
-            className={`font-ui -my-2 border-b py-2 text-[13px] ${
-              option.value === value
-                ? 'border-accent text-accent'
-                : 'border-transparent text-text-2'
-            }`}
+            className={`nabu-press font-ui flex min-h-[40px] items-center rounded-full px-4
+              text-[13px] transition-colors duration-150 ${
+                option.value === value
+                  ? 'bg-surface-2 text-accent'
+                  : 'text-text-2 hover:text-text'
+              }`}
           >
             {option.label}
           </button>

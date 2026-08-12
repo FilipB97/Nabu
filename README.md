@@ -19,8 +19,8 @@ po każdej odpowiedzi. Nie ma jeszcze logowania ani synchronizacji.
 | Dexie jako źródło prawdy, zapis po każdej odpowiedzi | etapów i bram dla obcego pisma (M3) |
 | talie ładowane paczkami na żądanie, nie w precache | statystyk i pełnych ustawień (M9) |
 | pipeline 01–07, sześć języków z dystraktorami | renderowania ruby w sesji (M4) |
-| 13 tokenów motywu, 5 presetów, bramka kontrastu w CI | |
-| kroje zsubsetowane do znaków z talii, razem 1,34 MB | |
+| 17 tokenów motywu, 5 presetów, bramka kontrastu w CI | |
+| kroje zsubsetowane do znaków z talii, razem 1,35 MB | |
 
 ### Dane
 
@@ -30,7 +30,7 @@ po każdej odpowiedzi. Nie ma jeszcze logowania ani synchronizacji.
 | portugalski | 8 423 | 1 771 | 24% | 57–11 978 |
 | szwedzki | 2 323 | 974 | 15% | 50–11 973 |
 | koreański | 761 | 301 | 16% | 85–29 831 |
-| japoński | 16 699 | 1 323 | 8% | 57–19 998 |
+| japoński | 18 490 | 1 456 | 8% | 55–19 998 |
 | chiński | 1 481 | 416 | 18% | 72–12 000 |
 
 Japoński ma pełną segmentację i czytania: `毎日[まいにち]`, `興味深い[きょうみぶかい]`,
@@ -48,7 +48,7 @@ Build nie wymaga klucza API i da się go powtórzyć w całości — szczegóły
 
 ```sh
 npm install
-npm run dev          # http://localhost:5173/#/demo
+npm run dev          # http://localhost:5173/#/start
 ```
 
 Trasy:
@@ -77,7 +77,7 @@ indziej jest początkiem osypywania się wielojęzyczności, a widać to dopiero
 języku. Plan przewidywał `grep` w M4; reguła ESLint działa od M0 i nie da się jej przeoczyć.
 
 **Kolor nie może wyjść poza `src/theme/`.** Wartość heksowa w komponencie omija presety
-i test kontrastu naraz. Kolory żyją jako trzynaście tokenów semantycznych opisanych
+i test kontrastu naraz. Kolory żyją jako siedemnaście tokenów semantycznych opisanych
 w [`docs/ADR-002-motywy.md`](docs/ADR-002-motywy.md).
 
 ## Sprawdzenie offline

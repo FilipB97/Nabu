@@ -12,12 +12,16 @@
 export const TOKENS = [
   'bg',
   'surface',
+  'surface-2',
   'text',
   'text-2',
   'text-3',
   'border',
   'border-quiet',
   'accent',
+  'accent-2',
+  'accent-text',
+  'shadow',
   'tick-done',
   'tick-future',
   'tick-current',
@@ -48,12 +52,20 @@ export const ROLES: Record<
 > = {
   bg: { role: 'background' },
   surface: { role: 'background' },
+  'surface-2': { role: 'background' },
 
-  text: { role: 'text', on: ['bg', 'surface'] },
-  'text-2': { role: 'text', on: ['bg', 'surface'] },
+  // Wypełnienie akcentem jest powierzchnią jak każda inna: przycisk główny ma na sobie
+  // tekst i oba krańce gradientu muszą go unieść, nie tylko ten, na który akurat padnie
+  // środek. Dlatego `accent` i `accent-2` są tu ROLI `background`, a nie tylko `text` —
+  // token bywa jednym i drugim, zależnie od miejsca.
+  'accent-2': { role: 'background' },
+
+  text: { role: 'text', on: ['bg', 'surface', 'surface-2'] },
+  'text-2': { role: 'text', on: ['bg', 'surface', 'surface-2'] },
   'text-3': { role: 'text', on: ['bg'] },
-  accent: { role: 'text', on: ['bg', 'surface'] },
-  'wrong-text': { role: 'text', on: ['bg'] },
+  accent: { role: 'text', on: ['bg', 'surface', 'surface-2'] },
+  'accent-text': { role: 'text', on: ['accent', 'accent-2'] },
+  'wrong-text': { role: 'text', on: ['bg', 'surface'] },
 
   'tick-done': { role: 'ui', on: ['bg'] },
   'tick-current': { role: 'ui', on: ['bg'] },
@@ -73,6 +85,11 @@ export const ROLES: Record<
   // poza wykończeniem. Decyzja i jej granice: docs/ADR-002-motywy.md.
   border: { role: 'decorative' },
   'wrong-border': { role: 'decorative' },
+
+  // Cień nie niesie informacji — powtarza to, co mówi już wypełnienie i odstęp.
+  // Występuje wyłącznie z przezroczystością, więc jego kontrast wobec tła nie jest
+  // wielkością, którą dałoby się sensownie zmierzyć.
+  shadow: { role: 'decorative' },
 }
 
 /** Wymagana proporcja kontrastu dla roli. Zwraca 0, gdy roli nie sprawdzamy. */

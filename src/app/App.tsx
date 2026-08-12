@@ -23,9 +23,12 @@ import { Mono } from '@/ui/Mono'
 function DevNav() {
   const { pathname } = useLocation()
   if (pathname.startsWith('/sesja/')) return null
+  // Pasek jest rusztowaniem, nie nawigacją produktu: w buildzie znika, a demo i test
+  // dźwięku zostają dostępne z cichej stopki na ekranie startu.
+  if (!import.meta.env.DEV) return null
 
   return (
-    <nav className="flex gap-5 border-b border-border-quiet bg-bg px-8 py-3">
+    <nav className="flex gap-5 bg-bg px-8 py-3">
       <Link to="/start">
         <Mono tone="normal">start</Mono>
       </Link>
