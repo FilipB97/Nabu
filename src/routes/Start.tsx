@@ -13,6 +13,7 @@ import {
 } from '@/store/db'
 import { Mark } from '@/ui/Ticks'
 import { Mono } from '@/ui/Mono'
+import { Choice } from '@/ui/Choice'
 
 /**
  * Ekran startu sesji — sekcja 8.3 planu.
@@ -54,6 +55,15 @@ export function Start() {
   useEffect(() => {
     void refresh()
   }, [refresh])
+
+  const change = useCallback(
+    async (patch: Partial<Omit<LangSettings, 'lang'>>) => {
+      if (!selected) return
+      await updateSettings(selected, patch)
+      await refresh()
+    },
+    [refresh, selected],
+  )
 
   const addLanguage = useCallback(
     async (code: string) => {
@@ -182,25 +192,59 @@ export function Start() {
                 Zacznij
               </button>
 
-              <div className="flex gap-5">
-                {(['short', 'normal', 'long'] as const).map((level) => (
-                  <button
-                    key={level}
-                    type="button"
-                    onClick={async () => {
-                      await updateSettings(chosen.settings.lang, { intensity: level })
-                      await refresh()
-                    }}
-                    className={`font-ui border-b pb-1 text-[13px] ${
-                      chosen.settings.intensity === level
-                        ? 'border-accent text-accent'
-                        : 'border-transparent text-text-2'
-                    }`}
-                  >
-                    {INTENSITY_LABEL[level]}
-                  </button>
-                ))}
-              </div>
+              <Choice
+                label="sesja"
+                value={chosen.settings.intensity}
+                options={(['short', 'normal', 'long'] as const).map((level) => ({
+                  value: level,
+                  label: `${INTENSITY_LABEL[level]} · ${INTENSITY[level].due}`,
+                }))}
+                onChange={(intensity) => void change({ intensity })}
+              />
+
+              {/* Pełny ekran ustawień jest w M9. Tutaj są trzy rzeczy, które zmienia się
+                  w trakcie nauki, a nie raz na zawsze — reszta może poczekać. */}
+              <details className="flex flex-col gap-6 border-t border-border-quiet pt-6">
+                <summary className="cursor-pointer list-none">
+                  <Mono>ustawienia języka</Mono>
+                </summary>
+
+                <div className="mt-6 flex flex-col gap-6">
+                  <Choice
+                    label="opcji w quizie"
+                    value={chosen.settings.quizOptions}
+                    options={[
+                      { value: 3, label: '3' },
+                      { value: 4, label: '4' },
+                      { value: 6, label: '6' },
+                    ]}
+                    onChange={(quizOptions) => void change({ quizOptions })}
+                    hint="Więcej opcji to mniejsza szansa trafienia strzałem, ale dłuższe czytanie."
+                  />
+
+                  <Choice
+                    label="po trafieniu"
+                    value={chosen.settings.autoAdvance}
+                    options={[
+                      { value: false, label: 'czekaj' },
+                      { value: true, label: 'dalej sam' },
+                    ]}
+                    onChange={(autoAdvance) => void change({ autoAdvance })}
+                    hint="Po odpowiedzi widać poprawne słowo, czytanie i znaczenie. Pudło zawsze czeka na dotknięcie."
+                  />
+
+                  <Choice
+                    label="tryb"
+                    value={chosen.settings.active}
+                    options={[
+                      { value: true, label: 'aktywny' },
+                      { value: false, label: 'utrzymywany' },
+                    ]}
+                    onChange={(active) => void change({ active })}
+                    hint="Utrzymywany nie dostaje nowych słów — tylko powtórki tego, co już umiesz."
+                  />
+                </div>
+              </details>
             </div>
           )}
         </>

@@ -1,7 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { gradeFromQuiz, measure, medianOf, type QuizOutcome } from '@/srs/grade'
 import { review } from '@/srs/sm2'
-import { AGAIN, newCard, type CardState, type CardType, type Grade } from '@/srs/types'
+import {
+  AGAIN,
+  HARD,
+  newCard,
+  type CardState,
+  type CardType,
+  type Grade,
+  type LogEntry,
+} from '@/srs/types'
 import {
   BACKLOG_LIMIT,
   INTENSITY,
@@ -14,8 +22,20 @@ import {
   type LangSettings,
 } from '@/store/db'
 import { loadBand, loadByIds, loadLexicon, type Lexicon } from '@/store/decks'
-import { buildConfusions, buildOptions, type LastShown, type OptionSet } from './options.ts'
-import { SessionQueue, knownLemmas, selectFresh, type QueueEntry } from './queue.ts'
+import {
+  buildConfusions,
+  buildOptions,
+  type LastShown,
+  type Option,
+  type OptionSet,
+} from './options.ts'
+import {
+  SessionQueue,
+  cardedLemmas,
+  knownLemmas,
+  selectFresh,
+  type QueueEntry,
+} from './queue.ts'
 
 /**
  * Spięcie silnika, magazynu i talii w jedną sesję — sekcja 8.4 planu.
@@ -32,6 +52,31 @@ export type SessionCard = {
   mode: CardType
 }
 
+/**
+ * Stan odsłonięcia — to, co widać między odpowiedzią a następną kartą.
+ *
+ * Trzyma wszystko, czego potrzebuje ekran, żeby powiedzieć trzy rzeczy naraz:
+ * czy było dobrze, jak brzmi poprawne słowo i co znaczy. Ekran nie sięga po nie
+ * do karty, bo w trakcie odsłonięcia karta jest już policzona i odłożona.
+ */
+export type Reveal = {
+  /** Indeks wybranej opcji; `null` przy karcie bez opcji. */
+  chosen: number | null
+  correct: number
+  grade: Grade
+  /** Poprawna opcja — słowo i glosa, do wypełnienia luki. */
+  answer: Option | null
+  /** Czytanie: furigana dla japońskiego, pinyin dla chińskiego. */
+  reading?: string
+  /** Czy ocenę da się jeszcze zmienić na „Trudne". */
+  canMarkHard: boolean
+  /**
+   * Użytkownik dotknął czegoś na odsłonięciu, więc automatyczne przejście dalej
+   * jest wstrzymane. Bez tego „było trudne" znikałoby razem z kartą.
+   */
+  held: boolean
+}
+
 export type SessionSummary = {
   answered: number
   firstTry: number
@@ -45,6 +90,7 @@ type Phase = 'loading' | 'running' | 'done' | 'empty'
 export function useSession(lang: string) {
   const [phase, setPhase] = useState<Phase>('loading')
   const [current, setCurrent] = useState<SessionCard | null>(null)
+  const [reveal, setReveal] = useState<Reveal | null>(null)
   const [progress, setProgress] = useState({ done: 0, total: 0, lapses: [] as number[] })
   const [summary, setSummary] = useState<SessionSummary | null>(null)
   const [settings, setSettings] = useState<LangSettings | null>(null)
@@ -64,6 +110,10 @@ export function useSession(lang: string) {
   })
   /** Jeden poziom cofnięcia — sekcja 8.4. */
   const undo = useRef<{ before: CardState; entry: QueueEntry } | null>(null)
+  /** Odpowiedź zapisana, karta jeszcze na ekranie — czeka na „Dalej". */
+  const pending = useRef<{ result: ReturnType<typeof review>; log: LogEntry; entry: QueueEntry } | null>(
+    null,
+  )
 
   const prepare = useCallback((entry: QueueEntry, options: number): SessionCard => {
     const built = buildOptions(
@@ -111,7 +161,7 @@ export function useSession(lang: string) {
       const seen = await seenIds(lang)
       const allCards = await db.cards.where('lang').equals(lang).toArray()
       const known = knownLemmas(allCards, dueItems)
-      const freshItems = selectFresh(pool, known, seen, freshLimit)
+      const freshItems = selectFresh(pool, known, seen, freshLimit, cardedLemmas(allCards, dueItems))
 
       const log = await db.log.where('lang').equals(lang).reverse().limit(400).toArray()
       const samples = log.filter((e) => e.mode.startsWith('quiz')).map((e) => e.ms)
@@ -127,11 +177,11 @@ export function useSession(lang: string) {
           const item = dueItems.get(card.id)
           return item ? [{ card, item, fresh: false }] : []
         }),
-        ...freshItems.map((item) => ({
-          card: newCard(item.id, lang, 'sentences', now),
-          item,
-          fresh: true,
-        })),
+        ...freshItems.map((item) => {
+          const target = item.tokens[item.cloze]
+          const lemma = target ? (target.lemma ?? target.s.toLocaleLowerCase()) : undefined
+          return { card: newCard(item.id, lang, 'sentences', now, lemma), item, fresh: true }
+        }),
       ]
 
       if (cancelled) return
@@ -142,6 +192,9 @@ export function useSession(lang: string) {
 
       queue.current = new SessionQueue(entries)
       stats.current = { answered: 0, firstTry: 0, missed: 0, fresh: 0, startedAt: now }
+      undo.current = null
+      pending.current = null
+      setReveal(null)
       setProgress({ done: 0, total: entries.length, lapses: [] })
 
       const first = queue.current.peek()
@@ -155,18 +208,55 @@ export function useSession(lang: string) {
     }
   }, [lang, prepare])
 
+  // ---- przejście do następnej karty ------------------------------------------
+  /**
+   * Zdejmuje odpowiedzianą kartę i pokazuje kolejną. Osobno od `answer`, bo między
+   * odpowiedzią a następną kartą jest teraz ODSŁONIĘCIE: użytkownik musi zobaczyć,
+   * czy trafił, co znaczyło słowo i czym różniło się od tego, które wybrał. Bez tej
+   * przerwy quiz nie uczy — daje tylko wynik, którego nie ma jak sprawdzić.
+   */
+  const next = useCallback(() => {
+    const active = queue.current
+    const done = pending.current
+    if (!active || !done || !settings) return
+
+    pending.current = null
+    setReveal(null)
+
+    const index = active.done
+    active.take()
+    if (done.result.inSession) active.reinsert({ ...done.entry, card: done.result.card })
+
+    setProgress((prev) => ({
+      done: active.done,
+      total: active.total,
+      lapses: done.log.grade === AGAIN ? [...prev.lapses, index] : prev.lapses,
+    }))
+
+    const upcoming = active.peek()
+    if (!upcoming) {
+      setSummary({ ...stats.current })
+      setCurrent(null)
+      setPhase('done')
+      return
+    }
+    setCurrent(prepare(upcoming, settings.quizOptions))
+  }, [prepare, settings])
+
   // ---- odpowiedź -------------------------------------------------------------
   const answer = useCallback(
-    async (chosen: number | null, markedHard = false, revealGrade?: Grade) => {
+    async (chosen: number | null, revealGrade?: Grade) => {
       const active = queue.current
       const card = current
-      if (!active || !card || !settings) return
+      // `pending` niepuste znaczy, że karta jest już odpowiedziana i czeka na „Dalej".
+      // Drugie dotknięcie w tym stanie nie może przestawić oceny.
+      if (!active || !card || !settings || pending.current) return
 
       const now = Date.now()
       const { ms } = measure(now - shownAt.current)
       const correct = card.options ? chosen === card.options.correct : revealGrade !== AGAIN
 
-      const outcome: QuizOutcome = { correct, ms, markedHard }
+      const outcome: QuizOutcome = { correct, ms, markedHard: false }
       const grade =
         card.options === null && revealGrade !== undefined
           ? revealGrade
@@ -176,7 +266,7 @@ export function useSession(lang: string) {
       const chosenOption =
         card.options && chosen !== null ? card.options.options[chosen] : undefined
 
-      await recordAnswer(result.card, {
+      const log: LogEntry = {
         ts: now,
         id: card.entry.card.id,
         lang,
@@ -185,36 +275,60 @@ export function useSession(lang: string) {
         mode: card.mode,
         ...(chosenOption ? { chosen: chosenOption.id } : {}),
         ...(card.options ? { options: card.options.options.map((o) => o.id) } : {}),
-      })
+      }
+      await recordAnswer(result.card, log)
 
       undo.current = { before: card.entry.card, entry: card.entry }
+      pending.current = { result, log, entry: card.entry }
 
       stats.current.answered += 1
       if (card.entry.fresh) stats.current.fresh += 1
       if (grade === AGAIN) stats.current.missed += 1
       else stats.current.firstTry += 1
 
-      const index = active.done
-      active.take()
-      if (result.inSession) active.reinsert({ ...card.entry, card: result.card })
-
-      setProgress((prev) => ({
-        done: active.done,
-        total: active.total,
-        lapses: grade === AGAIN ? [...prev.lapses, index] : prev.lapses,
-      }))
-
-      const next = active.peek()
-      if (!next) {
-        setSummary({ ...stats.current })
-        setCurrent(null)
-        setPhase('done')
+      // Karta `reveal` nie ma czego odsłaniać — użytkownik sam przed chwilą ocenił
+      // odpowiedź, którą widział. Odsłonięcie dotyczy wyłącznie quizu.
+      if (!card.options) {
+        next()
         return
       }
-      setCurrent(prepare(next, settings.quizOptions))
+
+      const reading = card.entry.item.tokens[card.entry.item.cloze]?.r
+      setReveal({
+        chosen,
+        correct: card.options.correct,
+        grade,
+        answer: card.options.options[card.options.correct] ?? null,
+        ...(reading ? { reading } : {}),
+        canMarkHard: grade !== AGAIN,
+        held: false,
+      })
     },
-    [current, lang, prepare, settings],
+    [current, lang, next, settings],
   )
+
+  /**
+   * „Było trudne" po trafieniu — sekcja 6.2. Zapis poszedł już do bazy, więc zamiast
+   * odkładać go do „Dalej" (co kosztowałoby odpowiedź przy zamknięciu aplikacji
+   * w trakcie odsłonięcia) przeliczamy kartę od stanu sprzed odpowiedzi i nadpisujemy
+   * ostatni wpis logu. Ta sama ścieżka co przy cofnięciu, tylko bez powrotu do karty.
+   */
+  const markHard = useCallback(async () => {
+    const done = pending.current
+    const previous = undo.current
+    if (!done || !previous || done.log.grade === AGAIN || done.log.grade === HARD) return
+
+    await db.cards.put(previous.before)
+    const last = await db.log.orderBy('seq').last()
+    if (last?.seq !== undefined && last.id === previous.before.id) await db.log.delete(last.seq)
+
+    const result = review(previous.before, HARD, done.log.ts)
+    const log: LogEntry = { ...done.log, grade: HARD }
+    await recordAnswer(result.card, log)
+
+    pending.current = { ...done, result, log }
+    setReveal((prev) => (prev ? { ...prev, grade: HARD, canMarkHard: false, held: true } : prev))
+  }, [])
 
   /**
    * Cofnięcie ostatniej odpowiedzi. Jeden poziom wystarczy: nietrafione dotknięcie
@@ -224,6 +338,8 @@ export function useSession(lang: string) {
     const previous = undo.current
     if (!previous || !settings) return
     undo.current = null
+    pending.current = null
+    setReveal(null)
 
     await db.cards.put(previous.before)
     const last = await db.log.orderBy('seq').last()
@@ -236,10 +352,13 @@ export function useSession(lang: string) {
   return {
     phase,
     current,
+    reveal,
     progress,
     summary,
     settings,
     answer,
+    next,
+    markHard,
     undoLast,
     canUndo: undo.current !== null,
   }

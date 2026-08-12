@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { newCard, type CardState } from '@/srs/types'
 import type { DeckItem, Lexicon } from '@/store/decks'
-import { SessionQueue, knownLemmas, selectFresh, type QueueEntry } from './queue.ts'
+import {
+  SessionQueue,
+  cardedLemmas,
+  knownLemmas,
+  selectFresh,
+  type QueueEntry,
+} from './queue.ts'
 import { buildConfusions, buildOptions } from './options.ts'
+import { splitAroundCloze } from './cloze.ts'
 
 const NOW = Date.UTC(2026, 7, 12, 12, 0, 0)
 
@@ -93,6 +100,66 @@ describe('dobór nowych pozycji metodą i+1', () => {
 
   it('nie zwraca nic, gdy limit to zero — to jest stan „zaległości powyżej progu"', () => {
     expect(selectFresh([item('a', 100, ['x'])], known, new Set(), 0)).toEqual([])
+  })
+})
+
+describe('zdanie wokół luki', () => {
+  function sentence(text: string, surfaces: string[], cloze: number): DeckItem {
+    return {
+      ...item('x', 100, surfaces, cloze),
+      text,
+      tokens: surfaces.map((s) => ({ s, b: 100, lemma: s })),
+    }
+  }
+
+  it('zachowuje interpunkcję, której nie ma w tokenach', () => {
+    const it_ = sentence('那人是谁？', ['那', '人', '是', '谁'], 1)
+    expect(splitAroundCloze(it_, '')).toEqual({ before: '那', after: '是谁？' })
+  })
+
+  it('zachowuje przecinki i kropkę w zdaniu ze spacjami', () => {
+    const it_ = sentence('Lo hecho, hecho está.', ['Lo', 'hecho', 'hecho', 'está'], 2)
+    expect(splitAroundCloze(it_, ' ')).toEqual({ before: 'Lo hecho, ', after: ' está.' })
+  })
+
+  it('bierze właściwe wystąpienie, gdy forma powtarza się wcześniej', () => {
+    const it_ = sentence('a b a b', ['a', 'b', 'a', 'b'], 2)
+    expect(splitAroundCloze(it_, ' ')).toEqual({ before: 'a b ', after: ' b' })
+  })
+
+  it('gdy tokenu nie ma w zdaniu, wraca do sklejania — zdanie uboższe, ale poprawne', () => {
+    const it_ = sentence('Całkiem inne zdanie.', ['ala', 'ma', 'kota'], 1)
+    expect(splitAroundCloze(it_, ' ')).toEqual({ before: 'ala', after: 'kota' })
+  })
+})
+
+describe('jeden lemat, jedna karta', () => {
+  const known = new Set(['woda'])
+
+  it('dwa zdania z tym samym słowem w luce nie wchodzą do sesji razem', () => {
+    const pool = [
+      item('samochód-1', 100, ['samochód', 'woda']),
+      item('samochód-2', 110, ['samochód', 'woda']),
+      item('dom', 120, ['dom', 'woda']),
+    ]
+    expect(selectFresh(pool, known, new Set(), 2).map((i) => i.id)).toEqual(['samochód-1', 'dom'])
+  })
+
+  it('słowo, na które jest już karta, nie wraca jako nowe w kolejnej sesji', () => {
+    const pool = [item('samochód-2', 110, ['samochód', 'woda']), item('dom', 120, ['dom', 'woda'])]
+    const covered = new Set(['samochód'])
+    expect(selectFresh(pool, known, new Set(), 5, covered).map((i) => i.id)).toEqual(['dom'])
+  })
+
+  it('lemat czyta się z karty, bez wczytywania zdania', () => {
+    const card: CardState = { ...newCard('x', 'ja', 'sentences', NOW, '車'), interval: 0 }
+    expect(cardedLemmas([card], new Map()).has('車')).toBe(true)
+  })
+
+  it('karty sprzed pola `lemma` odzyskują je ze zdania, gdy jest pod ręką', () => {
+    const card = newCard('a', 'es', 'sentences', NOW)
+    const items = new Map([['a', item('a', 100, ['woda'])]])
+    expect(cardedLemmas([card], items).has('woda')).toBe(true)
   })
 })
 

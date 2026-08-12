@@ -844,7 +844,7 @@ pokazuje tekst japoński krojem systemowym albo nie pokazuje go wcale.
 | `adapter.tokenizer` | Implementacja | Języki |
 |---|---|---|
 | `space` | podział regexem `\p{L}+`, lemat = forma z małej litery | es, pt, sv, ko (z hakami adaptera) |
-| `dict` | zachłanne najdłuższe dopasowanie do słownika | zh (po v1) |
+| `dict` | dopasowanie dwukierunkowe do słownika CC-CEDICT | zh |
 | `morph` | analizator morfologiczny | ja (kuromoji + IPADIC) |
 
 **Korekta wobec pierwszej wersji planu.** Pisało tu, że koreański obsłuży `space`, bo
@@ -862,6 +862,15 @@ ale dopiero z trzema hakami w adapterze:
 
 Podniesienie koreańskiego do `morph` (mecab-ko) zostaje zadaniem po v1. Te haki
 doprowadzają go do stanu używalnego, ale nie zastępują analizy morfologicznej.
+
+**Chiński: dopasowanie musi być dwukierunkowe.** Zachłanne dopasowanie od lewej myli się
+przewidywalnie i zawsze w tę samą stronę: w `打网球` („grać w tenisa") bierze rzadkie `打网`
+i zostawia `球` („kula") jako osobne słowo, które trafia potem do luki w zdaniu o tenisie.
+Tniemy więc raz od lewej, raz od prawej i wybieramy wynik z mniejszą liczbą tokenów, potem
+z mniejszą liczbą tokenów jednoznakowych (pojedynczy znak zwykle jest resztką po złym cięciu),
+a przy remisie rozstrzygamy częstością słów. Bez tego ostatniego kroku `马上去` tnie się na
+`马` + `上去` zamiast `马上` + `去` — oba warianty mają po dwa tokeny, różnią się tym, że
+`马上` jest słowem pospolitym.
 
 Wtyczka zwraca zawsze ten sam kształt: `{ s, r, b, pos, lemma }`. Dla języków łacińskich
 `r` jest `null` — pipeline i UI muszą to znosić bez rozgałęzień. `pos` przestaje być
@@ -1079,10 +1088,16 @@ uruchamiany tą samą komendą z innym kodem języka.
 | szwedzki | 2 323 | 974 | 15% | 56% | 1 | 50–11 973 |
 | koreański | 761 | 301 | 16% | 79% | 4% | 85–29 831 |
 | japoński | 16 699 | 1 323 | 8% | 55% | 0% | 57–19 998 |
+| chiński | 1 481 | 416 | 18% | 58% | 1% | 72–12 000 |
 
-Bramka przechodzi we wszystkich pięciu językach. Talia waży 22 MB w paczkach po 500 zdań;
-kroje zsubsetowane do znaków z `data/` mieszczą się w 1,25 MB, z czego Noto Serif JP
-878 kB przy 2032 znakach (pełny krój ma 12,9 MB).
+Bramka przechodzi we wszystkich sześciu językach. Talia waży 22 MB w paczkach po 500 zdań;
+kroje zsubsetowane do znaków z `data/` mieszczą się w 1,34 MB, z czego Noto Serif JP
+970 kB przy 2539 znakach (pełny krój ma 12,9 MB).
+
+Chiński ma osobną kategorię odrzutu, której nie ma nigdzie indziej: **5 219 zdań w zapisie
+tradycyjnym**. Tatoeba trzyma oba warianty pisma pod jednym kodem `cmn`, a uczący się wybiera
+jeden — talia z obydwoma naraz uczyłaby dwóch systemów pod jedną nazwą. Odrzut idzie do
+`innyZapis`, obok `pozaZasięgiem`, a nie do jakości: to nie jest wada zdania (patrz 10.2).
 
 Koreański i japoński weszły wcześniej, niż przewidywał plan (M3 i M4), i to celowo:
 uruchomienie pipeline'u na obcym piśmie ujawniło osiem założeń zaszytych pod klasę A,
@@ -1110,6 +1125,30 @@ używania na dwóch językach naraz.
 Przy okazji wyszła wada danych niewidoczna w samych danych: zdanie „Lo hecho, hecho está"
 z luką na pierwszym `hecho` zostawiało drugie widoczne obok — odpowiedź stała w pytaniu.
 Krok `05` odrzuca teraz zdania, w których lemat luki nie jest jedyny.
+
+**Poprawka po pierwszym użyciu na telefonie (12.08.2026).** Sesja przechodziła do następnej
+karty natychmiast po dotknięciu opcji. Testy tego nie łapały, bo zapis, ocena i kolejka
+działały poprawnie — brakowało jedynej rzeczy, dla której ten quiz w ogóle istnieje:
+**odsłonięcia**. Użytkownik nie widział, czy trafił, co znaczyło słowo ani czym różniło się
+od tego, które wybrał, więc karta nie uczyła niczego, a nieznajomość języka czyniła wynik
+nierozpoznawalnym. Trzy zmiany:
+
+- między odpowiedzią a następną kartą jest stan pośredni: luka wypełnia się poprawnym słowem,
+  opcje przechodzą w stany `correct` / `chosen-wrong` / `dimmed`, pod zdaniem pojawia się
+  czytanie i glosa. Dalej idzie się dotknięciem;
+- `autoAdvance` domyślnie **wyłączone** (było `true` z czasów, gdy ekran nie miał odsłonięcia,
+  czyli oznaczało „przewiń natychmiast"); migracja bazy do wersji 2 zeruje je także tam,
+  gdzie zdążyło się zapisać. Przy włączonym trafienie znika po 1,4 s, pudło zawsze czeka;
+- „było trudne" po trafieniu przelicza kartę od stanu sprzed odpowiedzi i nadpisuje ostatni
+  wpis logu — sekcja 6.2 przewidywała ten przycisk, ale nie miał gdzie stać.
+
+Druga wada z tej samej sesji: dwa zdania z tym samym słowem w luce weszły jako dwie osobne
+nowe pozycje. Karta niesie lemat (`CardState.lemma`), a dobór nowych pozycji pomija lematy,
+na które karta już istnieje — także takie w krokach nauki, które `knownLemmas` celowo pomija.
+
+To już czwarty raz, gdy wada widoczna wyłącznie na wyrenderowanej karcie przechodzi przez
+dane i testy (poprzednie: `見 = けん opinia`, „Lo ___ hecho está", CC-CEDICT z CRLF).
+Ręczny przegląd na urządzeniu jest osobną bramką, nie formalnością.
 
 ### M3 — koreański: etap 0 i obce pismo (0,5 dnia)
 Karty `script` (hangul), etapy i bramy, `hasScriptStage` w adapterze.

@@ -1,218 +1,219 @@
 {
   "lang": "ja",
-  "zdań": 16599,
+  "zdań": 18490,
   "kandydatów": 49453,
   "odrzuconychNaJakości": 4005,
   "odsetekOdrzutówJakościowych": 8,
-  "odsetekNieprzydatnychNaKartę": 58,
+  "odsetekNieprzydatnychNaKartę": 55,
   "pozaZasięgiem": 199396,
+  "innyZapis": 0,
   "powodyJakość": {
     "znaki spoza zestawu języka": 2276,
     "pasmo powyżej progu języka": 1714,
     "wulgaryzm": 15
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 24723,
+    "brak tokenu nadającego się na lukę": 22832,
     "za krótkie": 3954,
     "za długie": 172
   },
   "tłumaczenia": {
-    "bezpośrednie": 7929,
-    "przezAngielski": 8670
+    "bezpośrednie": 8887,
+    "przezAngielski": 9603
   },
   "pasma": {
-    "min": 57,
-    "mediana": 1377,
-    "p90": 7182,
+    "min": 55,
+    "mediana": 1376,
+    "p90": 7177,
     "max": 19998
   },
-  "quizNiedostępny": 57,
+  "quizNiedostępny": 56,
   "próbka": [
     {
-      "text": "私は時間がない。",
-      "pl": "Nie mam czasu.",
-      "luka": "時間",
-      "band": 57,
+      "text": "彼らは仕事中です。",
+      "pl": "Oni są w pracy.",
+      "luka": "仕事",
+      "band": 55,
       "src": "pivot",
       "dystraktory": [
-        "日",
         "本",
-        "車",
-        "問題",
+        "日",
+        "時間",
+        "今日",
+        "前",
         "中",
-        "日本",
         "子供",
         "年"
       ]
     },
     {
-      "text": "私の家はその通りから少し入ったところだ。",
-      "pl": "Mój dom jest niedaleko ulicy.",
-      "luka": "通り",
-      "band": 260,
+      "text": "顔は知ってます。",
+      "pl": "Znam go z widzenia.",
+      "luka": "顔",
+      "band": 256,
       "src": "pivot",
       "dystraktory": [
-        "運転",
-        "道",
-        "あまり",
+        "頭",
+        "全部",
         "人間",
-        "顔",
-        "町",
-        "数",
-        "学生"
+        "運転",
+        "学生",
+        "通り",
+        "ドア",
+        "毎日"
       ]
     },
     {
-      "text": "あなたの辞書を使ってもいいですか。",
-      "pl": "Czy mogę używać twojego słownika?",
-      "luka": "辞書",
-      "band": 455,
+      "text": "彼は、町で遊びまわっている。",
+      "pl": "Poszedł na miasto się zabawić.",
+      "luka": "町",
+      "band": 450,
+      "src": "direct",
+      "dystraktory": [
+        "世界",
+        "本当",
+        "東京",
+        "猫",
+        "数",
+        "心",
+        "電車",
+        "通り"
+      ]
+    },
+    {
+      "text": "自分の名前消すの忘れたでしょ。",
+      "pl": "Zapomniałeś wymazać swoje imię.",
+      "luka": "名前",
+      "band": 658,
       "src": "pivot",
       "dystraktory": [
-        "新聞",
-        "簡単",
-        "嘘",
-        "午後",
-        "船",
-        "足",
-        "クラス",
-        "箱"
+        "事故",
+        "結婚",
+        "計画",
+        "一番",
+        "成功",
+        "一緒",
+        "アメリカ",
+        "映画"
       ]
     },
     {
-      "text": "私には子どもが十人いる。",
-      "pl": "Mam dziesięcioro dzieci.",
-      "luka": "子ども",
-      "band": 657,
-      "src": "direct",
+      "text": "私たちは、彼女がカナダで生まれたという事実を知っている。",
+      "pl": "Wiemy że ona urodziła się w Kanadzie.",
+      "luka": "カナダ",
+      "band": 890,
+      "src": "pivot",
       "dystraktory": [
-        "男の子",
-        "帽子",
-        "科学",
-        "数学",
-        "フランス",
-        "道路",
-        "カメラ",
-        "銀行"
+        "サッカー",
+        "コート",
+        "郵便",
+        "森",
+        "シャツ",
+        "ラジオ",
+        "敵",
+        "客"
       ]
     },
     {
-      "text": "彼も彼の妹もパーティーに招待されている。",
-      "pl": "Na imprezę zaproszony jest zarówno on, jak i jego siostra.",
-      "luka": "妹",
-      "band": 884,
-      "src": "direct",
-      "dystraktory": [
-        "味",
-        "妻",
-        "弟",
-        "価値",
-        "下",
-        "元気",
-        "女",
-        "自由"
-      ]
-    },
-    {
-      "text": "必要なら彼女に地図を書いてあげるとトムは言った。",
-      "pl": "Tom powiedział, że w razie potrzeby narysuje jej mapę.",
+      "text": "どこで地図を買えますか。",
+      "pl": "Gdzie mogę dostać mapę?",
       "luka": "地図",
       "band": 1200,
       "src": "pivot",
       "dystraktory": [
+        "地面",
         "田舎",
         "早起き",
         "調査",
         "工場",
         "塩",
         "週",
-        "人口",
-        "過去"
+        "人口"
       ]
     },
     {
-      "text": "彼らの両方がその会合に出席したわけではなかった。",
-      "pl": "Obaj nie byli na zebraniu.",
+      "text": "私はその両方とも大好きだ。",
+      "pl": "Bardzo ich oboje lubię.",
       "luka": "両方",
       "band": 1576,
-      "src": "direct",
+      "src": "pivot",
       "dystraktory": [
         "便",
         "不安",
         "否定",
         "階段",
         "不幸",
+        "夕方",
         "富士山",
-        "世紀",
-        "綺麗"
+        "世紀"
       ]
     },
     {
-      "text": "私は草の上に寝た。",
-      "pl": "Położyłem się na trawie.",
-      "luka": "草",
-      "band": 2181,
+      "text": "今日歯医者へ行きました。",
+      "pl": "Poszedłem dziś do dentysty.",
+      "luka": "歯医者",
+      "band": 2177,
       "src": "direct",
       "dystraktory": [
-        "煙草",
-        "韓国",
-        "油",
+        "医師",
+        "記者",
+        "草",
+        "地下鉄",
+        "漫画",
+        "汽車",
         "鏡",
-        "惑星",
-        "真",
-        "競技",
-        "歯医者"
+        "惑星"
       ]
     },
     {
-      "text": "砂は好きじゃないのよ。",
-      "pl": "Nie lubię piasku.",
-      "luka": "砂",
-      "band": 3113,
+      "text": "私は外の風景にすべての注意を集中した。",
+      "pl": "Poświęciłem całą moją uwagę krajobrazowi na zewnątrz.",
+      "luka": "風景",
+      "band": 3097,
       "src": "pivot",
       "dystraktory": [
+        "砂",
         "砂漠",
-        "風景",
-        "活用",
+        "影",
+        "人種",
         "不可欠",
-        "唇",
-        "少数",
-        "毛布",
-        "小切手"
+        "医療",
+        "婚約",
+        "活用"
       ]
     },
     {
-      "text": "彼女は思い切ってあの森に入って行くだろうか。",
-      "pl": "Czy ona odważy się wejść do lasu?",
-      "luka": "森",
-      "band": 4587,
+      "text": "そんなに頻繁に遅刻するなら私は君を首にしなければならない。",
+      "pl": "Jeśli będziesz się spóźniał, będę musiał cię wyrzucić.",
+      "luka": "頻繁",
+      "band": 4577,
       "src": "direct",
       "dystraktory": [
-        "味",
-        "村",
-        "橋",
-        "機会",
-        "機械",
-        "ラジオ",
-        "カナダ",
-        "コート"
+        "賄賂",
+        "組合",
+        "苺",
+        "余り",
+        "液体",
+        "矢",
+        "小麦粉",
+        "血液"
       ]
     },
     {
-      "text": "我々は全員ひざまずいて祈りを捧げた。",
-      "pl": "Uklękliśmy wszyscy do modlitwy.",
-      "luka": "祈り",
-      "band": 7614,
+      "text": "この若者は、自分の国についてろくに知らない。",
+      "pl": "Ten młody człowiek wie niewiele o swym kraju.",
+      "luka": "若者",
+      "band": 7613,
       "src": "pivot",
       "dystraktory": [
-        "人質",
-        "神聖",
-        "ファスナー",
-        "アスピリン",
-        "復讐",
-        "マリ",
-        "狂気",
-        "南極"
+        "荷物",
+        "患者",
+        "不可能",
+        "都市",
+        "普段",
+        "自動車",
+        "火事",
+        "財布"
       ]
     },
     {

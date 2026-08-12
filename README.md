@@ -17,10 +17,10 @@ po każdej odpowiedzi. Nie ma jeszcze logowania ani synchronizacji.
 | silnik SM-2 z krokami nauki i ochroną przed strzałem | kart produkcji i rysowania (M8) |
 | kolejka sesji, karty wracają w tej samej sesji | kalibracji i poziomów wejściowych (M7) |
 | Dexie jako źródło prawdy, zapis po każdej odpowiedzi | etapów i bram dla obcego pisma (M3) |
-| talie ładowane paczkami na żądanie, nie w precache | statystyk i ustawień (M9) |
-| pipeline 01–07, pięć języków z dystraktorami | renderowania ruby w sesji (M4) |
+| talie ładowane paczkami na żądanie, nie w precache | statystyk i pełnych ustawień (M9) |
+| pipeline 01–07, sześć języków z dystraktorami | renderowania ruby w sesji (M4) |
 | 13 tokenów motywu, 5 presetów, bramka kontrastu w CI | |
-| kroje zsubsetowane do znaków z talii, razem 1,25 MB | chińskiego |
+| kroje zsubsetowane do znaków z talii, razem 1,34 MB | |
 
 ### Dane
 
@@ -31,16 +31,13 @@ po każdej odpowiedzi. Nie ma jeszcze logowania ani synchronizacji.
 | szwedzki | 2 323 | 974 | 15% | 50–11 973 |
 | koreański | 761 | 301 | 16% | 85–29 831 |
 | japoński | 16 699 | 1 323 | 8% | 57–19 998 |
+| chiński | 1 481 | 416 | 18% | 72–12 000 |
 
 Japoński ma pełną segmentację i czytania: `毎日[まいにち]`, `興味深い[きょうみぶかい]`,
 katakana bez furigany. Koreański ma rozdzielone partykuły, więc luka wypada na samym
-rzeczowniku, a partykuła zostaje w zdaniu jako wskazówka składniowa.
-| koreański | 761 | 301 | 16% | 85–29 831 |
-| japoński | 16 699 | 1 323 | 8% | 57–19 998 |
-
-Japoński ma pełną segmentację i czytania: `毎日[まいにち]`, `興味深い[きょうみぶかい]`,
-katakana bez furigany. Koreański ma rozdzielone partykuły, więc luka wypada na samym
-rzeczowniku, a partykuła zostaje w zdaniu jako wskazówka składniowa.
+rzeczowniku, a partykuła zostaje w zdaniu jako wskazówka składniowa. Chiński jest cięty
+dwukierunkowo po CC-CEDICT i niesie pinyin z tonami; talia uczy wyłącznie zapisu
+uproszczonego, a 5 219 zdań w zapisie tradycyjnym odpada jako inny system pisma.
 
 **Nic w `data/` nie jest napisane maszynowo.** Zdania i ich polskie tłumaczenia pochodzą
 z Tatoeby, glosy z polskiego Wikisłownika, rangi z list częstości napisów filmowych.
@@ -54,8 +51,9 @@ npm install
 npm run dev          # http://localhost:5173/#/demo
 ```
 
-Trasy w M1:
+Trasy:
 
+- `#/start` — dodanie języka, ustawienia sesji, wejście w naukę
 - `#/demo` — trzy stany karty, trzy systemy pisma, przełącznik presetów
 - `#/audio` — test warstwy dźwięku z sekcji 11 planu, do wykonania na iPhonie
 
@@ -103,9 +101,9 @@ samolotowy, uruchom z ikony.
 
 ## Licencje
 
-Kod: MIT. Dane w `data/` powstają w M1 i będą dziedziczyć licencje źródeł
-(Tatoeba, FrequencyWords, KRADFILE, KanjiVG) — szczegóły w sekcji 10.4 planu,
-`data/ATTRIBUTION.md` powstanie razem z pierwszą talią.
+Kod: MIT. Dane w `data/` dziedziczą SA po źródłach (Tatoeba, FrequencyWords, Wikisłownik,
+CC-CEDICT, kuromoji/IPADIC) — komplet w [`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md),
+skąd build kopiuje go do `data/ATTRIBUTION.md` przy każdym przebiegu.
 
 Kroje w `public/fonts/` to subsety Archivo, Spectral, IBM Plex Mono, Noto Serif JP
 i Noto Serif KR, wszystkie na SIL OFL 1.1.

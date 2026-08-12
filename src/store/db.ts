@@ -56,6 +56,20 @@ class NabuDb extends Dexie {
       log: '++seq, ts, id, lang, [lang+ts]',
       settings: 'lang',
     })
+
+    // Wersja 2 nie zmienia schematu, tylko wartość ustawienia. `autoAdvance` startowało
+    // jako `true` w czasach, gdy ekran sesji w ogóle nie miał odsłonięcia — trafienie
+    // przewijało kartę natychmiast i nie dało się zobaczyć, czy było dobrze. Ustawienia
+    // nigdy nie było jak zmienić, więc `true` w bazie nie jest wyborem użytkownika,
+    // tylko śladem po tamtym błędzie.
+    this.version(2).upgrade((tx) =>
+      tx
+        .table<LangSettings>('settings')
+        .toCollection()
+        .modify((row) => {
+          row.autoAdvance = false
+        }),
+    )
   }
 }
 
@@ -65,7 +79,9 @@ const DEFAULTS: Omit<LangSettings, 'lang' | 'addedAt'> = {
   active: true,
   intensity: 'normal',
   quizOptions: 4,
-  autoAdvance: true,
+  // Domyślnie czekamy na dotknięcie. Odsłonięcie niesie treść do nauczenia się —
+  // poprawne słowo, jego czytanie i glosę — więc nie może znikać samo.
+  autoAdvance: false,
   production: 'mature',
   furigana: 'after',
   romaji: true,
