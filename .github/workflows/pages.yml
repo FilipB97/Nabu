@@ -1,0 +1,61 @@
+name: build i deploy na Pages
+
+on:
+  push:
+    branches: [main, 'claude/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: lint, testy, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Reguła ESLint pilnuje dwóch rzeczy, które inaczej wychodzą na jaw dopiero
+      # po miesiącach: kodów języków poza adapterami i kolorów poza warstwą motywu.
+      - name: ESLint
+        run: npm run lint
+
+      # Bramka kontrastu z sekcji 9.1 planu — preset łamiący AA nie wchodzi do repo.
+      - name: Testy
+        run: npm test
+
+      - name: Build
+        run: npm run build
+        env:
+          NABU_BASE: /${{ github.event.repository.name }}/
+
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name == 'push'
+        with:
+          path: dist
+
+  deploy:
+    name: deploy
+    if: github.event_name == 'push'
+    needs: check
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

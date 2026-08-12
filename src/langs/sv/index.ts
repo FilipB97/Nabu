@@ -1,0 +1,20 @@
+import type { LangAdapter } from '../types'
+
+/** Szwedzki — klasa A. */
+export const sv: LangAdapter = {
+  code: 'sv',
+  name: 'szwedzki',
+  tatoeba: 'swe',
+  freq: 'sv',
+  script: /^[\p{Script=Latin}\p{P}\p{Zs}\d]+$/u,
+  rtl: false,
+  hasScriptStage: false,
+  needsReading: false,
+  needsTranslit: false,
+  tokenizer: 'space',
+  display: { font: 'display', size: 30, lineHeight: 1.55 },
+  tts: { locale: 'sv-SE', rate: 0.6 },
+  sentence: { minTokens: 4, maxTokens: 18 },
+  quiz: { shape: 'edit', minOptions: 4 },
+  production: ['type'],
+}

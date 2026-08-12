@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Nabu">
+  <!-- Znak marki: trzy równo rozłożone znaczniki. Ten sam rysunek jest paskiem
+       postępu sesji, wykresem prognozy i licznikiem opanowanych znaków (sekcja 0 planu). -->
+  <rect width="64" height="64" fill="#0F1622"/>
+  <rect x="14" y="18" width="7" height="28" fill="#8FA8F0"/>
+  <rect x="28.5" y="18" width="7" height="28" fill="#5A6580"/>
+  <rect x="43" y="18" width="7" height="28" fill="#5A6580"/>
+</svg>
