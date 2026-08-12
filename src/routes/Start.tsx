@@ -456,9 +456,18 @@ export function Start() {
         </div>
       )}
 
-      {/* Narzędzia deweloperskie zostają dostępne z telefonu — test dźwięku z sekcji 11
-          wykonuje się na urządzeniu, nie na desktopie — ale nie zajmują paska u góry. */}
-      <nav className="mt-auto flex gap-5 pt-8">
+      {/* Stopka: postęp i ustawienia w tym samym miejscu co narzędzia deweloperskie —
+          test dźwięku z sekcji 11 wykonuje się na urządzeniu, więc musi być dostępny
+          z telefonu, ale nic z tego nie zasługuje na pasek u góry. */}
+      <nav className="mt-auto flex flex-wrap gap-5 pt-8">
+        {chosen && (
+          <Link to={`/postep/${chosen.settings.lang}`} className="nabu-press">
+            <Mono tone="normal">postęp</Mono>
+          </Link>
+        )}
+        <Link to="/ustawienia" className="nabu-press">
+          <Mono tone="normal">ustawienia</Mono>
+        </Link>
         <Link to="/demo">
           <Mono>demo</Mono>
         </Link>

@@ -101,7 +101,7 @@ export type SessionSummary = {
   startedAt: number
 }
 
-type Phase = 'loading' | 'running' | 'done' | 'empty'
+type Phase = 'loading' | 'running' | 'done' | 'empty' | 'error'
 
 /**
  * Etap decyduje o rodzaju karty: `script` pyta o czytanie znaku, `core` o znaczenie
@@ -332,7 +332,12 @@ export function useSession(lang: string) {
       setPhase('running')
     }
 
-    void build()
+    // Talia jest wczytywana z sieci przy pierwszym użyciu języka. Bez tego bloku
+    // pierwsze otwarcie w samolocie kończy się napisem „wczytuję talię…" bez końca,
+    // a użytkownik nie ma jak się dowiedzieć, że po prostu nie ma jej jeszcze na dysku.
+    void build().catch(() => {
+      if (!cancelled) setPhase('error')
+    })
     return () => {
       cancelled = true
     }

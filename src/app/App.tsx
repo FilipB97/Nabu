@@ -4,6 +4,8 @@ import { Demo } from '@/routes/Demo'
 import { Start } from '@/routes/Start'
 import { Session } from '@/routes/Session'
 import { Calibration } from '@/routes/Calibration'
+import { Stats } from '@/routes/Stats'
+import { Settings } from '@/routes/Settings'
 import { Done } from '@/routes/Done'
 import { AudioTest } from '@/routes/AudioTest'
 import { Mono } from '@/ui/Mono'
@@ -53,6 +55,8 @@ export function App() {
           <Route path="/sesja/:lang" element={<Session />} />
           <Route path="/kalibracja/:lang" element={<Calibration />} />
           <Route path="/koniec/:lang" element={<Done />} />
+          <Route path="/postep/:lang" element={<Stats />} />
+          <Route path="/ustawienia" element={<Settings />} />
           <Route path="/demo" element={<Demo />} />
           <Route path="/audio" element={<AudioTest />} />
           <Route path="*" element={<Navigate to="/start" replace />} />

@@ -1318,6 +1318,28 @@ klawiatura jamo składa 물 z ㅁ + ㅜ + ㄹ.
 Statystyki z mylonymi parami, pełne ustawienia, wybór presetu motywu, wszystkie stany
 brzegowe, cofanie odpowiedzi, obsługa klawiatury na desktopie, dostępność.
 
+**Wynik (12.08.2026):** ekran postępu (`#/postep/:lang`) odpowiada na trzy pytania, które
+użytkownik faktycznie zadaje: ile już umiem, kiedy to wróci, co mi się myli. **Bez passy
+i serii dni** — sekcja 1 odrzuca je świadomie, bo zamieniają cel „umieć" na cel
+„nie przerwać", a jeden opuszczony dzień nie może być porażką.
+
+Mylone **pary**, nie mylone słowa: nie „nie znasz 氷", tylko „mylisz 氷 z 水". To jest
+jedyna rzecz, której samoocena nie potrafi powiedzieć, a quiz tak — i bez pola `chosen`
+w logu (sekcja 5.3) tego ekranu nie dałoby się zrobić wstecz. Pierwsza sesja japońska
+pokazała pary `う → つ` i `え → あ`, czyli dokładnie kany mylone kształtem.
+
+Ustawienia globalne (`#/ustawienia`) mają wyłącznie motyw, bo tylko on nie należy do
+żadnego języka; reszta siedzi przy języku, którego dotyczy. Preset pokazujemy JEGO
+kolorami, w wariancie aktualnie widocznym — nazwa „Mech" nie mówi nic, dopóki nie zobaczy
+się rampy.
+
+Dwa stany brzegowe, które dotąd kończyły się zawieszeniem albo brakiem wyjścia:
+
+- **talia niepobrana** — pierwsze otwarcie języka bez sieci kończyło się napisem
+  „wczytuję talię…" bez końca. Teraz jest komunikat i droga powrotna;
+- **cofnięcie odpowiedzi** istniało wyłącznie pod klawiszem `Z`, czyli na telefonie
+  nie istniało — a nietrafione dotknięcie zdarza się właśnie tam. Jest na odsłonięciu.
+
 ### Później
 Chiński (tokenizer `dict` + pinyin z CC-CEDICT), arabski (RTL, zależny od pewnej warstwy audio),
 kolejne języki klasy A na żądanie, ocena odpowiedzi otwartych przez model, wyjaśnienia różnic

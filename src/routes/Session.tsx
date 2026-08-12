@@ -137,6 +137,21 @@ export function Session() {
     if (phase === 'empty') navigate(`/start`, { replace: true })
   }, [phase, summary, lang, navigate])
 
+  if (phase === 'error') {
+    return (
+      <div className="mx-auto flex min-h-screen w-full max-w-[460px] flex-col justify-center gap-6 bg-bg px-7">
+        <Mono tone="normal">talia niepobrana</Mono>
+        <p className="font-ui text-[15px] leading-[1.6] text-text">
+          Nie udało się wczytać materiału dla tego języka. Talia pobiera się przy pierwszym
+          użyciu i zostaje na urządzeniu — jeśli jesteś offline, wróć tu z zasięgiem.
+        </p>
+        <Button variant="primary" full onClick={() => navigate('/start')}>
+          Wróć
+        </Button>
+      </div>
+    )
+  }
+
   if (phase !== 'running' || !current || !settings) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-bg">
@@ -359,9 +374,16 @@ export function Session() {
                 wyżej), a wymuszony fokus rysuje obwódkę wokół przycisku przy każdej
                 odpowiedzi — na telefonie wygląda jak usterka. */}
             {reveal && (
-              <Button variant="primary" full onClick={next} className="mt-3">
-                Dalej
-              </Button>
+              <div className="mt-3 flex items-center gap-3">
+                <Button variant="primary" full onClick={next}>
+                  Dalej
+                </Button>
+                {/* Cofnięcie było dotąd wyłącznie pod klawiszem `Z`, czyli na telefonie
+                    nie istniało — a nietrafione dotknięcie zdarza się właśnie tam. */}
+                <Button variant="ghost" onClick={() => void undoLast()}>
+                  cofnij
+                </Button>
+              </div>
             )}
           </>
         ) : (

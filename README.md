@@ -6,21 +6,25 @@ czytaniami i wymową, działa offline i mieści się w dziesięciu minutach dzie
 Pełna specyfikacja — model danych, silnik powtórek, pipeline i kolejność prac z bramkami —
 jest w [`plan.md`](plan.md). Ten plik opisuje tylko, jak uruchomić repo.
 
-## Stan: M5
+## Stan: M9 (bez M6)
 
-Działająca sesja: dodajesz język, przechodzisz przez pismo, rdzeń i zdania, słuchasz
-wymowy, a postęp zapisuje się lokalnie po każdej odpowiedzi. Nie ma jeszcze logowania
-ani synchronizacji.
+Działająca aplikacja: dodajesz język, kalibrujesz zasięg słownictwa, przechodzisz przez
+pismo, rdzeń i zdania, słuchasz wymowy, a karty dojrzałe proszą o odtworzenie słowa
+z pamięci. Postęp zapisuje się lokalnie po każdej odpowiedzi. Konto i synchronizacja (M6)
+są świadomie odłożone.
 
 | jest | nie ma |
 |---|---|
-| Vite + React + TypeScript, PWA z precache | statystyk i pełnych ustawień (M9) |
-| silnik SM-2 z krokami nauki i ochroną przed strzałem | kart produkcji i rysowania (M8) |
+| Vite + React + TypeScript, PWA z precache | logowania i synchronizacji (M6) |
+| silnik SM-2 z krokami nauki i ochroną przed strzałem | rysowania znaków po KanjiVG (M8) |
 | furigana i pinyin nad wyrazami, sterowane ustawieniem | |
-| etapy: pismo → rdzeń → zdania, z bramą opanowania | klawiatur kana i jamo (M8) |
-| Dexie jako źródło prawdy, zapis po każdej odpowiedzi | logowania i synchronizacji (M6) |
+| etapy: pismo → rdzeń → zdania, z bramą opanowania | |
+| Dexie jako źródło prawdy, zapis po każdej odpowiedzi | eksportu i importu pliku (M6) |
 | mowa systemowa i karty ze słuchu od trzeciej powtórki | |
-| pipeline 01–07, sześć języków z dystraktorami | kalibracji poziomu wejściowego (M7) |
+| kalibracja zasięgu i poziom wejściowy | |
+| produkcja: wpisywanie, klawiatura kana i jamo | |
+| statystyki z mylonymi parami, wybór presetu motywu | |
+| pipeline 01–07, sześć języków z dystraktorami | |
 | 17 tokenów motywu, 5 presetów, bramka kontrastu w CI | |
 | kroje zsubsetowane do znaków z talii, razem 1,36 MB | |
 
@@ -56,6 +60,8 @@ npm run dev          # http://localhost:5173/#/start
 Trasy:
 
 - `#/start` — dodanie języka, ustawienia sesji, wejście w naukę
+- `#/postep/{lang}` — utrwalone słowa, prognoza powtórek, mylone pary
+- `#/ustawienia` — motyw: preset i wariant
 - `#/demo` — trzy stany karty, trzy systemy pisma, przełącznik presetów
 - `#/audio` — test warstwy dźwięku z sekcji 11 planu, do wykonania na iPhonie
 
