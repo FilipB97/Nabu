@@ -58,13 +58,17 @@ export function QuizOption({
   const mark = state === 'correct' && chosen ? '✓' : state === 'chosen-wrong' ? '×' : ''
 
   return (
+    // `aria-disabled`, a nie `disabled`: wyłączony przycisk wypada z drzewa dostępności
+    // i traci fokus, a po odpowiedzi to właśnie opcje niosą treść do nauczenia się —
+    // ujawnione glosy i informację, czym wybrane słowo różniło się od poprawnego.
+    // Użytkownik czytnika ekranu musi móc je przejrzeć, tylko nie może już kliknąć.
     <button
       type="button"
-      disabled={answered}
-      onClick={onSelect}
+      aria-disabled={answered}
+      onClick={answered ? undefined : onSelect}
       aria-label={answered ? `${term} — ${gloss}` : term}
       className={`flex min-h-[62px] w-full items-center justify-between gap-3 border px-[18px] text-start
-        select-none disabled:cursor-default ${STATE_CLASSES[state]}`}
+        select-none ${answered ? 'cursor-default' : 'cursor-pointer'} ${STATE_CLASSES[state]}`}
     >
       <span className="flex items-baseline gap-[10px]">
         <span className={`${FONT_CLASS[font]} text-[24px] leading-[1.35]`}>{term}</span>

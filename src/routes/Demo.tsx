@@ -150,8 +150,10 @@ function ThemePicker() {
 
 function Phone({ children, caption }: { children: React.ReactNode; caption: string }) {
   return (
-    <figure className="m-0 flex flex-none flex-col gap-[10px]">
-      <div className="h-[844px] w-[390px] overflow-hidden rounded-[34px] border border-border-quiet">
+    // `max-w-full` bez `flex-none`: ramka telefonu ma 390 px, czyli więcej niż szerokość
+    // wielu telefonów. Bez tego strona przewijałaby się w poziomie, a plan tego zabrania.
+    <figure className="m-0 flex w-[390px] max-w-full flex-col gap-[10px]">
+      <div className="h-[844px] w-full overflow-hidden rounded-[34px] border border-border-quiet">
         {children}
       </div>
       <figcaption>
