@@ -6,19 +6,46 @@ czytaniami i wymową, działa offline i mieści się w dziesięciu minutach dzie
 Pełna specyfikacja — model danych, silnik powtórek, pipeline i kolejność prac z bramkami —
 jest w [`plan.md`](plan.md). Ten plik opisuje tylko, jak uruchomić repo.
 
-## Stan: M0
+## Stan: M2
 
-Szkielet aplikacji z warstwą motywów i kartą z makiety odtworzoną na żywych tokenach.
-Nie ma jeszcze danych, silnika powtórek ani logowania — te wchodzą od M1.
+Działająca sesja: dodajesz język, odpowiadasz na karty, postęp zapisuje się lokalnie
+po każdej odpowiedzi. Nie ma jeszcze logowania ani synchronizacji.
 
 | jest | nie ma |
 |---|---|
-| Vite + React + TypeScript, PWA z precache | `data/` — talie powstają w M1 |
-| 13 tokenów motywu, 5 presetów × jasny/ciemny/systemowy | silnika SRS i kolejki sesji |
-| bramka kontrastu AA w CI (118 asercji) | Firebase, kont, synchronizacji |
-| karta quizu w trzech systemach pisma, obsługa klawiatury | kart produkcji i rysowania |
-| adaptery pięciu języków wg kontraktu z sekcji 2.1 | dystraktorów (krok `06`) |
-| kroje hostowane u siebie i zsubsetowane, razem 188 kB | |
+| Vite + React + TypeScript, PWA z precache | logowania i synchronizacji (M6) |
+| silnik SM-2 z krokami nauki i ochroną przed strzałem | kart produkcji i rysowania (M8) |
+| kolejka sesji, karty wracają w tej samej sesji | kalibracji i poziomów wejściowych (M7) |
+| Dexie jako źródło prawdy, zapis po każdej odpowiedzi | etapów i bram dla obcego pisma (M3) |
+| talie ładowane paczkami na żądanie, nie w precache | statystyk i ustawień (M9) |
+| pipeline 01–07, pięć języków z dystraktorami | renderowania ruby w sesji (M4) |
+| 13 tokenów motywu, 5 presetów, bramka kontrastu w CI | |
+| kroje zsubsetowane do znaków z talii, razem 1,25 MB | chińskiego |
+
+### Dane
+
+| język | zdań | leksykon | odrzuty jakościowe | pasma |
+|---|---|---|---|---|
+| hiszpański | 10 949 | 2 445 | 25% | 63–11 998 |
+| portugalski | 8 423 | 1 771 | 24% | 57–11 978 |
+| szwedzki | 2 323 | 974 | 15% | 50–11 973 |
+| koreański | 761 | 301 | 16% | 85–29 831 |
+| japoński | 16 699 | 1 323 | 8% | 57–19 998 |
+
+Japoński ma pełną segmentację i czytania: `毎日[まいにち]`, `興味深い[きょうみぶかい]`,
+katakana bez furigany. Koreański ma rozdzielone partykuły, więc luka wypada na samym
+rzeczowniku, a partykuła zostaje w zdaniu jako wskazówka składniowa.
+| koreański | 761 | 301 | 16% | 85–29 831 |
+| japoński | 16 699 | 1 323 | 8% | 57–19 998 |
+
+Japoński ma pełną segmentację i czytania: `毎日[まいにち]`, `興味深い[きょうみぶかい]`,
+katakana bez furigany. Koreański ma rozdzielone partykuły, więc luka wypada na samym
+rzeczowniku, a partykuła zostaje w zdaniu jako wskazówka składniowa.
+
+**Nic w `data/` nie jest napisane maszynowo.** Zdania i ich polskie tłumaczenia pochodzą
+z Tatoeby, glosy z polskiego Wikisłownika, rangi z list częstości napisów filmowych.
+Build nie wymaga klucza API i da się go powtórzyć w całości — szczegóły w
+[`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md) i sekcji 10.3 planu.
 
 ## Uruchomienie
 
@@ -27,7 +54,7 @@ npm install
 npm run dev          # http://localhost:5173/#/demo
 ```
 
-Trasy w M0:
+Trasy w M1:
 
 - `#/demo` — trzy stany karty, trzy systemy pisma, przełącznik presetów
 - `#/audio` — test warstwy dźwięku z sekcji 11 planu, do wykonania na iPhonie
@@ -42,7 +69,8 @@ Trasy w M0:
 | `npm test` | Vitest — kontrast presetów, arytmetyka hangulu, spójność tokenów |
 | `npm run lint` | ESLint, w tym reguła o kodach języków i kolorach |
 | `npm run check` | wszystko naraz, tak jak w CI |
-| `node build/07-fonts.ts` | pobiera i subsetuje kroje do `public/fonts/` |
+| `npm run build:data es` | pełny pipeline danych dla języka → `data/es/` |
+| `npm run build:fonts` | subsetuje kroje lokalnie (wymaga `pip install fonttools brotli`) |
 
 ## Dwie reguły, których pilnuje CI
 

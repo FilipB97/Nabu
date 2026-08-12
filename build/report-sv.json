@@ -1,0 +1,235 @@
+{
+  "lang": "sv",
+  "zdań": 2315,
+  "kandydatów": 8080,
+  "odrzuconychNaJakości": 1212,
+  "odsetekOdrzutówJakościowych": 15,
+  "odsetekNieprzydatnychNaKartę": 56,
+  "pozaZasięgiem": 48738,
+  "powodyJakość": {
+    "pasmo powyżej progu języka": 726,
+    "za dużo tokenów spoza listy częstości": 295,
+    "nazwa własna": 174,
+    "wulgaryzm": 15,
+    "znaki spoza zestawu języka": 2
+  },
+  "powodyPrzydatność": {
+    "za krótkie": 2375,
+    "brak tokenu nadającego się na lukę": 2163,
+    "za długie": 15
+  },
+  "tłumaczenia": {
+    "bezpośrednie": 690,
+    "przezAngielski": 1625
+  },
+  "pasma": {
+    "min": 50,
+    "mediana": 1248,
+    "p90": 6121,
+    "max": 11973
+  },
+  "quizNiedostępny": 1,
+  "próbka": [
+    {
+      "text": "Vad vill du då?",
+      "pl": "Czego zatem chcesz?",
+      "luka": "då",
+      "band": 50,
+      "src": "pivot",
+      "dystraktory": [
+        "igen",
+        "mycket",
+        "lite",
+        "tillbaka",
+        "nog"
+      ]
+    },
+    {
+      "text": "Jag var aldrig din vän.",
+      "pl": "Nigdy nie byłam twoją przyjaciółką.",
+      "luka": "vän",
+      "band": 227,
+      "src": "direct",
+      "dystraktory": [
+        "väg",
+        "hand",
+        "problem",
+        "sak",
+        "kväll",
+        "far",
+        "gud",
+        "pengar"
+      ]
+    },
+    {
+      "text": "Det var trevligt att göra ingenting.",
+      "pl": "Fajnie było nic nie robić.",
+      "luka": "trevligt",
+      "band": 428,
+      "src": "direct",
+      "dystraktory": [
+        "gott",
+        "heller",
+        "ibland",
+        "alls",
+        "svårt",
+        "tillsammans",
+        "förut",
+        "inne"
+      ]
+    },
+    {
+      "text": "Få bort Tom härifrån.",
+      "pl": "Zabierz stąd Toma.",
+      "luka": "Tom",
+      "band": 659,
+      "src": "pivot",
+      "dystraktory": [
+        "skyldig",
+        "dum",
+        "trött",
+        "sjuk",
+        "snäll",
+        "annorlunda",
+        "full",
+        "orolig"
+      ]
+    },
+    {
+      "text": "Du vet att det här är annorlunda.",
+      "pl": "Wiesz, że to różnica.",
+      "luka": "annorlunda",
+      "band": 735,
+      "src": "pivot",
+      "dystraktory": [
+        "ung",
+        "orolig",
+        "dum",
+        "dålig",
+        "tvungen",
+        "sjuk",
+        "trött",
+        "skyldig"
+      ]
+    },
+    {
+      "text": "Jag tycker om att dansa.",
+      "pl": "Lubię tańczyć.",
+      "luka": "dansa",
+      "band": 1032,
+      "src": "pivot",
+      "dystraktory": [
+        "lösa",
+        "byta",
+        "ändra",
+        "välja",
+        "bevisa",
+        "glömma",
+        "säkra",
+        "arbeta"
+      ]
+    },
+    {
+      "text": "Hon hörde honom sjunga.",
+      "pl": "Słyszała, jak on śpiewa.",
+      "luka": "sjunga",
+      "band": 1436,
+      "src": "direct",
+      "dystraktory": [
+        "stänga",
+        "springa",
+        "ljuga",
+        "fungera",
+        "laga",
+        "backa",
+        "minnas",
+        "gömma"
+      ]
+    },
+    {
+      "text": "Äntligen är det fredag.",
+      "pl": "Nareszcie piątek.",
+      "luka": "fredag",
+      "band": 2071,
+      "src": "pivot",
+      "dystraktory": [
+        "lördag",
+        "färg",
+        "alternativ",
+        "tyska",
+        "mening",
+        "fiende",
+        "stig",
+        "franska"
+      ]
+    },
+    {
+      "text": "Jag spelade fotboll igår.",
+      "pl": "Grałem wczoraj w piłkę nożną.",
+      "luka": "fotboll",
+      "band": 2816,
+      "src": "pivot",
+      "dystraktory": [
+        "morbror",
+        "antal",
+        "flygplan",
+        "otur",
+        "fågel",
+        "tjuv",
+        "hatt",
+        "kopia"
+      ]
+    },
+    {
+      "text": "Det är fortfarande lite för tidigt för snö.",
+      "pl": "Wciąż trochę za wcześnie na śnieg.",
+      "luka": "snö",
+      "band": 4139,
+      "src": "direct",
+      "dystraktory": [
+        "pension",
+        "brand",
+        "sport",
+        "anställd",
+        "kinesiska",
+        "undantag",
+        "våning",
+        "trädgård"
+      ]
+    },
+    {
+      "text": "Alla måste anpassa sig.",
+      "pl": "Każdy musi się dostosować.",
+      "luka": "anpassa",
+      "band": 6434,
+      "src": "pivot",
+      "dystraktory": [
+        "reparera",
+        "undervisa",
+        "frysa",
+        "drunkna",
+        "anställa",
+        "kila",
+        "skruva",
+        "reagera"
+      ]
+    },
+    {
+      "text": "Hon skrattade med illa dolt förakt i rösten.",
+      "pl": "Śmiała się ze źle skrywaną wzgardą w głosie.",
+      "luka": "förakt",
+      "band": 11973,
+      "src": "direct",
+      "dystraktory": [
+        "förkylning",
+        "turist",
+        "yoghurt",
+        "kam",
+        "sköldpadda",
+        "mjöl",
+        "polska",
+        "oljud"
+      ]
+    }
+  ]
+}

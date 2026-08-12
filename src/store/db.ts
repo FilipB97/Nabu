@@ -1,0 +1,148 @@
+import Dexie, { type Table } from 'dexie'
+import type { CardState, LogEntry } from '@/srs/types'
+
+/**
+ * Magazyn lokalny — sekcja 5.3 i 5.5 planu.
+ *
+ * IndexedDB jest ŹRÓDŁEM PRAWDY, nie pamięcią podręczną chmury. Zapis idzie tu
+ * natychmiast po każdej odpowiedzi i sesja nigdy nie czeka na sieć. Firestore
+ * (M6) będzie kopią, a nie warunkiem działania.
+ */
+
+/** Ustawienia per język — sekcja 8.5. Motyw jest globalny i siedzi poza bazą. */
+export type LangSettings = {
+  lang: string
+  /**
+   * Aktywny dostaje nowe pozycje, utrzymywany tylko zaległe powtórki (sekcja 2.4).
+   * Bez tego rozróżnienia pięć języków to 100+ kart dziennie i porzucenie aplikacji.
+   */
+  active: boolean
+  intensity: 'short' | 'normal' | 'long'
+  /** Liczba opcji w quizie: 3, 4 albo 6. */
+  quizOptions: number
+  /** Przejście dalej po trafieniu, bez dotykania „Dalej". Pudło zawsze czeka. */
+  autoAdvance: boolean
+  production: 'off' | 'mature' | 'always'
+  furigana: 'always' | 'after' | 'never'
+  romaji: boolean
+  /** Tempo mowy 0.3–1.0. */
+  rate: number
+  /** Pasmo częstości, z którego dobieramy nowe pozycje (sekcja 3.1). */
+  bandFrom: number
+  bandTo: number
+  addedAt: number
+}
+
+/** Ile kart w sesji, wg intensywności — sekcja 3.2. */
+export const INTENSITY: Record<LangSettings['intensity'], { due: number; fresh: number }> = {
+  short: { due: 10, fresh: 3 },
+  normal: { due: 25, fresh: 8 },
+  long: { due: 50, fresh: 15 },
+}
+
+export type StoredLog = LogEntry & { seq?: number }
+
+class NabuDb extends Dexie {
+  cards!: Table<CardState, string>
+  log!: Table<StoredLog, number>
+  settings!: Table<LangSettings, string>
+
+  constructor() {
+    super('nabu')
+    this.version(1).stores({
+      // `[lang+due]` obsługuje jedyne zapytanie gorące w sesji: „co jest do powtórki
+      // w tym języku". Bez indeksu złożonego trzeba by przeglądać całą tabelę.
+      cards: 'id, lang, due, stage, [lang+due], [lang+stage]',
+      log: '++seq, ts, id, lang, [lang+ts]',
+      settings: 'lang',
+    })
+  }
+}
+
+export const db = new NabuDb()
+
+const DEFAULTS: Omit<LangSettings, 'lang' | 'addedAt'> = {
+  active: true,
+  intensity: 'normal',
+  quizOptions: 4,
+  autoAdvance: true,
+  production: 'mature',
+  furigana: 'after',
+  romaji: true,
+  rate: 0.6,
+  bandFrom: 1,
+  bandTo: 500,
+  addedAt: 0,
+} as Omit<LangSettings, 'lang' | 'addedAt'>
+
+export async function settingsFor(lang: string): Promise<LangSettings> {
+  const stored = await db.settings.get(lang)
+  if (stored) return stored
+  const fresh: LangSettings = { ...DEFAULTS, lang, addedAt: Date.now() }
+  await db.settings.put(fresh)
+  return fresh
+}
+
+export async function updateSettings(
+  lang: string,
+  patch: Partial<Omit<LangSettings, 'lang'>>,
+): Promise<LangSettings> {
+  const current = await settingsFor(lang)
+  const next = { ...current, ...patch }
+  await db.settings.put(next)
+  return next
+}
+
+/** Języki dodane przez użytkownika, w kolejności dodania. */
+export async function addedLanguages(): Promise<LangSettings[]> {
+  const all = await db.settings.toArray()
+  return all.sort((a, b) => a.addedAt - b.addedAt)
+}
+
+/**
+ * Zapisuje wynik odpowiedzi: stan karty i wpis w logu, w jednej transakcji.
+ * Rozdzielenie ich groziłoby stanem, w którym karta ma nowy interwał, a log nie wie,
+ * skąd się wziął — a to jest dokładnie ten materiał, na którym stanie kiedyś FSRS.
+ */
+export async function recordAnswer(card: CardState, entry: LogEntry): Promise<void> {
+  await db.transaction('rw', db.cards, db.log, async () => {
+    await db.cards.put(card)
+    await db.log.add(entry)
+  })
+}
+
+/** Karty do powtórki w danym języku, na teraz. */
+export async function dueCards(lang: string, now: number, limit: number): Promise<CardState[]> {
+  const cards = await db.cards
+    .where('[lang+due]')
+    .between([lang, Dexie.minKey], [lang, new Date(now).toISOString()])
+    .limit(limit * 2)
+    .toArray()
+  return cards.filter((card) => !card.suspended).slice(0, limit)
+}
+
+/** Ile kart czeka w danym języku — do ekranu startu. */
+export async function dueCount(lang: string, now: number): Promise<number> {
+  return db.cards
+    .where('[lang+due]')
+    .between([lang, Dexie.minKey], [lang, new Date(now).toISOString()])
+    .count()
+}
+
+/**
+ * Liczba pozycji rozpoczętych, ale jeszcze nieutrwalonych. Powyżej progu przestajemy
+ * dokładać nowe i mówimy o tym wprost na ekranie startu (sekcja 6, limit zaległości).
+ */
+export const BACKLOG_LIMIT = 20
+
+export async function backlogCount(lang: string): Promise<number> {
+  return db.cards.where('[lang+stage]').between([lang, ''], [lang, '￿']).filter(
+    (card) => card.interval === 0 && card.reps > 0 && !card.suspended,
+  ).count()
+}
+
+/** Identyfikatory pozycji, które użytkownik już widział — do doboru nowych. */
+export async function seenIds(lang: string): Promise<Set<string>> {
+  const ids = await db.cards.where('lang').equals(lang).primaryKeys()
+  return new Set(ids)
+}

@@ -2,121 +2,171 @@
  * Krok 07 — kroje pisma hostowane u siebie i zsubsetowane. Sekcja 9.2 planu.
  *
  * Aplikacja ma otwierać się w samolocie, więc `preconnect` do fonts.gstatic.com
- * nie może przetrwać przeniesienia makiety do kodu. Pobieramy pliki `.woff2` raz,
- * commitujemy do `public/fonts/` i wpinamy przez `@font-face` w `src/index.css`.
+ * nie może przetrwać przeniesienia makiety do kodu. Pobieramy kroje raz, subsetujemy
+ * lokalnie, commitujemy do `public/fonts/` i wpinamy przez `@font-face` w `src/index.css`.
  *
- * Subsetowanie robi za nas parametr `text=` w API Google Fonts: zwraca krój zawężony
- * dokładnie do podanych znaków. Dla pism CJK to różnica między kilkoma megabajtami
- * a kilkudziesięcioma kilobajtami — czyli między psuciem precache'a a jego brakiem.
+ * Zestaw znaków bierzemy z `data/`: skrypt czyta wszystkie talie i buduje unię znaków,
+ * które faktycznie występują. Dzięki temu subset regeneruje się razem z danymi i nie ma
+ * ryzyka, że talia urośnie o znak, którego krój nie zawiera.
  *
- * STAN NA M0: zestaw znaków CJK jest wpisany na sztywno, bo `data/` jeszcze nie istnieje.
- * W M1, gdy powstaną talie, `cjkCharsFor()` ma czytać unię znaków z `data/{lang}/`
- * zamiast stałej — reszta skryptu zostaje bez zmian.
+ * DLACZEGO LOKALNIE, A NIE PRZEZ API GOOGLE FONTS. Parametr `text=` w css2 subsetuje
+ * po stronie serwera i działał, dopóki zestaw był mały. Po dołożeniu koreańskiego urósł
+ * do 690 znaków (5,5 kB po zakodowaniu w URL-u), Google po cichu zignorował parametr
+ * i zwrócił pełny krój w 124 kawałkach — czyli dokładnie to, czego ta sekcja planu
+ * zabrania. Cichy fallback do pełnego kroju jest gorszy od błędu, więc skrypt sprawdza
+ * teraz wagę wyniku i przerywa, gdy subset nie zadziałał.
  *
- * Uruchomienie:  node build/07-fonts.ts
+ * Uruchomienie:  npm run build:fonts   (wymaga `pip install fonttools brotli`)
  */
 
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, readdir, stat } from 'node:fs/promises'
+import { spawn } from 'node:child_process'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { CACHE, DATA, download } from './lib/io.ts'
 
 const OUT_DIR = resolve(dirname(fileURLToPath(import.meta.url)), '../public/fonts')
 
-/** Bez tego nagłówka API zwraca `.ttf` zamiast `.woff2`. */
-const WOFF2_UA =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' +
-  'Chrome/120.0.0.0 Safari/537.36'
-
-/** Znaki potrzebne polskiemu interfejsowi i językom klasy A. */
+/** Znaki potrzebne polskiemu interfejsowi, niezależnie od zawartości talii. */
 const LATIN =
   'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789' +
-  'ĄĆĘŁŃÓŚŹŻąćęłńóśźż' + // polski
-  'ÁÀÂÃÄÅÇÉÈÊËÍÌÎÏÑÓÒÔÕÖÚÙÛÜÝ' + // es, pt
-  'áàâãäåçéèêëíìîïñóòôõöúùûüýÿ' +
-  'ÆØÅæøå' + // sv, no
-  ' .,;:!?¡¿·—–-–…„“”‘’"\'()[]{}/\\@#%&*+=<>|~^$€£×÷°'
+  'ĄĆĘŁŃÓŚŹŻąćęłńóśźż' +
+  'ÁÀÂÃÄÅÇÉÈÊËÍÌÎÏÑÓÒÔÕÖÚÙÛÜÝáàâãäåçéèêëíìîïñóòôõöúùûüýÿ' +
+  'ÆØÅæøå' +
+  ' .,;:!?¡¿·—–-…„“”‘’"\'()[]{}/\\@#%&*+=<>|~^$€£×÷°'
 
-/**
- * Kana w całości (etap 0 japońskiego) plus kanji z demo M0.
- * W M1 zastąpić unią znaków z `data/ja/`.
- */
+/** Kana w całości: etap 0 japońskiego wymaga wszystkich znaków, nie tylko tych z talii. */
 const KANA =
   'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん' +
   'がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽっゃゅょぁぃぅぇぉー' +
   'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン' +
   'ガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポッャュョァィゥェォ' +
   '、。「」・'
-const KANJI_M0 = '水氷湯米建物確認'
 
-/** Sylaby hangul z demo M0. W M1 zastąpić unią znaków z `data/ko/`. */
-const HANGUL_M0 = '물불밀말좀주세요안녕하십니까'
+/** Znaki z dema, żeby strona demonstracyjna działała także bez talii japońskiej. */
+const DEMO = '水氷湯米建物確認물불밀말좀주세요안녕하십니까'
 
-type FontJob = {
-  /** Nazwa pliku wynikowego, bez rozszerzenia. */
-  file: string
-  /** Rodzina w API Google Fonts. */
-  family: string
-  /** Grubość; API wymaga jej podania jawnie. */
-  weight: number | string
-  /** Gdy podany, krój jest zawężony dokładnie do tych znaków. */
-  text?: string
+/** Zbiera znaki występujące w taliach, w rozbiciu na systemy pisma. */
+async function charsFromData(): Promise<{ latin: string; hangul: string; cjk: string }> {
+  const chars = new Set<string>()
+  let langs: string[] = []
+  try {
+    langs = await readdir(DATA)
+  } catch {
+    return { latin: '', hangul: '', cjk: '' }
+  }
+
+  for (const lang of langs) {
+    let files: string[] = []
+    try {
+      files = await readdir(resolve(DATA, lang))
+    } catch {
+      continue
+    }
+    for (const file of files) {
+      if (!file.endsWith('.json')) continue
+      for (const char of await readFile(resolve(DATA, lang, file), 'utf8')) chars.add(char)
+    }
+  }
+
+  const pick = (re: RegExp) => [...chars].filter((c) => re.test(c)).join('')
+  return {
+    latin: pick(/[\p{Script=Latin}\p{P}\p{S}]/u),
+    hangul: pick(/\p{Script=Hangul}/u),
+    cjk: pick(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u),
+  }
 }
+
+const fromData = await charsFromData()
+
+const GH = 'https://raw.githubusercontent.com/google/fonts/main'
+
+type FontJob = { file: string; url: string; chars: string }
 
 const JOBS: FontJob[] = [
-  { file: 'archivo-latin', family: 'Archivo', weight: '100..900', text: LATIN },
-  { file: 'spectral-300-latin', family: 'Spectral', weight: 300, text: LATIN },
-  { file: 'spectral-400-latin', family: 'Spectral', weight: 400, text: LATIN },
-  { file: 'plex-mono-400-latin', family: 'IBM Plex Mono', weight: 400, text: LATIN },
-  { file: 'noto-serif-jp', family: 'Noto Serif JP', weight: 400, text: KANA + KANJI_M0 + LATIN },
-  { file: 'noto-serif-kr', family: 'Noto Serif KR', weight: 400, text: HANGUL_M0 + LATIN },
+  {
+    file: 'archivo-latin',
+    url: `${GH}/ofl/archivo/Archivo%5Bwdth,wght%5D.ttf`,
+    chars: LATIN + fromData.latin,
+  },
+  {
+    file: 'spectral-300-latin',
+    url: `${GH}/ofl/spectral/Spectral-Light.ttf`,
+    chars: LATIN + fromData.latin,
+  },
+  {
+    file: 'spectral-400-latin',
+    url: `${GH}/ofl/spectral/Spectral-Regular.ttf`,
+    chars: LATIN + fromData.latin,
+  },
+  {
+    file: 'plex-mono-400-latin',
+    url: `${GH}/ofl/ibmplexmono/IBMPlexMono-Regular.ttf`,
+    chars: LATIN,
+  },
+  {
+    file: 'noto-serif-jp',
+    url: `${GH}/ofl/notoserifjp/NotoSerifJP%5Bwght%5D.ttf`,
+    chars: KANA + DEMO + LATIN + fromData.cjk,
+  },
+  {
+    file: 'noto-serif-kr',
+    url: `${GH}/ofl/notoserifkr/NotoSerifKR%5Bwght%5D.ttf`,
+    chars: DEMO + LATIN + fromData.hangul,
+  },
 ]
 
-function cssUrl({ family, weight, text }: FontJob): string {
-  const axis = typeof weight === 'string' ? `wght@${weight}` : `wght@${weight}`
-  const params = new URLSearchParams({
-    family: `${family}:${axis}`,
-    display: 'swap',
+/** Zawęża krój do podanych znaków przez `fontTools.subset` i zapisuje jako woff2. */
+function subset(source: string, target: string, chars: string): Promise<void> {
+  const unique = [...new Set(chars)].join('')
+  return new Promise((ok, fail) => {
+    const child = spawn('python3', [
+      '-m',
+      'fontTools.subset',
+      source,
+      `--text=${unique}`,
+      `--output-file=${target}`,
+      '--flavor=woff2',
+      '--layout-features=*',
+      '--no-hinting',
+    ])
+    let stderr = ''
+    child.stderr.on('data', (chunk) => (stderr += String(chunk)))
+    child.on('error', fail)
+    child.on('exit', (code) =>
+      code === 0
+        ? ok()
+        : fail(new Error(`fontTools.subset zakończył się kodem ${code}\n${stderr}`)),
+    )
   })
-  if (text) params.set('text', text)
-  return `https://fonts.googleapis.com/css2?${params.toString()}`
-}
-
-async function fetchText(url: string): Promise<string> {
-  const response = await fetch(url, { headers: { 'User-Agent': WOFF2_UA } })
-  if (!response.ok) throw new Error(`${response.status} ${response.statusText} — ${url}`)
-  return response.text()
 }
 
 async function run(): Promise<void> {
   await mkdir(OUT_DIR, { recursive: true })
+  await mkdir(CACHE, { recursive: true })
   let total = 0
 
   for (const job of JOBS) {
-    const css = await fetchText(cssUrl(job))
-    // Z parametrem `text=` API zwraca URL bez rozszerzenia (`/l/font?kit=…`),
-    // więc rozpoznajemy format po deklaracji `format('woff2')`, nie po ścieżce.
-    const sources = [...css.matchAll(/src:\s*url\((https:\/\/[^)]+)\)\s*format\('woff2'\)/g)].map(
-      (m) => m[1]!,
+    const source = await download(job.url, `font-${job.file}.ttf`)
+    const target = resolve(OUT_DIR, `${job.file}.woff2`)
+
+    await subset(source, target, job.chars)
+    const { size } = await stat(target)
+
+    // Bezpiecznik: subset nie może po cichu zwrócić pełnego kroju. Noto Serif JP
+    // w całości waży kilka megabajtów i rozwala precache, a bramka M0 przechodziłaby
+    // wtedy tylko pozornie.
+    if (size > 1_500_000) {
+      throw new Error(
+        `${job.file}: wynik waży ${(size / 1048576).toFixed(1)} MB — subset nie zadziałał`,
+      )
+    }
+
+    total += size
+    console.log(
+      `  ${job.file.padEnd(22)} ${(size / 1024).toFixed(1).padStart(7)} kB   ` +
+        `${new Set(job.chars).size} znaków`,
     )
-
-    if (sources.length === 0) {
-      throw new Error(`Brak woff2 w odpowiedzi dla ${job.family} — API zmieniło format?`)
-    }
-    if (sources.length > 1) {
-      // Z parametrem `text=` API zawsze zwraca jeden plik. Więcej oznacza, że subset
-      // się nie zastosował, a wtedy Noto Serif JP wraca do pełnego rozmiaru.
-      throw new Error(`${job.family}: ${sources.length} plików zamiast jednego — subset nie zadziałał`)
-    }
-
-    const binary = await fetch(sources[0]!, { headers: { 'User-Agent': WOFF2_UA } })
-    if (!binary.ok) throw new Error(`${binary.status} przy pobieraniu ${job.file}`)
-
-    const bytes = Buffer.from(await binary.arrayBuffer())
-    await writeFile(resolve(OUT_DIR, `${job.file}.woff2`), bytes)
-    total += bytes.byteLength
-
-    const kb = (bytes.byteLength / 1024).toFixed(1)
-    console.log(`  ${job.file.padEnd(22)} ${kb.padStart(7)} kB   ${job.family}`)
   }
 
   console.log(`\nRazem ${(total / 1024).toFixed(1)} kB w ${OUT_DIR}`)

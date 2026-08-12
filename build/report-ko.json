@@ -1,0 +1,226 @@
+{
+  "lang": "ko",
+  "zdań": 759,
+  "kandydatów": 2300,
+  "odrzuconychNaJakości": 360,
+  "odsetekOdrzutówJakościowych": 16,
+  "odsetekNieprzydatnychNaKartę": 51,
+  "pozaZasięgiem": 13573,
+  "powodyJakość": {
+    "pasmo powyżej progu języka": 243,
+    "za dużo tokenów spoza listy częstości": 104,
+    "znaki spoza zestawu języka": 9,
+    "wulgaryzm": 4
+  },
+  "powodyPrzydatność": {
+    "brak tokenu nadającego się na lukę": 588,
+    "za krótkie": 579,
+    "za długie": 14
+  },
+  "tłumaczenia": {
+    "bezpośrednie": 20,
+    "przezAngielski": 739
+  },
+  "pasma": {
+    "min": 85,
+    "mediana": 6215,
+    "p90": 23076,
+    "max": 29831
+  },
+  "quizNiedostępny": 29,
+  "próbka": [
+    {
+      "text": "오늘이 며칠이지?",
+      "pl": "Jaka jest dzisiejsza data?",
+      "luka": "오늘",
+      "band": 85,
+      "src": "pivot",
+      "dystraktory": [
+        "빨리",
+        "지금",
+        "이제"
+      ]
+    },
+    {
+      "text": "개가 짖네.",
+      "pl": "Psy szczekają.",
+      "luka": "개",
+      "band": 726,
+      "src": "pivot",
+      "dystraktory": [
+        "간",
+        "기분",
+        "배",
+        "길",
+        "저녁",
+        "문제",
+        "학교",
+        "노래"
+      ]
+    },
+    {
+      "text": "나는 그녀가 헤엄치는 것을 봤다.",
+      "pl": "Widziałem, jak pływała.",
+      "luka": "것",
+      "band": 1362,
+      "src": "pivot",
+      "dystraktory": [
+        "게",
+        "정말",
+        "해",
+        "못",
+        "날"
+      ]
+    },
+    {
+      "text": "결과가 좋으면 모든 것이 좋다.",
+      "pl": "Wszystko dobre, co się dobrze kończy.",
+      "luka": "결과",
+      "band": 2410,
+      "src": "pivot",
+      "dystraktory": [
+        "달러",
+        "건물",
+        "벌",
+        "그림",
+        "계속하다",
+        "사과",
+        "자동차",
+        "대통령"
+      ]
+    },
+    {
+      "text": "난 내 고양이가 그리워.",
+      "pl": "Tęsknię za moim kotem.",
+      "luka": "고양이",
+      "band": 4127,
+      "src": "pivot",
+      "dystraktory": [
+        "비행기",
+        "할아버지",
+        "다리",
+        "도시",
+        "파티",
+        "쪽",
+        "피",
+        "오후"
+      ]
+    },
+    {
+      "text": "아무도 거짓말을 안 했어.",
+      "pl": "Nikt nie kłamał.",
+      "luka": "거짓말",
+      "band": 5374,
+      "src": "pivot",
+      "dystraktory": [
+        "얼마",
+        "길",
+        "기억",
+        "딸",
+        "가족",
+        "사진",
+        "달",
+        "물"
+      ]
+    },
+    {
+      "text": "감기에 걸려서 열이 나.",
+      "pl": "Przeziębiłem się i mam gorączkę.",
+      "luka": "감기",
+      "band": 8267,
+      "src": "pivot",
+      "dystraktory": [
+        "사기",
+        "금",
+        "날씨",
+        "공기",
+        "남",
+        "가수",
+        "고래",
+        "가능성"
+      ]
+    },
+    {
+      "text": "계속 땅 파고 있어봐.",
+      "pl": "Kop dalej.",
+      "luka": "땅",
+      "band": 11311,
+      "src": "pivot",
+      "dystraktory": [
+        "빵",
+        "사과",
+        "병",
+        "공",
+        "잡지",
+        "도망",
+        "자살",
+        "바다"
+      ]
+    },
+    {
+      "text": "그녀는 힘든 삶을 살았다.",
+      "pl": "Miała ciężkie życie.",
+      "luka": "삶",
+      "band": 14967,
+      "src": "pivot",
+      "dystraktory": [
+        "섬",
+        "사과",
+        "사자",
+        "자살",
+        "사기",
+        "도망",
+        "소설",
+        "시계"
+      ]
+    },
+    {
+      "text": "톰은 낯을 가리는 것처럼 보여.",
+      "pl": "Tom wydaje się wstydliwy.",
+      "luka": "것",
+      "band": 19326,
+      "src": "pivot",
+      "dystraktory": [
+        "게",
+        "정말",
+        "해",
+        "못",
+        "날"
+      ]
+    },
+    {
+      "text": "호주에 가본 적이 있나요?",
+      "pl": "Byłeś w Australii?",
+      "luka": "적",
+      "band": 23488,
+      "src": "pivot",
+      "dystraktory": [
+        "저녁",
+        "전화",
+        "아버지",
+        "생각",
+        "선생님",
+        "집",
+        "새",
+        "여자"
+      ]
+    },
+    {
+      "text": "돌고래는 호기심이 많다.",
+      "pl": "Delfiny są ciekawskie.",
+      "luka": "돌고래",
+      "band": 29831,
+      "src": "pivot",
+      "dystraktory": [
+        "손톱",
+        "초콜렛",
+        "거미",
+        "소고기",
+        "항구",
+        "발음",
+        "잠자리",
+        "고래"
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import type { LangAdapter } from '../types'
+import type { LangAdapter } from '../types.ts'
 
 /**
  * Japoński — klasa C. Brak spacji wymusza segmentację morfologiczną, a kanji mają
@@ -16,15 +16,27 @@ export const ja: LangAdapter = {
   name: 'japoński',
   tatoeba: 'jpn',
   freq: 'ja',
+  freqSource: 'corpus',
   script: /^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{P}\p{Zs}\dー々]+$/u,
   rtl: false,
   hasScriptStage: true,
   needsReading: true,
   needsTranslit: true,
+  blocklist: /クソ|ちんこ|べっちょ|セックス/iu,
   tokenizer: 'morph',
   display: { font: 'ja', size: 34, lineHeight: 2 },
   tts: { locale: 'ja-JP', rate: 0.4 },
-  sentence: { minTokens: 4, maxTokens: 18 },
-  quiz: { shape: 'kanji-components', minOptions: 4 },
+  // Analizator morfologiczny rozbija na cząstki gramatyczne, więc to samo zdanie
+  // daje więcej tokenów niż podział po spacjach. Progi odpowiednio wyżej.
+  sentence: { minTokens: 5, maxTokens: 24, maxUnknown: 1, clozeSlack: 1 },
+  maxBand: 20000,
+  quiz: {
+    // Tylko rzeczowniki. Czasowniki i przymiotniki trafiałyby do opcji w formie
+    // odmienionej (`大きく`, `歌い`), a ich glosa opisuje formę słownikową — cztery
+    // opcje w różnych formach są wskazówką gramatyczną, nie testem znajomości słowa.
+    clozePos: ['noun'],
+    shape: 'kanji-components',
+    minOptions: 4,
+  },
   production: ['draw', 'kana'],
 }

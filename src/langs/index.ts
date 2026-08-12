@@ -1,9 +1,9 @@
-import type { LangAdapter } from './types'
-import { es } from './es'
-import { pt } from './pt'
-import { sv } from './sv'
-import { ko } from './ko'
-import { ja } from './ja'
+import type { LangAdapter } from './types.ts'
+import { es } from './es/index.ts'
+import { pt } from './pt/index.ts'
+import { sv } from './sv/index.ts'
+import { ko } from './ko/index.ts'
+import { ja } from './ja/index.ts'
 
 /**
  * Rejestr adapterów — jedyne miejsce, które zna komplet obsługiwanych języków.
@@ -40,5 +40,5 @@ export function interferesWith(code: string): string[] {
 // bez wpisywania kodu języka jako literału (patrz reguła ESLint).
 export { es, pt, sv, ko, ja }
 
-export type { LangAdapter } from './types'
-export { stagesFor } from './types'
+export type { LangAdapter } from './types.ts'
+export { stagesFor } from './types.ts'

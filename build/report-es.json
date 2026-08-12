@@ -1,0 +1,236 @@
+{
+  "lang": "es",
+  "zdań": 10909,
+  "kandydatów": 43142,
+  "odrzuconychNaJakości": 10667,
+  "odsetekOdrzutówJakościowych": 25,
+  "odsetekNieprzydatnychNaKartę": 50,
+  "pozaZasięgiem": 398091,
+  "powodyJakość": {
+    "pasmo powyżej progu języka": 6007,
+    "nazwa własna": 2872,
+    "za dużo tokenów spoza listy częstości": 1631,
+    "wulgaryzm": 146,
+    "znaki spoza zestawu języka": 11
+  },
+  "powodyPrzydatność": {
+    "brak tokenu nadającego się na lukę": 11740,
+    "za krótkie": 9626,
+    "za długie": 200
+  },
+  "tłumaczenia": {
+    "bezpośrednie": 3178,
+    "przezAngielski": 7731
+  },
+  "pasma": {
+    "min": 68,
+    "mediana": 2031,
+    "p90": 7444,
+    "max": 11998
+  },
+  "quizNiedostępny": 0,
+  "próbka": [
+    {
+      "text": "Ya no sé qué hacer.",
+      "pl": "Już nie wiem, co robić.",
+      "luka": "hacer",
+      "band": 68,
+      "src": "pivot",
+      "dystraktory": [
+        "decir",
+        "ver",
+        "hecho",
+        "ir",
+        "estar",
+        "hablar"
+      ]
+    },
+    {
+      "text": "Debes salir del coche.",
+      "pl": "Musisz wysiąść z samochodu.",
+      "luka": "coche",
+      "band": 408,
+      "src": "direct",
+      "dystraktory": [
+        "clase",
+        "doctor",
+        "sangre",
+        "llama",
+        "equipo",
+        "haya",
+        "guerra",
+        "punto"
+      ]
+    },
+    {
+      "text": "Sé que suena extraño, pero es verdad.",
+      "pl": "Wiem, że brzmi to dziwnie, ale to prawda.",
+      "luka": "extraño",
+      "band": 647,
+      "src": "pivot",
+      "dystraktory": [
+        "raro",
+        "querido",
+        "general",
+        "cuarto",
+        "perfecto",
+        "duro",
+        "libre",
+        "derecho"
+      ]
+    },
+    {
+      "text": "En este momento está en la iglesia.",
+      "pl": "Teraz jest w kościele.",
+      "luka": "iglesia",
+      "band": 1000,
+      "src": "pivot",
+      "dystraktory": [
+        "intento",
+        "infierno",
+        "vieja",
+        "sorpresa",
+        "mayoría",
+        "busca",
+        "tía",
+        "piso"
+      ]
+    },
+    {
+      "text": "Hoy me voy al cine.",
+      "pl": "Idę dzisiaj do kina.",
+      "luka": "cine",
+      "band": 1406,
+      "src": "pivot",
+      "dystraktory": [
+        "vacaciones",
+        "pantalones",
+        "movimiento",
+        "opción",
+        "visita",
+        "defensa",
+        "bosque",
+        "testigo"
+      ]
+    },
+    {
+      "text": "Todo lo que él hace, lo hace despacio.",
+      "pl": "On wszystko, co robi, robi powoli.",
+      "luka": "despacio",
+      "band": 1760,
+      "src": "direct",
+      "dystraktory": [
+        "directamente",
+        "últimamente",
+        "perfectamente",
+        "normalmente",
+        "deprisa",
+        "suficientemente",
+        "claramente",
+        "solamente"
+      ]
+    },
+    {
+      "text": "Eres un buen estudiante.",
+      "pl": "Jesteś dobrym studentem.",
+      "luka": "estudiante",
+      "band": 2250,
+      "src": "direct",
+      "dystraktory": [
+        "solución",
+        "esquina",
+        "estómago",
+        "entrevista",
+        "artista",
+        "inteligencia",
+        "plato",
+        "tarea"
+      ]
+    },
+    {
+      "text": "No lo puedo demostrar, pero estoy seguro de que fue asesinado.",
+      "pl": "Nie mam dowodu, ale jestem pewny, że on został zamordowany.",
+      "luka": "demostrar",
+      "band": 2991,
+      "src": "pivot",
+      "dystraktory": [
+        "lograr",
+        "visitar",
+        "preparar",
+        "presentar",
+        "abandonar",
+        "preocuparse",
+        "enseñar",
+        "cocinar"
+      ]
+    },
+    {
+      "text": "Él toca bien la guitarra.",
+      "pl": "On dobrze gra na gitarze.",
+      "luka": "guitarra",
+      "band": 3832,
+      "src": "direct",
+      "dystraktory": [
+        "tarta",
+        "alianza",
+        "hierro",
+        "industria",
+        "existencia",
+        "barra",
+        "masa",
+        "estrategia"
+      ]
+    },
+    {
+      "text": "Vamos a echar un partido de tenis.",
+      "pl": "Zagrajmy w tenisa.",
+      "luka": "tenis",
+      "band": 5300,
+      "src": "pivot",
+      "dystraktory": [
+        "iris",
+        "ausencia",
+        "temor",
+        "avenida",
+        "término",
+        "sándwich",
+        "comentario",
+        "toalla"
+      ]
+    },
+    {
+      "text": "Tom parece divertirse mucho tratando de provocar tantos problemas como él pueda.",
+      "pl": "Tom zdaje się mieć sporo zabawy usiłując spowodować jak najwięcej kłopotów.",
+      "luka": "provocar",
+      "band": 7775,
+      "src": "pivot",
+      "dystraktory": [
+        "prestar",
+        "cavar",
+        "llover",
+        "arrancar",
+        "ocupar",
+        "navegar",
+        "inventar",
+        "perseguir"
+      ]
+    },
+    {
+      "text": "La universidad lleva el nombre de su fundador.",
+      "pl": "Uniwersytet nosi imię swego założyciela.",
+      "luka": "fundador",
+      "band": 11998,
+      "src": "pivot",
+      "dystraktory": [
+        "mudanza",
+        "dinosaurio",
+        "panza",
+        "aprendizaje",
+        "intensidad",
+        "morada",
+        "maratón",
+        "recado"
+      ]
+    }
+  ]
+}

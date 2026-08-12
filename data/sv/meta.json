@@ -1,0 +1,39 @@
+{
+  "lang": "sv",
+  "version": "2026-08-12",
+  "license": "Tatoeba CC BY 2.0 FR; FrequencyWords CC BY-SA 3.0; Wikisłownik (plwiktionary) CC BY-SA 3.0",
+  "sentences": 2315,
+  "lexicon": 973,
+  "packs": [
+    {
+      "file": "sentences-000.json",
+      "from": 50,
+      "to": 529,
+      "count": 500
+    },
+    {
+      "file": "sentences-001.json",
+      "from": 529,
+      "to": 955,
+      "count": 500
+    },
+    {
+      "file": "sentences-002.json",
+      "from": 955,
+      "to": 2126,
+      "count": 500
+    },
+    {
+      "file": "sentences-003.json",
+      "from": 2126,
+      "to": 5117,
+      "count": 500
+    },
+    {
+      "file": "sentences-004.json",
+      "from": 5131,
+      "to": 11973,
+      "count": 315
+    }
+  ]
+}

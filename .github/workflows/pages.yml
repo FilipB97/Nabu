@@ -1,8 +1,11 @@
 name: build i deploy na Pages
 
+# Sprawdzenia lecą na każdym pull requeście, deploy wyłącznie po scaleniu do `main`.
+# Gałęzie robocze nie mają własnego wdrożenia: strona pod adresem Pages ma pokazywać
+# to, co zostało przyjęte, a nie ostatnią rzecz, którą ktoś wypchnął.
 on:
   push:
-    branches: [main, 'claude/**']
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
@@ -11,11 +14,11 @@ permissions:
   pages: write
   id-token: write
 
-# Sprawdzenia anulują się nawzajem w obrębie tej samej gałęzi i zdarzenia — nowy push
+# Sprawdzenia anulują się nawzajem w obrębie tego samego pull requesta — nowy push
 # unieważnia poprzedni. Deploy ma własną grupę i NIE jest anulowany: jedna grupa dla
-# obu zadań oznaczałaby, że przebieg z pull requesta ubija trwający deploy.
+# obu zadań oznaczałaby, że kolejny przebieg ubija trwające wdrożenie.
 concurrency:
-  group: check-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  group: check-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -38,6 +41,7 @@ jobs:
         run: npm run lint
 
       # Bramka kontrastu z sekcji 9.1 planu — preset łamiący AA nie wchodzi do repo.
+      # Do tego testy silnika SRS: sekcja 16 wymaga pokrycia logiki powtórek.
       - name: Testy
         run: npm test
 
@@ -46,18 +50,17 @@ jobs:
         env:
           NABU_BASE: /${{ github.event.repository.name }}/
 
+      # Artefakt powstaje tylko dla `main` — z pull requesta nie ma czego wdrażać.
       - uses: actions/upload-pages-artifact@v3
-        if: github.event_name == 'push'
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         with:
           path: dist
 
   deploy:
     name: deploy
-    if: github.event_name == 'push'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: check
     runs-on: ubuntu-latest
-    # Wymaga włączonego Pages ze źródłem „GitHub Actions" w ustawieniach repozytorium.
-    # Bez tego krok kończy się błędem 404 — to nie jest błąd w kodzie.
     concurrency:
       group: pages-deploy
       cancel-in-progress: false
