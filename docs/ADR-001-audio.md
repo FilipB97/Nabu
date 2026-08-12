@@ -1,6 +1,6 @@
 # ADR-001 — warstwa dźwięku
 
-**Status:** oczekuje na wynik testu na urządzeniu
+**Status:** przyjęte — mowa działa w Safari i w zainstalowanym PWA (12.08.2026)
 **Kontekst:** sekcja 11 planu, bramka M0
 
 ## Problem
@@ -38,30 +38,41 @@ pomylić uruchomienie z ikony z uruchomieniem w Safari.
 
 ## Wyniki
 
+Test wykonany 12 sierpnia 2026 na urządzeniu właściciela projektu.
+
 | | Safari | Dodane do ekranu głównego |
 |---|---|---|
-| Wersja iOS | | |
-| Słychać japoński | | |
-| Słychać koreański | | |
-| Słychać hiszpański | | |
-| Stan `AudioContext` po starcie | | |
-| Liczba głosów | | |
-| Zdarzenia `onstart` / `onend` | | |
+| Mowa działa | tak | **tak** |
+
+Pozostałe pola tabeli (wersja iOS, liczba głosów, stan `AudioContext`) nie zostały
+spisane. Rozstrzygnięcia nie zmieniają: interesowało nas jedno pytanie zamknięte
+i odpowiedź jest twierdząca w obu trybach. Gdyby pojawiła się regresja, trasa
+`#/audio` raportuje komplet tych danych, a test trwa dziesięć minut.
 
 ## Decyzja
 
-_Do uzupełnienia po teście._ Możliwe rozstrzygnięcia:
+**`speechSynthesis` jest ścieżką podstawową. Plan B odpada.**
 
-- **Działa w obu** → `speechSynthesis` jako ścieżka podstawowa. Pipeline bez zmian.
-- **Działa tylko w Safari** → plan B: audio wygenerowane w buildzie do
-  `data/{lang}/audio/`, odtwarzane elementem `<audio>`, precache w service workerze.
-  Waży więcej, ale jest przewidywalne. Nowy krok `09-audio` w pipelinie, decyzja
-  o formacie (`.m4a` albo `.opus`) i o tym, czy generujemy dźwięk do wszystkich zdań,
-  czy tylko do rdzenia słownictwa.
-- **Nie działa nigdzie** → wracamy do rozmowy o architekturze, zanim powstanie M1.
+Czego przez to nie wprowadzamy:
 
-Niezależnie od wyniku warstwa audio siedzi za interfejsem `speak(text, lang, rate)`,
-żeby zmiana ścieżki nie dotykała komponentów.
+- kroku `09-audio` w pipelinie ani katalogu `data/{lang}/audio/`
+- wagi plików dźwiękowych w talii, więc budżet precache'a i rozmiar podawany
+  na ekranie „talia niepobrana" zostają takie, jak zakładał plan
+- decyzji o formacie (`.m4a` / `.opus`) ani o tym, czy generujemy dźwięk do wszystkich
+  zdań, czy tylko do rdzenia słownictwa
+
+Warstwa audio i tak siedzi za interfejsem `speak(text, lang, rate)` — nie dlatego,
+że spodziewamy się zmiany ścieżki, tylko dlatego, że tempo mowy jest jednocześnie
+parametrem adaptera i ustawieniem użytkownika, a to i tak wymaga jednego miejsca.
+
+## Co pozostaje otwarte
+
+Test potwierdził działanie mowy, ale **nie** sprawdził dostępności głosów dla wszystkich
+pięciu języków na czystym urządzeniu. iOS pobiera głosy na żądanie i nie każdy system
+ma zainstalowany japoński czy koreański. Ryzyko „brak głosu TTS dla języka w systemie"
+(sekcja 14 planu) zostaje otwarte i domykamy je w M5: detekcja przy dodawaniu języka
+plus instrukcja pobrania głosu w ustawieniach iOS. Trasa `#/audio` już wypisuje listę
+głosów per język, więc materiał do tej detekcji jest gotowy.
 
 ## Uwaga poboczna
 

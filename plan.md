@@ -20,7 +20,7 @@ z czterema ocenami wystawianymi przez użytkownika. Obowiązuje wersja poniżej:
 | Log zapisuje, **co** użytkownik wybrał — bez tego nie ma mylonych par | 5.3, 8.6 |
 | Motyw to warstwa 13 tokenów i presety barw, z testem kontrastu w CI | 9.1 |
 | Kroje pisma hostowane u siebie i subsetowane; nowy krok `07` | 9.2 |
-| Test audio przechodzi z M5 do M0, bo jego wynik zmienia pipeline | 11 |
+| Test audio przechodzi z M5 do M0, bo jego wynik zmienia pipeline — **wykonany, mowa działa** | 11 |
 
 Szacunek czasu rośnie z ~8,5 do ~12 dni. Kolejność etapów w sekcji 12 jest zaktualizowana.
 
@@ -923,11 +923,18 @@ dozwolone; nazwy plików pochodnych nie mogą sugerować, że to oryginalne kroj
 
 ---
 
-## 11. Dźwięk — do sprawdzenia w M0, nie przed M5
+## 11. Dźwięk — sprawdzone, ścieżka rozstrzygnięta
 
-**Wykonaj ten test w M0 i zapisz wynik w `docs/ADR-001-audio.md`.**
+**Wynik: `speechSynthesis` działa w Safari i w PWA dodanym do ekranu głównego
+(test z 12.08.2026, `docs/ADR-001-audio.md`). Plan B odpada.**
 
-Pierwotnie ten test stał przed M5, bo dotyczy warstwy dźwięku. To był błąd w kolejności:
+Znaczy to, że pipeline nie dostaje kroku generowania audio, talia nie rośnie
+o pliki dźwiękowe, a M5 sprowadza się do implementacji `speak()` i karty
+`quiz-listen`. Reszta tej sekcji zostaje jako zapis tego, czego szukaliśmy
+i dlaczego test stał w M0 — gdyby kiedyś pojawiła się regresja w iOS,
+procedura jest gotowa do powtórzenia.
+
+Test stał pierwotnie przed M5, bo dotyczy warstwy dźwięku. To był błąd w kolejności:
 plan B (audio generowane w buildzie) dokłada krok do pipeline'u i zmienia wagę talii,
 czyli wpływa na decyzje podejmowane w M1 — pakowanie `sentences.json`, budżet precache'a,
 rozmiar podawany na ekranie „talia niepobrana". Test trwa dziesięć minut, więc nie ma
@@ -1010,7 +1017,9 @@ Trzecia: dystraktory `kanji-components` na 20 losowych kartach. To jedyny język
 podobieństwo kształtu naprawdę decyduje o trudności karty.
 
 ### M5 — dźwięk (0,5 dnia)
-Implementacja ścieżki wybranej w M0 (sekcja 11), karta `quiz-listen`.
+Implementacja `speak(text, lang, rate)` na `speechSynthesis` (ścieżka potwierdzona
+w M0, ADR-001), karta `quiz-listen`, wykrycie braku głosu systemowego dla języka
+wraz z instrukcją jego pobrania.
 **Bramka:** japoński czyta się poprawnie w zainstalowanym PWA.
 
 ### M6 — konto i sync (1 dzień)
@@ -1071,7 +1080,7 @@ tryb słuchania w tle.
 
 | Ryzyko | Prawdopodobieństwo | Reakcja |
 |---|---|---|
-| Audio nie działa w zainstalowanym PWA | średnie | plan B z sekcji 11, sprawdzony już w M0 |
+| ~~Audio nie działa w zainstalowanym PWA~~ | **zamknięte** | sprawdzone w M0: działa, ADR-001 |
 | Safari czyści IndexedDB | średnie | Firestore + ręczny eksport, oba w v1 |
 | kuromoji myli czytania w kontekście | niskie–średnie | bramka M4, ewentualnie MeCab z UniDic |
 | Dystraktory za łatwe albo dwuznaczne | **wysokie** | ręczny przegląd 20 zestawów na język (10.1b); odrzucanie synonimów po glosie |
@@ -1081,7 +1090,7 @@ tryb słuchania w tle.
 | Talia rośnie ponad limit cache Safari | niskie | dziel `sentences.json` na paczki po 500, ładuj na żądanie |
 | Free tier Firestore | bardzo niskie | paczkowanie po 400 kart, 1–2 zapisy na sesję |
 | Kod zaszywa się pod japoński | **wysokie** | trzy języki w M1, przegląd `grep` w M4, procedura z sekcji 15 |
-| Brak głosu TTS dla języka w systemie | niskie | wykrycie przy dodaniu języka + instrukcja pobrania głosu |
+| Brak głosu TTS dla języka w systemie | niskie | **otwarte** — wykrycie przy dodaniu języka + instrukcja pobrania głosu, M5 |
 
 ---
 
