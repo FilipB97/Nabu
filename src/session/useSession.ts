@@ -9,7 +9,6 @@ import {
   type CardType,
   type Grade,
   type LogEntry,
-  type Stage,
 } from '@/srs/types'
 import {
   BACKLOG_LIMIT,
@@ -31,6 +30,7 @@ import {
   type DeckItem,
   type Lexicon,
 } from '@/store/decks'
+import { hasVoice } from '@/audio/speak'
 import { currentStage, type GatedStage } from './stages.ts'
 import {
   buildConfusions,
@@ -96,12 +96,21 @@ type Phase = 'loading' | 'running' | 'done' | 'empty'
  *
  * `production` nie ma tu własnego wpisu, bo nie jest etapem, przez który przechodzi
  * język — to tryb pojedynczej dojrzałej karty i wchodzi dopiero w M8.
+ *
+ * Od `reps >= 3` co druga powtórka zdania idzie ze słuchu (sekcja 7.2): ta sama treść,
+ * inny kanał. Co DRUGA, a nie każda — inaczej karta przestaje być czytana i zostaje
+ * wyćwiczone rozpoznawanie brzmienia bez zapisu. Parzystość `reps` daje przeplot
+ * bez losowania, więc powtórka jest przewidywalna, a nie kapryśna.
  */
-function modeFor(stage: Stage): CardType {
-  if (stage === 'script') return 'script'
-  if (stage === 'core') return 'quiz-word'
+export function modeFor(card: CardState, canListen: boolean): CardType {
+  if (card.stage === 'script') return 'script'
+  if (card.stage === 'core') return 'quiz-word'
+  if (canListen && card.reps >= LISTEN_FROM_REPS && card.reps % 2 === 1) return 'quiz-listen'
   return 'quiz-cloze'
 }
+
+/** Od ilu powtórek karta zdania bywa zadawana ze słuchu — sekcja 7.2. */
+const LISTEN_FROM_REPS = 3
 
 /**
  * Karty do powtórki mogą pochodzić z różnych etapów naraz, a każdy etap leży w innym
@@ -181,6 +190,8 @@ export function useSession(lang: string) {
   })
   /** Jeden poziom cofnięcia — sekcja 8.4. */
   const undo = useRef<{ before: CardState; entry: QueueEntry } | null>(null)
+  /** Czy system ma głos dla tego języka. Bez niego karta ze słuchu jest pustym ekranem. */
+  const canListen = useRef(false)
   /** Odpowiedź zapisana, karta jeszcze na ekranie — czeka na „Dalej". */
   const pending = useRef<{ result: ReturnType<typeof review>; log: LogEntry; entry: QueueEntry } | null>(
     null,
@@ -201,7 +212,7 @@ export function useSession(lang: string) {
       })
     }
     shownAt.current = Date.now()
-    return { entry, options: built, mode: built ? modeFor(entry.card.stage) : 'reveal' }
+    return { entry, options: built, mode: built ? modeFor(entry.card, canListen.current) : 'reveal' }
   }, [])
 
   // ---- budowa sesji ----------------------------------------------------------
@@ -225,6 +236,7 @@ export function useSession(lang: string) {
       // jest już przy zdaniach (sekcja 2a).
       const stage = currentStage(adapter, allCards, meta, config.stageOverride)
       setStage(stage)
+      canListen.current = hasVoice(adapter.tts.locale)
 
       const due = await dueCards(lang, now, limits.due)
       const dueItems = await resolveItems(lang, due)
@@ -400,6 +412,15 @@ export function useSession(lang: string) {
     setPhase('running')
   }, [prepare, settings])
 
+  /**
+   * Zeruje zegar odpowiedzi. Karta ze słuchu odtwarza zdanie zaraz po pokazaniu, więc
+   * bez tego do czasu odpowiedzi wliczałoby się kilka sekund czytania — a `ms` jest
+   * w tej aplikacji wielkością nośną, nie statystyką (sekcja 6.2).
+   */
+  const restartClock = useCallback(() => {
+    shownAt.current = Date.now()
+  }, [])
+
   return {
     phase,
     current,
@@ -410,6 +431,7 @@ export function useSession(lang: string) {
     settings,
     answer,
     next,
+    restartClock,
     undoLast,
     canUndo: undo.current !== null,
   }

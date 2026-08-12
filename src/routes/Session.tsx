@@ -1,9 +1,10 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { adapterFor } from '@/langs'
 import { AGAIN, GOOD } from '@/srs/types'
 import { useSession } from '@/session/useSession'
 import { layoutAroundCloze, type Piece } from '@/session/cloze'
+import { speak, stopSpeaking } from '@/audio/speak'
 import { QuizOption, type OptionState } from '@/ui/QuizOption'
 import { Button } from '@/ui/Button'
 import { Mono } from '@/ui/Mono'
@@ -38,10 +39,45 @@ export function Session() {
   const { lang = '' } = useParams()
   const navigate = useNavigate()
   const adapter = adapterFor(lang)
-  const { phase, current, stage, reveal, progress, summary, settings, answer, next, undoLast } =
-    useSession(lang)
+  const {
+    phase,
+    current,
+    stage,
+    reveal,
+    progress,
+    summary,
+    settings,
+    answer,
+    next,
+    restartClock,
+    undoLast,
+  } = useSession(lang)
 
   const hit = reveal !== null && reveal.chosen === reveal.correct
+  const listening = current?.mode === 'quiz-listen'
+  const sentence = current?.entry.item.text ?? ''
+
+  const say = useCallback(
+    () => void speak(sentence, { locale: adapter.tts.locale, rate: settings?.rate ?? 0.6 }),
+    [sentence, adapter, settings],
+  )
+
+  // Karta ze słuchu odtwarza zdanie sama, zaraz po pokazaniu, i dopiero wtedy rusza zegar
+  // odpowiedzi. Pozostałe karty milczą, dopóki użytkownik nie dotknie głośnika.
+  useEffect(() => {
+    if (!listening || reveal) return
+    let cancelled = false
+    void speak(sentence, { locale: adapter.tts.locale, rate: settings?.rate ?? 0.6 }).then(() => {
+      if (!cancelled) restartClock()
+    })
+    return () => {
+      cancelled = true
+      stopSpeaking()
+    }
+  }, [listening, reveal, sentence, adapter, settings, restartClock])
+
+  // Wyjście z ekranu nie może zostawić mówiącej przeglądarki.
+  useEffect(() => stopSpeaking, [])
 
   // Klawiatura jest na desktopie podstawowym sposobem obsługi (sekcja 8.4).
   useEffect(() => {
@@ -74,10 +110,14 @@ export function Session() {
         event.preventDefault()
         void undoLast()
       }
+      if (event.key.toLowerCase() === 'p') {
+        event.preventDefault()
+        say()
+      }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [answer, undoLast, next, navigate, current, reveal])
+  }, [answer, undoLast, next, navigate, current, reveal, say])
 
   // Automatyczne przejście wyłącznie po trafieniu — pudło zawsze czeka na dotknięcie,
   // bo to przy pudle jest najwięcej do przeczytania.
@@ -186,7 +226,23 @@ export function Session() {
       </header>
 
       <main className="flex flex-1 flex-col justify-center gap-7 px-7 py-10">
-        {jednoelementowa ? (
+        {listening && !reveal ? (
+          // Karta ze słuchu — sekcja 7.2. Nie ma tu nic do przeczytania i to jest cała
+          // jej treść: ten sam materiał, inny kanał. Zdanie pokazujemy dopiero przy
+          // odsłonięciu, żeby dało się sprawdzić, co się usłyszało.
+          <div className="flex flex-col items-center gap-6">
+            <button
+              type="button"
+              onClick={say}
+              aria-label="Odtwórz zdanie ponownie"
+              className="nabu-press nabu-accent-fill flex h-[104px] w-[104px] items-center
+                justify-center rounded-full text-[38px]"
+            >
+              ►
+            </button>
+            <Mono tone="normal">posłuchaj i wybierz brakujące słowo</Mono>
+          </div>
+        ) : jednoelementowa ? (
           <p
             className={`${fontClass} text-center text-text`}
             style={{
@@ -232,7 +288,17 @@ export function Session() {
               {layout.tail}
             </p>
 
-            <p className="font-ui text-[15px] leading-[1.55] text-text-2">{entry.item.pl}</p>
+            <div className="flex items-start justify-between gap-4">
+              <p className="font-ui text-[15px] leading-[1.55] text-text-2">{entry.item.pl}</p>
+              <button
+                type="button"
+                onClick={say}
+                aria-label="Przeczytaj zdanie"
+                className="nabu-press -m-2 shrink-0 rounded-full p-2 text-[17px] text-text-3"
+              >
+                ♪
+              </button>
+            </div>
           </>
         )}
 

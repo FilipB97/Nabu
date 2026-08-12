@@ -14,6 +14,7 @@ import {
   updateSettings,
   type LangSettings,
 } from '@/store/db'
+import { hasVoice, onVoicesChanged, primeSpeech } from '@/audio/speak'
 import { Mark } from '@/ui/Ticks'
 import { Mono } from '@/ui/Mono'
 import { Choice } from '@/ui/Choice'
@@ -61,6 +62,14 @@ export function Start() {
   const navigate = useNavigate()
   const [rows, setRows] = useState<Row[] | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
+  /**
+   * Głosy systemowe pojawiają się asynchronicznie, a na iOS także po pobraniu przez
+   * użytkownika w trakcie działania aplikacji — stąd nasłuch, a nie jednorazowy odczyt.
+   * To jest domknięcie ryzyka „brak głosu TTS" z sekcji 14 (ADR-001).
+   */
+  const [voiceTick, setVoiceTick] = useState(0)
+
+  useEffect(() => onVoicesChanged(() => setVoiceTick((n) => n + 1)), [])
 
   const refresh = useCallback(async () => {
     const now = Date.now()
@@ -133,6 +142,9 @@ export function Start() {
   const maintained = rows.filter((r) => !r.settings.active)
   const chosen = rows.find((r) => r.settings.lang === selected) ?? null
   const missing = LANG_CODES.filter((code) => !rows.some((r) => r.settings.lang === code))
+  // `voiceTick` jest tu po to, żeby odczyt powtórzył się po dosłaniu głosów.
+  const voiceMissing =
+    chosen !== null && voiceTick >= 0 && !hasVoice(adapterFor(chosen.settings.lang).tts.locale)
   const fresh = chosen && chosen.backlog >= BACKLOG_LIMIT
     ? 0
     : chosen
@@ -241,13 +253,24 @@ export function Start() {
                   <p className="font-ui text-[13px] leading-[1.5] text-text-2">
                     {STAGE_HINT[chosen.stage]}
                   </p>
+                  {voiceMissing && (
+                    <p className="font-ui text-[12.5px] leading-[1.5] text-text-3">
+                      System nie ma głosu dla tego języka, więc karty ze słuchu są pomijane.
+                      Na iPhonie: Ustawienia → Dostępność → Zawartość mówiona → Głosy.
+                    </p>
+                  )}
                 </div>
 
                 <Button
                   variant="primary"
                   full
                   disabled={chosen.due === 0 && fresh === 0}
-                  onClick={() => navigate(`/sesja/${chosen.settings.lang}`)}
+                  onClick={() => {
+                    // Pierwsze `speak()` musi wyjść z gestu użytkownika, inaczej iOS
+                    // zignoruje wszystkie kolejne — po cichu (ADR-001).
+                    primeSpeech()
+                    navigate(`/sesja/${chosen.settings.lang}`)
+                  }}
                 >
                   Zacznij
                 </Button>
@@ -296,6 +319,18 @@ export function Start() {
                     ]}
                     onChange={(autoAdvance) => void change({ autoAdvance })}
                     hint="Po odpowiedzi widać poprawne słowo, czytanie i znaczenie. Pudło zawsze czeka na dotknięcie."
+                  />
+
+                  <Choice
+                    label="tempo mowy"
+                    value={chosen.settings.rate}
+                    options={[
+                      { value: 0.45, label: 'wolno' },
+                      { value: 0.6, label: 'normalnie' },
+                      { value: 0.85, label: 'szybko' },
+                    ]}
+                    onChange={(rate) => void change({ rate })}
+                    hint="Dotyczy czytania zdań i kart ze słuchu."
                   />
 
                   <Choice

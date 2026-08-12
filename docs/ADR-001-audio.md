@@ -65,14 +65,26 @@ Warstwa audio i tak siedzi za interfejsem `speak(text, lang, rate)` — nie dlat
 że spodziewamy się zmiany ścieżki, tylko dlatego, że tempo mowy jest jednocześnie
 parametrem adaptera i ustawieniem użytkownika, a to i tak wymaga jednego miejsca.
 
-## Co pozostaje otwarte
+## Co pozostawało otwarte — domknięte w M5 (12.08.2026)
 
-Test potwierdził działanie mowy, ale **nie** sprawdził dostępności głosów dla wszystkich
-pięciu języków na czystym urządzeniu. iOS pobiera głosy na żądanie i nie każdy system
-ma zainstalowany japoński czy koreański. Ryzyko „brak głosu TTS dla języka w systemie"
-(sekcja 14 planu) zostaje otwarte i domykamy je w M5: detekcja przy dodawaniu języka
-plus instrukcja pobrania głosu w ustawieniach iOS. Trasa `#/audio` już wypisuje listę
-głosów per język, więc materiał do tej detekcji jest gotowy.
+Test potwierdził działanie mowy, ale **nie** sprawdzał dostępności głosów dla wszystkich
+języków na czystym urządzeniu. iOS pobiera głosy na żądanie i nie każdy system ma
+zainstalowany japoński czy koreański.
+
+Rozstrzygnięcie: brak głosu jest **stanem aplikacji, nie błędem**. `hasVoice(locale)`
+sprawdza to przy każdej sesji, karty ze słuchu przy braku głosu w ogóle się nie pojawiają
+(zamiast pojawiać się i milczeć), a ekran startu mówi o tym wprost i podaje ścieżkę:
+Ustawienia → Dostępność → Zawartość mówiona → Głosy. Odczyt jest ponawiany na zdarzenie
+`voiceschanged`, bo użytkownik może pobrać głos w trakcie działania aplikacji.
+
+Dwie rzeczy wyszły przy pisaniu tej warstwy i obie są w niej zamknięte:
+
+- **pierwsze `speak()` musi wyjść z gestu użytkownika**, inaczej iOS ignoruje wszystkie
+  kolejne wywołania programowe — bez błędu i bez zdarzenia. Pusta wypowiedź wysłana
+  z przycisku „Zacznij" odblokowuje resztę sesji (`primeSpeech`);
+- **dopasowanie locale musi być dwustopniowe**: systemy podają warianty, których nie da się
+  przewidzieć (`zh-Hans-CN` zamiast `zh-CN`, `ko_KR` z podkreślnikiem zamiast myślnika).
+  Samo porównanie pełnego kodu uznałoby chiński za język bez głosu.
 
 ## Uwaga poboczna
 

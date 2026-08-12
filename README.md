@@ -6,22 +6,23 @@ czytaniami i wymową, działa offline i mieści się w dziesięciu minutach dzie
 Pełna specyfikacja — model danych, silnik powtórek, pipeline i kolejność prac z bramkami —
 jest w [`plan.md`](plan.md). Ten plik opisuje tylko, jak uruchomić repo.
 
-## Stan: M2
+## Stan: M5
 
-Działająca sesja: dodajesz język, odpowiadasz na karty, postęp zapisuje się lokalnie
-po każdej odpowiedzi. Nie ma jeszcze logowania ani synchronizacji.
+Działająca sesja: dodajesz język, przechodzisz przez pismo, rdzeń i zdania, słuchasz
+wymowy, a postęp zapisuje się lokalnie po każdej odpowiedzi. Nie ma jeszcze logowania
+ani synchronizacji.
 
 | jest | nie ma |
 |---|---|
-| Vite + React + TypeScript, PWA z precache | logowania i synchronizacji (M6) |
+| Vite + React + TypeScript, PWA z precache | statystyk i pełnych ustawień (M9) |
 | silnik SM-2 z krokami nauki i ochroną przed strzałem | kart produkcji i rysowania (M8) |
 | furigana i pinyin nad wyrazami, sterowane ustawieniem | |
 | etapy: pismo → rdzeń → zdania, z bramą opanowania | klawiatur kana i jamo (M8) |
-| Dexie jako źródło prawdy, zapis po każdej odpowiedzi | dźwięku w sesji (M5) |
-| talie ładowane paczkami na żądanie, nie w precache | statystyk i pełnych ustawień (M9) |
+| Dexie jako źródło prawdy, zapis po każdej odpowiedzi | logowania i synchronizacji (M6) |
+| mowa systemowa i karty ze słuchu od trzeciej powtórki | |
 | pipeline 01–07, sześć języków z dystraktorami | kalibracji poziomu wejściowego (M7) |
 | 17 tokenów motywu, 5 presetów, bramka kontrastu w CI | |
-| kroje zsubsetowane do znaków z talii, razem 1,35 MB | |
+| kroje zsubsetowane do znaków z talii, razem 1,36 MB | |
 
 ### Dane
 

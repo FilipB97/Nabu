@@ -1243,6 +1243,32 @@ w M0, ADR-001), karta `quiz-listen`, wykrycie braku głosu systemowego dla języ
 wraz z instrukcją jego pobrania.
 **Bramka:** japoński czyta się poprawnie w zainstalowanym PWA.
 
+**Wynik (12.08.2026):** `speak(text, {locale, rate})` w `src/audio/`, przed nim nic więcej
+nie ma. Trzy rzeczy, bez których dźwięk zawodzi po cichu, i wszystkie trzy siedzą w tej
+jednej warstwie:
+
+- **lista głosów zapełnia się asynchronicznie.** Safari zwraca z `getVoices()` pustą tablicę
+  przy pierwszym wywołaniu i dosyła głosy zdarzeniem `voiceschanged`. Pytanie „czy jest głos
+  japoński" zadane za wcześnie odpowiada „nie", więc ekran startu nasłuchuje, a nie odczytuje
+  raz;
+- **iOS wymaga gestu.** Pierwsze `speak()` musi wyjść z dotknięcia użytkownika, inaczej
+  kolejne wywołania programowe są ignorowane — bez błędu i bez zdarzenia. Pusta wypowiedź
+  wysłana z przycisku „Zacznij" odblokowuje resztę sesji;
+- **dopasowanie locale jest dwustopniowe.** Systemy podają warianty, których nie da się
+  przewidzieć (`zh-Hans-CN` zamiast `zh-CN`, `ko_KR` z podkreślnikiem), więc po pełnym kodzie
+  próbujemy samego języka.
+
+Karta `quiz-listen` wchodzi od `reps >= 3`, ale co DRUGĄ powtórkę — inaczej dojrzała karta
+przestaje być czytana i ćwiczy się rozpoznawanie brzmienia bez zapisu. Zdanie odtwarza się
+samo po pokazaniu karty, a zegar odpowiedzi rusza dopiero po ucichnięciu (sekcja 6.2 wymaga
+odjęcia czasu odtwarzania, bo `ms` jest wielkością nośną). Tekst pojawia się przy odsłonięciu,
+żeby dało się sprawdzić, co się usłyszało.
+
+**Ryzyko „brak głosu TTS" (sekcja 14) domknięte.** Bez głosu dla języka karty ze słuchu
+w ogóle się nie pojawiają — nie ma pustych ekranów — a ekran startu mówi wprost, że są
+pomijane, i podaje ścieżkę do pobrania głosu w ustawieniach iOS. Pozostałe karty czyta
+przycisk przy tłumaczeniu, więc brak głosu nie odbiera niczego poza jednym typem karty.
+
 ### M6 — konto i sync (1 dzień)
 Firebase Auth anonimowo + upgrade, Firestore, reguły w repo, kolejka offline,
 eksport i import JSON.

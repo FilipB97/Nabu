@@ -11,6 +11,7 @@ import {
 import { buildConfusions, buildOptions } from './options.ts'
 import { layoutAroundCloze, splitAroundCloze } from './cloze.ts'
 import { currentStage, isMastered, stageProgress } from './stages.ts'
+import { modeFor } from './useSession.ts'
 import { ja, es } from '@/langs'
 import type { DeckMeta } from '@/store/decks'
 
@@ -346,5 +347,32 @@ describe('etapy i brama opanowania', () => {
 
   it('postęp etapu podaje mianownik, a nie sam procent', () => {
     expect(stageProgress(cards('core', 4, 30), meta(), 'core')).toEqual({ solid: 4, needed: 9 })
+  })
+})
+
+describe('kiedy karta idzie ze słuchu', () => {
+  const card = (over: Partial<CardState>): CardState => ({
+    ...newCard('x', 'ja', 'sentences', NOW),
+    ...over,
+  })
+
+  it('nowa karta jest czytana, nie słuchana — bez zapisu nie ma czego rozpoznawać', () => {
+    expect(modeFor(card({ reps: 0 }), true)).toBe('quiz-cloze')
+    expect(modeFor(card({ reps: 2 }), true)).toBe('quiz-cloze')
+  })
+
+  it('od trzeciej powtórki co druga idzie ze słuchu', () => {
+    expect(modeFor(card({ reps: 3 }), true)).toBe('quiz-listen')
+    expect(modeFor(card({ reps: 4 }), true)).toBe('quiz-cloze')
+    expect(modeFor(card({ reps: 5 }), true)).toBe('quiz-listen')
+  })
+
+  it('bez głosu w systemie karta zostaje czytana', () => {
+    expect(modeFor(card({ reps: 5 }), false)).toBe('quiz-cloze')
+  })
+
+  it('etapy 0 i 1 nie mają wariantu ze słuchu', () => {
+    expect(modeFor(card({ reps: 9, stage: 'script' }), true)).toBe('script')
+    expect(modeFor(card({ reps: 9, stage: 'core' }), true)).toBe('quiz-word')
   })
 })
