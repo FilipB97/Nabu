@@ -15,23 +15,24 @@ po każdej odpowiedzi. Nie ma jeszcze logowania ani synchronizacji.
 |---|---|
 | Vite + React + TypeScript, PWA z precache | logowania i synchronizacji (M6) |
 | silnik SM-2 z krokami nauki i ochroną przed strzałem | kart produkcji i rysowania (M8) |
-| kolejka sesji, karty wracają w tej samej sesji | kalibracji i poziomów wejściowych (M7) |
-| Dexie jako źródło prawdy, zapis po każdej odpowiedzi | etapów i bram dla obcego pisma (M3) |
+| furigana i pinyin nad wyrazami, sterowane ustawieniem | |
+| etapy: pismo → rdzeń → zdania, z bramą opanowania | klawiatur kana i jamo (M8) |
+| Dexie jako źródło prawdy, zapis po każdej odpowiedzi | dźwięku w sesji (M5) |
 | talie ładowane paczkami na żądanie, nie w precache | statystyk i pełnych ustawień (M9) |
-| pipeline 01–07, sześć języków z dystraktorami | renderowania ruby w sesji (M4) |
+| pipeline 01–07, sześć języków z dystraktorami | kalibracji poziomu wejściowego (M7) |
 | 17 tokenów motywu, 5 presetów, bramka kontrastu w CI | |
 | kroje zsubsetowane do znaków z talii, razem 1,35 MB | |
 
 ### Dane
 
-| język | zdań | leksykon | odrzuty jakościowe | pasma |
-|---|---|---|---|---|
-| hiszpański | 10 949 | 2 445 | 25% | 63–11 998 |
-| portugalski | 8 423 | 1 771 | 24% | 57–11 978 |
-| szwedzki | 2 323 | 974 | 15% | 50–11 973 |
-| koreański | 761 | 301 | 16% | 85–29 831 |
-| japoński | 18 490 | 1 456 | 8% | 55–19 998 |
-| chiński | 1 481 | 416 | 18% | 72–12 000 |
+| język | zdań | rdzeń | pismo | odrzuty jakościowe | pasma |
+|---|---|---|---|---|---|
+| hiszpański | 10 909 | 100 | — | 25% | 63–11 998 |
+| portugalski | 8 398 | 100 | — | 24% | 57–11 978 |
+| szwedzki | 2 315 | 100 | — | 15% | 50–11 973 |
+| koreański | 752 | 100 | 40 | 16% | 85–29 831 |
+| japoński | 18 490 | 100 | 92 | 8% | 55–19 998 |
+| chiński | 1 481 | 100 | — | 18% | 72–12 000 |
 
 Japoński ma pełną segmentację i czytania: `毎日[まいにち]`, `興味深い[きょうみぶかい]`,
 katakana bez furigany. Koreański ma rozdzielone partykuły, więc luka wypada na samym

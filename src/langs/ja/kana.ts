@@ -6,6 +6,8 @@
  * wystarczy przesunięcie o 0x60.
  */
 
+import type { ScriptItem } from '../types.ts'
+
 const KATAKANA_START = 0x30a1
 const KATAKANA_END = 0x30f6
 const TO_HIRAGANA = 0x60
@@ -34,4 +36,49 @@ export function hasKanji(text: string): boolean {
  */
 export function needsFurigana(surface: string, reading: string): boolean {
   return hasKanji(surface) && toHiragana(reading) !== surface
+}
+
+/**
+ * Inwentarz kany dla etapu 0 — sekcja 2a.
+ *
+ * Dwa razy po 46 znaków podstawowych, bez dakuten i handakuten: `が` to `か` ze znakiem
+ * dźwięczności, więc jest regułą do zrozumienia, a nie osobnym znakiem do zapamiętania.
+ * Wprowadzanie ich jako oddzielnych pozycji podwoiłoby etap 0 i uczyło tej samej rzeczy
+ * drugi raz.
+ *
+ * Kolejność jest tradycyjna (gojūon), bo w tej kolejności kana jest uporządkowana
+ * we wszystkich materiałach — łamanie jej utrudniłoby korzystanie z czegokolwiek poza
+ * tą aplikacją.
+ */
+const GOJUON: ReadonlyArray<[hiragana: string, katakana: string, romaji: string]> = [
+  ['あ', 'ア', 'a'], ['い', 'イ', 'i'], ['う', 'ウ', 'u'], ['え', 'エ', 'e'], ['お', 'オ', 'o'],
+  ['か', 'カ', 'ka'], ['き', 'キ', 'ki'], ['く', 'ク', 'ku'], ['け', 'ケ', 'ke'], ['こ', 'コ', 'ko'],
+  ['さ', 'サ', 'sa'], ['し', 'シ', 'shi'], ['す', 'ス', 'su'], ['せ', 'セ', 'se'], ['そ', 'ソ', 'so'],
+  ['た', 'タ', 'ta'], ['ち', 'チ', 'chi'], ['つ', 'ツ', 'tsu'], ['て', 'テ', 'te'], ['と', 'ト', 'to'],
+  ['な', 'ナ', 'na'], ['に', 'ニ', 'ni'], ['ぬ', 'ヌ', 'nu'], ['ね', 'ネ', 'ne'], ['の', 'ノ', 'no'],
+  ['は', 'ハ', 'ha'], ['ひ', 'ヒ', 'hi'], ['ふ', 'フ', 'fu'], ['へ', 'ヘ', 'he'], ['ほ', 'ホ', 'ho'],
+  ['ま', 'マ', 'ma'], ['み', 'ミ', 'mi'], ['む', 'ム', 'mu'], ['め', 'メ', 'me'], ['も', 'モ', 'mo'],
+  ['や', 'ヤ', 'ya'], ['ゆ', 'ユ', 'yu'], ['よ', 'ヨ', 'yo'],
+  ['ら', 'ラ', 'ra'], ['り', 'リ', 'ri'], ['る', 'ル', 'ru'], ['れ', 'レ', 're'], ['ろ', 'ロ', 'ro'],
+  ['わ', 'ワ', 'wa'], ['を', 'ヲ', 'wo'],
+  ['ん', 'ン', 'n'],
+]
+
+/** Samogłoska kończąca czytanie — po niej grupujemy dystraktory. */
+function vowelOf(romaji: string): string {
+  return /[aeiou]$/.test(romaji) ? romaji.slice(-1) : romaji
+}
+
+export function kanaItems(): ScriptItem[] {
+  const items: ScriptItem[] = []
+  // Najpierw cała hiragana, potem katakana: to są dwa systemy do opanowania, a nie
+  // jeden z dwoma wariantami. Przeplatanie ich dawałoby karty あ / ア obok siebie,
+  // czyli dokładnie tę parę, której nie da się rozróżnić po czytaniu.
+  for (const [hira, , romaji] of GOJUON) {
+    items.push({ s: hira, r: romaji, group: `hiragana-${vowelOf(romaji)}` })
+  }
+  for (const [, kata, romaji] of GOJUON) {
+    items.push({ s: kata, r: romaji, group: `katakana-${vowelOf(romaji)}` })
+  }
+  return items
 }

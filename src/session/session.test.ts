@@ -9,7 +9,10 @@ import {
   type QueueEntry,
 } from './queue.ts'
 import { buildConfusions, buildOptions } from './options.ts'
-import { splitAroundCloze } from './cloze.ts'
+import { layoutAroundCloze, splitAroundCloze } from './cloze.ts'
+import { currentStage, isMastered, stageProgress } from './stages.ts'
+import { ja, es } from '@/langs'
+import type { DeckMeta } from '@/store/decks'
 
 const NOW = Date.UTC(2026, 7, 12, 12, 0, 0)
 
@@ -130,6 +133,33 @@ describe('zdanie wokół luki', () => {
   it('gdy tokenu nie ma w zdaniu, wraca do sklejania — zdanie uboższe, ale poprawne', () => {
     const it_ = sentence('Całkiem inne zdanie.', ['ala', 'ma', 'kota'], 1)
     expect(splitAroundCloze(it_, ' ')).toEqual({ before: 'ala', after: 'kota' })
+  })
+
+  it('rozkład na kawałki niesie interpunkcję między wyrazami', () => {
+    const it_ = sentence('Lo hecho, hecho está.', ['Lo', 'hecho', 'hecho', 'está'], 2)
+    const layout = layoutAroundCloze(it_, ' ')
+    expect(layout.exact).toBe(true)
+    expect(layout.before.map((p) => [p.glue, p.token.s])).toEqual([
+      ['', 'Lo'],
+      [' ', 'hecho'],
+    ])
+    expect(layout.after.map((p) => [p.glue, p.token.s])).toEqual([[' ', 'está']])
+    expect(layout.tail).toBe('.')
+  })
+
+  it('gdy luka jest ostatnia, ogon trzyma znak końca zdania', () => {
+    const it_ = sentence('那人是谁？', ['那', '人', '是', '谁'], 3)
+    const layout = layoutAroundCloze(it_, '')
+    expect(layout.after).toEqual([])
+    expect(layout.tail).toBe('？')
+  })
+
+  it('rozkład ma tę samą ścieżkę odwrotu co sklejanie', () => {
+    const it_ = sentence('Całkiem inne zdanie.', ['ala', 'ma', 'kota'], 1)
+    const layout = layoutAroundCloze(it_, ' ')
+    expect(layout.exact).toBe(false)
+    expect(layout.before.map((p) => p.token.s)).toEqual(['ala'])
+    expect(layout.after.map((p) => p.token.s)).toEqual(['kota'])
   })
 })
 
@@ -262,5 +292,59 @@ describe('mylone pary z logu', () => {
 
   it('pomija wpisy bez wybranej opcji — produkcja i `reveal` nie mają czego mylić', () => {
     expect(buildConfusions([{ id: 's1', grade: 0 }], correctOf).size).toBe(0)
+  })
+})
+
+
+describe('etapy i brama opanowania', () => {
+  const meta = (over: Partial<DeckMeta> = {}): DeckMeta => ({
+    lang: 'ja',
+    version: '2026-08-12',
+    license: '',
+    sentences: 18_490,
+    lexicon: 1_456,
+    script: 10,
+    core: 10,
+    packs: [],
+    ...over,
+  })
+
+  const cards = (stage: CardState['stage'], count: number, interval: number): CardState[] =>
+    Array.from({ length: count }, (_, i) => ({
+      ...newCard(`${stage}-${i}`, 'ja', stage, NOW),
+      interval,
+    }))
+
+  it('nowe konto z obcym pismem startuje od etapu 0', () => {
+    expect(currentStage(ja, [], meta())).toBe('script')
+  })
+
+  it('język łaciński nie ma etapu 0 i startuje od rdzenia', () => {
+    expect(currentStage(es, [], meta({ script: 0 }))).toBe('core')
+  })
+
+  it('konto bez kart nie zalicza etapu — zero z zera to nie sto procent', () => {
+    expect(isMastered([], meta(), 'script')).toBe(false)
+  })
+
+  it('brama otwiera się przy 90% pozycji etapu', () => {
+    expect(isMastered(cards('script', 8, 30), meta(), 'script')).toBe(false)
+    expect(isMastered(cards('script', 9, 30), meta(), 'script')).toBe(true)
+  })
+
+  it('karta w krokach nauki nie liczy się do bramy', () => {
+    expect(isMastered(cards('script', 10, 0), meta(), 'script')).toBe(false)
+  })
+
+  it('opanowany etap 0 przepuszcza do rdzenia, ale nie dalej', () => {
+    expect(currentStage(ja, cards('script', 10, 30), meta())).toBe('core')
+  })
+
+  it('ręczne odblokowanie ma pierwszeństwo przed bramą', () => {
+    expect(currentStage(ja, [], meta(), 'sentences')).toBe('sentences')
+  })
+
+  it('postęp etapu podaje mianownik, a nie sam procent', () => {
+    expect(stageProgress(cards('core', 4, 30), meta(), 'core')).toEqual({ solid: 4, needed: 9 })
   })
 })

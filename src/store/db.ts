@@ -18,6 +18,11 @@ export type LangSettings = {
    */
   active: boolean
   intensity: 'short' | 'normal' | 'long'
+  /**
+   * Ręcznie wybrany etap — sekcja 2a: „etapy nie blokują sztywno". `null` znaczy,
+   * że etap wyznacza brama opanowania, i tak jest domyślnie.
+   */
+  stageOverride: 'script' | 'core' | 'sentences' | null
   /** Liczba opcji w quizie: 3, 4 albo 6. */
   quizOptions: number
   /** Przejście dalej po trafieniu, bez dotykania „Dalej". Pudło zawsze czeka. */
@@ -78,6 +83,7 @@ export const db = new NabuDb()
 const DEFAULTS: Omit<LangSettings, 'lang' | 'addedAt'> = {
   active: true,
   intensity: 'normal',
+  stageOverride: null,
   quizOptions: 4,
   // Domyślnie czekamy na dotknięcie. Odsłonięcie niesie treść do nauczenia się —
   // poprawne słowo, jego czytanie i glosę — więc nie może znikać samo.

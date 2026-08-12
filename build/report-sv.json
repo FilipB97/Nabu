@@ -6,6 +6,7 @@
   "odsetekOdrzutówJakościowych": 15,
   "odsetekNieprzydatnychNaKartę": 56,
   "pozaZasięgiem": 48738,
+  "innyZapis": 0,
   "powodyJakość": {
     "pasmo powyżej progu języka": 726,
     "za dużo tokenów spoza listy częstości": 295,

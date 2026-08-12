@@ -4,6 +4,8 @@
   "license": "Tatoeba CC BY 2.0 FR; FrequencyWords CC BY-SA 3.0; Wikisłownik (plwiktionary) CC BY-SA 3.0",
   "sentences": 8398,
   "lexicon": 1770,
+  "script": 0,
+  "core": 100,
   "packs": [
     {
       "file": "sentences-000.json",

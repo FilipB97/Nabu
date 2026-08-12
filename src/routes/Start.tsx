@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { LANG_CODES, adapterFor, interferesWith } from '@/langs'
+import { currentStage, gatedStages, stageProgress, type GatedStage } from '@/session/stages'
+import { loadMeta, type DeckMeta } from '@/store/decks'
 import {
   BACKLOG_LIMIT,
   INTENSITY,
   addedLanguages,
   backlogCount,
+  db,
   dueCount,
   settingsFor,
   updateSettings,
@@ -27,7 +30,26 @@ import { Button } from '@/ui/Button'
  * z przyciskiem startu — to jest jedyna rzecz, po którą użytkownik tu przychodzi.
  */
 
-type Row = { settings: LangSettings; due: number; backlog: number }
+type Row = {
+  settings: LangSettings
+  due: number
+  backlog: number
+  stage: GatedStage
+  progress: { solid: number; needed: number }
+  meta: DeckMeta
+}
+
+const STAGE_LABEL: Record<GatedStage, string> = {
+  script: 'pismo',
+  core: 'rdzeń',
+  sentences: 'zdania',
+}
+
+const STAGE_HINT: Record<GatedStage, string> = {
+  script: 'Najpierw znaki. Bez nich zdanie jest obrazkiem.',
+  core: 'Sto najczęstszych słów. Potem zdania mają się o co oprzeć.',
+  sentences: 'Zdania z korpusu, po jednym nowym słowie na raz.',
+}
 
 const INTENSITY_LABEL: Record<LangSettings['intensity'], string> = {
   short: 'krótka',
@@ -44,11 +66,19 @@ export function Start() {
     const now = Date.now()
     const langs = await addedLanguages()
     const loaded = await Promise.all(
-      langs.map(async (settings) => ({
-        settings,
-        due: await dueCount(settings.lang, now),
-        backlog: await backlogCount(settings.lang),
-      })),
+      langs.map(async (settings) => {
+        const meta = await loadMeta(settings.lang)
+        const cards = await db.cards.where('lang').equals(settings.lang).toArray()
+        const stage = currentStage(adapterFor(settings.lang), cards, meta, settings.stageOverride)
+        return {
+          settings,
+          meta,
+          stage,
+          progress: stageProgress(cards, meta, stage),
+          due: await dueCount(settings.lang, now),
+          backlog: await backlogCount(settings.lang),
+        }
+      }),
     )
     setRows(loaded)
     setSelected(
@@ -199,6 +229,20 @@ export function Start() {
                   </p>
                 )}
 
+                <div className="flex flex-col gap-2 border-t border-border-quiet pt-5">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <Mono tone="accent">etap · {STAGE_LABEL[chosen.stage]}</Mono>
+                    {chosen.stage !== 'sentences' && (
+                      <Mono tone="normal">
+                        {chosen.progress.solid} / {chosen.progress.needed}
+                      </Mono>
+                    )}
+                  </div>
+                  <p className="font-ui text-[13px] leading-[1.5] text-text-2">
+                    {STAGE_HINT[chosen.stage]}
+                  </p>
+                </div>
+
                 <Button
                   variant="primary"
                   full
@@ -252,6 +296,22 @@ export function Start() {
                     ]}
                     onChange={(autoAdvance) => void change({ autoAdvance })}
                     hint="Po odpowiedzi widać poprawne słowo, czytanie i znaczenie. Pudło zawsze czeka na dotknięcie."
+                  />
+
+                  <Choice
+                    label="etap"
+                    value={chosen.settings.stageOverride ?? 'auto'}
+                    options={[
+                      { value: 'auto' as const, label: 'po kolei' },
+                      ...gatedStages(adapterFor(chosen.settings.lang)).map((stage) => ({
+                        value: stage,
+                        label: STAGE_LABEL[stage],
+                      })),
+                    ]}
+                    onChange={(value) =>
+                      void change({ stageOverride: value === 'auto' ? null : value })
+                    }
+                    hint="Etapy nie blokują sztywno. Możesz przeskoczyć wcześniejsze, jeśli już je znasz."
                   />
 
                   <Choice

@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router'
 import { adapterFor } from '@/langs'
 import { AGAIN, GOOD } from '@/srs/types'
 import { useSession } from '@/session/useSession'
-import { splitAroundCloze } from '@/session/cloze'
+import { layoutAroundCloze, type Piece } from '@/session/cloze'
 import { QuizOption, type OptionState } from '@/ui/QuizOption'
 import { Button } from '@/ui/Button'
 import { Mono } from '@/ui/Mono'
@@ -27,11 +27,18 @@ import { Progress } from '@/ui/Ticks'
 /** Ile trwa automatyczne przejście po trafieniu, gdy jest włączone. */
 const AUTO_ADVANCE_MS = 1400
 
+/** Nazwa etapu w nagłówku — użytkownik ma wiedzieć, czego się w tej sesji uczy. */
+const STAGE_LABEL: Record<'script' | 'core' | 'sentences', string> = {
+  script: 'pismo',
+  core: 'rdzeń',
+  sentences: 'zdania',
+}
+
 export function Session() {
   const { lang = '' } = useParams()
   const navigate = useNavigate()
   const adapter = adapterFor(lang)
-  const { phase, current, reveal, progress, summary, settings, answer, next, undoLast } =
+  const { phase, current, stage, reveal, progress, summary, settings, answer, next, undoLast } =
     useSession(lang)
 
   const hit = reveal !== null && reveal.chosen === reveal.correct
@@ -97,11 +104,50 @@ export function Session() {
 
   const { entry, options } = current
   const target = entry.item.tokens[entry.item.cloze]
-  const { before, after } = splitAroundCloze(entry.item, adapter.tokenizer === 'space' ? ' ' : '')
+  const layout = layoutAroundCloze(entry.item, adapter.tokenizer === 'space' ? ' ' : '')
+
+  /**
+   * Czytania nad wyrazami — sekcja 9 i M4. Ustawienie `furigana` decyduje KIEDY:
+   * `always` od razu, `after` dopiero po odpowiedzi (żeby czytanie nie było podpowiedzią
+   * przy karcie ze słuchu ani ściągą przy cloze), `never` wcale.
+   *
+   * `showReading` jest wtyczką adaptera: japoński pokazuje czytanie tylko nad kanji,
+   * chiński nad wszystkim, języki łacińskie nie mają czego pokazywać.
+   */
+  const rubyVisible =
+    settings.furigana === 'always' || (settings.furigana === 'after' && reveal !== null)
+
+  const withRuby = (piece: Piece, key: number) => {
+    const { glue, token } = piece
+    const show = rubyVisible && token.r && (adapter.showReading?.(token.s, token.r) ?? true)
+    return (
+      <span key={key}>
+        {glue}
+        {show ? (
+          <ruby>
+            {token.s}
+            <rt>{token.r}</rt>
+          </ruby>
+        ) : (
+          token.s
+        )}
+      </span>
+    )
+  }
 
   const fontClass = { ui: 'font-ui', display: 'font-display', ja: 'font-ja', ko: 'font-ko' }[
     adapter.display.font
   ]
+
+  // Etapy 0 i 1 pytają o pojedynczy znak albo pojedyncze słowo, a odpowiedzią jest
+  // etykieta łacińska: czytanie albo polska glosa. Zdanie, tłumaczenie i luka nie mają
+  // się wtedy z czego wziąć, więc karta jest jednoelementowa.
+  //
+  // Patrzymy na ETAP karty, nie na jej tryb: pozycja bez dystraktorów spada na `reveal`,
+  // a wtedy tryb przestaje mówić cokolwiek o kształcie treści. Bez tego karta rdzenia
+  // bez opcji rysowała pustą lukę w nieistniejącym zdaniu.
+  const stageOfCard = entry.card.stage
+  const jednoelementowa = stageOfCard === 'script' || stageOfCard === 'core'
 
   const stateOf = (index: number): OptionState => {
     if (!reveal) return 'idle'
@@ -130,7 +176,9 @@ export function Session() {
           >
             <Mono tone="normal">← wyjdź</Mono>
           </button>
-          <Mono>{adapter.name}</Mono>
+          <Mono>
+            {adapter.name} · {STAGE_LABEL[stage]}
+          </Mono>
           <Mono tone="normal">
             {progress.done + 1} / {progress.total}
           </Mono>
@@ -138,36 +186,64 @@ export function Session() {
       </header>
 
       <main className="flex flex-1 flex-col justify-center gap-7 px-7 py-10">
-        <p
-          className={`${fontClass} text-text`}
-          style={{ fontSize: `${adapter.display.size}px`, lineHeight: adapter.display.lineHeight }}
-        >
-          {before}
-          {reveal?.answer ? (
-            // Po odsłonięciu luka wypełnia się poprawnym słowem. To jest moment, w którym
-            // zdanie po raz pierwszy da się przeczytać w całości — i po to jest cała karta.
-            <span className="nabu-accent-tint nabu-reveal mx-[2px] rounded-[6px] px-[6px] text-accent">
-              {reveal.answer.term}
-            </span>
-          ) : (
-            <span
-              className="mx-1 inline-block rounded-full border-b-[3px] border-accent align-[-0.15em]"
-              style={{ width: `${Math.max(2, (target?.s.length ?? 2) * 0.9)}em` }}
-              aria-label="luka"
-            />
-          )}
-          {after}
-        </p>
+        {jednoelementowa ? (
+          <p
+            className={`${fontClass} text-center text-text`}
+            style={{
+              // Znak pisma jest całą treścią karty, więc dostaje całą uwagę. Słowo rdzenia
+              // jest dłuższe, więc nieco mniejsze — ale nadal większe niż w zdaniu.
+              fontSize: stageOfCard === 'script' ? '96px' : '54px',
+              lineHeight: 1.25,
+            }}
+          >
+            {entry.item.text}
+          </p>
+        ) : (
+          <>
+            <p
+              className={`${fontClass} text-text`}
+              style={{
+                fontSize: `${adapter.display.size}px`,
+                lineHeight: adapter.display.lineHeight,
+              }}
+            >
+              {layout.before.map(withRuby)}
+              {reveal?.answer ? (
+                // Po odsłonięciu luka wypełnia się poprawnym słowem. To jest moment, w którym
+                // zdanie po raz pierwszy da się przeczytać w całości — i po to jest cała karta.
+                <span className="nabu-accent-tint nabu-reveal mx-[2px] rounded-[6px] px-[6px] text-accent">
+                  {rubyVisible && reveal.reading ? (
+                    <ruby>
+                      {reveal.answer.term}
+                      <rt>{reveal.reading}</rt>
+                    </ruby>
+                  ) : (
+                    reveal.answer.term
+                  )}
+                </span>
+              ) : (
+                <span
+                  className="mx-1 inline-block rounded-full border-b-[3px] border-accent align-[-0.15em]"
+                  style={{ width: `${Math.max(2, (target?.s.length ?? 2) * 0.9)}em` }}
+                  aria-label="luka"
+                />
+              )}
+              {layout.after.map(withRuby)}
+              {layout.tail}
+            </p>
 
-        <p className="font-ui text-[15px] leading-[1.55] text-text-2">{entry.item.pl}</p>
+            <p className="font-ui text-[15px] leading-[1.55] text-text-2">{entry.item.pl}</p>
+          </>
+        )}
 
         {reveal?.answer && (
           <p
-            className="nabu-reveal flex flex-wrap items-baseline gap-x-3 gap-y-1"
+            className={`nabu-reveal flex flex-wrap items-baseline gap-x-3 gap-y-1
+              ${jednoelementowa ? 'justify-center' : ''}`}
             aria-live="polite"
           >
             <Mono tone={hit ? 'accent' : 'normal'}>{hit ? 'dobrze' : 'źle'}</Mono>
-            {reveal.reading && (
+            {reveal.reading && !rubyVisible && reveal.reading !== reveal.answer.gloss && (
               <span className="font-mono text-[13px] text-text-2">{reveal.reading}</span>
             )}
             <span className="font-ui text-[14px] text-text">{reveal.answer.gloss}</span>
@@ -181,11 +257,14 @@ export function Session() {
             {options.options.map((option, index) => (
               <QuizOption
                 key={option.id}
-                term={option.term}
-                gloss={option.gloss}
+                // Przy etapach 0 i 1 odpowiedzią jest etykieta łacińska, a rzecz w piśmie
+                // docelowym stoi już na przodzie karty. Pokazywanie jej drugi raz w opcji
+                // zamieniłoby wybór w dopasowywanie dwóch identycznych napisów.
+                term={jednoelementowa ? option.gloss : option.term}
+                gloss={jednoelementowa ? '' : option.gloss}
                 state={stateOf(index)}
                 chosen={reveal?.chosen === index}
-                font={adapter.display.font}
+                font={jednoelementowa ? 'ui' : adapter.display.font}
                 shortcut={index + 1}
                 onSelect={() => void answer(index)}
               />

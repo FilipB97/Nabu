@@ -17,6 +17,8 @@ const MEDIAL_COUNT = 21
 const FINAL_COUNT = 28
 
 /** 초성 — 19 spółgłosek nagłosowych, w kolejności unikodowej. */
+import type { ScriptItem } from '../types.ts'
+
 export const INITIALS = [...'ᄀᄁᄂᄃᄄᄅᄆᄇᄈᄉᄊᄋᄌᄍᄎᄏᄐᄑᄒ']
 
 /** 중성 — 21 samogłosek. */
@@ -72,4 +74,45 @@ export function toJamoSequence(text: string): string[] {
     if (parts.final > 0) out.push(FINALS[parts.final]!)
   }
   return out
+}
+
+/**
+ * Inwentarz hangulu dla etapu 0 — sekcja 2a.
+ *
+ * Czterdzieści liter, nie sylaby. Hangul jest alfabetem zapisywanym w blokach sylabowych,
+ * więc opanowanie liter plus zasada składania (`compose` wyżej) wystarcza do przeczytania
+ * dowolnej sylaby. Uczenie sylab osobno oznaczałoby 11 172 pozycje zamiast czterdziestu.
+ *
+ * Czytania w romanizacji poprawionej (RR) — tej samej, której używają słowniki, mapy
+ * i nazwy własne. Transkrypcja polska („czo" zamiast `jo`) byłaby czytelniejsza na starcie
+ * i bezużyteczna wszędzie indziej.
+ *
+ * `ㅇ` ma dwa czytania zależne od pozycji w sylabie i to jest jedyny znak, w którym
+ * czytanie nie jest jednoznaczne. Zapisujemy oba, bo ukrycie tego wyszłoby na jaw
+ * przy pierwszym słowie i wyglądałoby jak błąd danych.
+ */
+const LETTERS: ReadonlyArray<[litera: string, czytanie: string, klasa: string]> = [
+  ['ㄱ', 'g / k', 'spółgłoska'], ['ㄴ', 'n', 'spółgłoska'], ['ㄷ', 'd / t', 'spółgłoska'],
+  ['ㄹ', 'r / l', 'spółgłoska'], ['ㅁ', 'm', 'spółgłoska'], ['ㅂ', 'b / p', 'spółgłoska'],
+  ['ㅅ', 's', 'spółgłoska'], ['ㅇ', 'nieme / ng', 'spółgłoska'], ['ㅈ', 'j', 'spółgłoska'],
+  ['ㅊ', 'ch', 'spółgłoska'], ['ㅋ', 'k', 'spółgłoska'], ['ㅌ', 't', 'spółgłoska'],
+  ['ㅍ', 'p', 'spółgłoska'], ['ㅎ', 'h', 'spółgłoska'],
+
+  ['ㄲ', 'kk', 'spółgłoska napięta'], ['ㄸ', 'tt', 'spółgłoska napięta'],
+  ['ㅃ', 'pp', 'spółgłoska napięta'], ['ㅆ', 'ss', 'spółgłoska napięta'],
+  ['ㅉ', 'jj', 'spółgłoska napięta'],
+
+  ['ㅏ', 'a', 'samogłoska'], ['ㅑ', 'ya', 'samogłoska'], ['ㅓ', 'eo', 'samogłoska'],
+  ['ㅕ', 'yeo', 'samogłoska'], ['ㅗ', 'o', 'samogłoska'], ['ㅛ', 'yo', 'samogłoska'],
+  ['ㅜ', 'u', 'samogłoska'], ['ㅠ', 'yu', 'samogłoska'], ['ㅡ', 'eu', 'samogłoska'],
+  ['ㅣ', 'i', 'samogłoska'],
+
+  ['ㅐ', 'ae', 'dwugłoska'], ['ㅒ', 'yae', 'dwugłoska'], ['ㅔ', 'e', 'dwugłoska'],
+  ['ㅖ', 'ye', 'dwugłoska'], ['ㅘ', 'wa', 'dwugłoska'], ['ㅙ', 'wae', 'dwugłoska'],
+  ['ㅚ', 'oe', 'dwugłoska'], ['ㅝ', 'wo', 'dwugłoska'], ['ㅞ', 'we', 'dwugłoska'],
+  ['ㅟ', 'wi', 'dwugłoska'], ['ㅢ', 'ui', 'dwugłoska'],
+]
+
+export function jamoItems(): ScriptItem[] {
+  return LETTERS.map(([s, r, group]) => ({ s, r, group }))
 }

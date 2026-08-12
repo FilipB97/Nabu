@@ -1180,6 +1180,30 @@ i bez problemu czytań. Rozdziela dwie trudności, które inaczej debugowałbyś
 **Bramka:** nowe konto koreańskie przechodzi hangul → rdzeń → zdania, bramy działają,
 język łaciński nadal startuje od `core`.
 
+**Wynik (12.08.2026):** etapy 0 i 1 powstają w buildzie, bez nowego pobrania. Inwentarz
+pisma jest w adapterze (`scriptItems`), bo kana i hangul to zbiory zamknięte, których nie ma
+w żadnym korpusie: 92 znaki kany (46 hiragany + 46 katakany, bez dakuten — `が` to `か`
+ze znakiem dźwięczności, czyli reguła, nie osobna pozycja) i 40 liter hangulu w romanizacji
+poprawionej. Rdzeń to setka najczęstszych słów talii, wzięta z puli luk — ma już glosę,
+część mowy, pasmo i czytanie, więc nie kosztuje nic. Cena: dziedziczy `clozePos`, czyli
+dla japońskiego i chińskiego są to same rzeczowniki.
+
+Etap wyznacza brama „90% pozycji etapu ma `interval >= 7`", z liczebnością etapu jako
+mianownikiem — bez tego konto bez ani jednej karty spełniałoby warunek (0 z 0 to 100%).
+Powtórki przychodzą ze wszystkich etapów naraz, nowe pozycje tylko z bieżącego.
+Ręczne odblokowanie jest w ustawieniach języka, zgodnie z sekcją 2a.
+
+Dwie wady wyszły dopiero na kartach:
+
+- **token bez rangi trafiał do luki z pasmem 0.** Sekcja 10.1 mówi wprost, że słowo spoza
+  listy częstości nie może być luką, ale kod podstawiał za brak rangi zero — a zero jest
+  w tej skali NAJCZĘSTSZYM słowem. Na zdaniach było niewidoczne; rdzeń, który sortuje
+  po paśmie, otwierał się na `홈페이지` i `통역사` jako najpospolitszych słowach koreańskiego;
+- **okno pasma dla dystraktorów jest mnożnikowe**, więc na czele listy niemal puste:
+  dla słowa o randze 14 zakres 0,4–2,5× to rangi 6–35. Rdzeń składa się dokładnie z takich
+  słów, więc pierwsza karta etapu 1 (`人`) miała jednego dystraktora i spadła na samoocenę.
+  Doszedł próg bezwzględny: rozpiętość do 60 rang jest zawsze dopuszczalna.
+
 ### M4 — japoński: segmentacja i furigana (1,5 dnia)
 kuromoji jako wtyczka `morph` w `02-tokenize`, czytania, renderowanie `<ruby>`.
 **Bramka — najważniejsza w projekcie:** ręcznie sprawdź 20 losowych zdań z `data/ja/sentences.json`.
@@ -1194,6 +1218,24 @@ więc bramka jest przeglądem tego, co reguła przepuściła, a nie szukaniem od
 
 Trzecia: dystraktory `kanji-components` na 20 losowych kartach. To jedyny język, w którym
 podobieństwo kształtu naprawdę decyduje o trudności karty.
+
+**Wynik (12.08.2026):** furigana renderuje się przez `<ruby>`, nad wyrazami w zdaniu i nad
+odsłoniętą luką. Kiedy się pojawia, decyduje ustawienie `furigana`: `always` od razu,
+`after` (domyślnie) dopiero po odpowiedzi — inaczej czytanie jest ściągą, a nie nauką.
+Nad CZYM się pojawia, decyduje adapter (`showReading`): japoński pokazuje je tylko nad kanji,
+bo `ねこ` nad `ねこ` powtarza to, co widać; chiński nad wszystkim, bo pinyinu nie da się
+odczytać ze znaku. Interlinia adaptera rezerwuje miejsce z góry, więc pojawienie się czytania
+nie przesuwa zdania.
+
+Wymagało to zmiany sposobu składania zdania: zamiast dwóch napisów wokół luki ekran dostaje
+listę tokenów wraz z tym, co je rozdziela (`layoutAroundCloze`). Interpunkcja zostaje na
+swoim miejscu, a każdy wyraz może dostać własne czytanie.
+
+Przegląd dwunastu zdań rozłożonych po całym paśmie: czytania poprawne w kontekście
+(`仕事{しごと}`, `歯医者{はいしゃ}`, `頻繁{ひんぱん}`), segmentacja daje słowa a nie znaki
+(`両方`, `風景`, `とり上げ`), a dystraktory trafiają w kształt bez wymuszania:
+`歯医者` dostaje `医師` i `記者` (wspólny `者`), `地図` dostaje `地面` (wspólny `地`),
+`カナダ` dostaje `サッカー` i `コート`, czyli katakanę do katakany.
 
 ### M5 — dźwięk (0,5 dnia)
 Implementacja `speak(text, lang, rate)` na `speechSynthesis` (ścieżka potwierdzona

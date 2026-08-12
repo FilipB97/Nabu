@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { adapterFor } from '@/langs'
 import { gradeFromQuiz, measure, medianOf, type QuizOutcome } from '@/srs/grade'
 import { review } from '@/srs/sm2'
 import {
@@ -8,6 +9,7 @@ import {
   type CardType,
   type Grade,
   type LogEntry,
+  type Stage,
 } from '@/srs/types'
 import {
   BACKLOG_LIMIT,
@@ -20,7 +22,16 @@ import {
   settingsFor,
   type LangSettings,
 } from '@/store/db'
-import { loadBand, loadByIds, loadLexicon, type Lexicon } from '@/store/decks'
+import {
+  loadBand,
+  loadByIds,
+  loadLexicon,
+  loadMeta,
+  loadStage,
+  type DeckItem,
+  type Lexicon,
+} from '@/store/decks'
+import { currentStage, type GatedStage } from './stages.ts'
 import {
   buildConfusions,
   buildOptions,
@@ -79,6 +90,73 @@ export type SessionSummary = {
 
 type Phase = 'loading' | 'running' | 'done' | 'empty'
 
+/**
+ * Etap decyduje o rodzaju karty: `script` pyta o czytanie znaku, `core` o znaczenie
+ * słowa, `sentences` o słowo w luce. Trzy różne pytania na tej samej maszynerii.
+ *
+ * `production` nie ma tu własnego wpisu, bo nie jest etapem, przez który przechodzi
+ * język — to tryb pojedynczej dojrzałej karty i wchodzi dopiero w M8.
+ */
+function modeFor(stage: Stage): CardType {
+  if (stage === 'script') return 'script'
+  if (stage === 'core') return 'quiz-word'
+  return 'quiz-cloze'
+}
+
+/**
+ * Karty do powtórki mogą pochodzić z różnych etapów naraz, a każdy etap leży w innym
+ * pliku. Grupujemy po etapie i wczytujemy tylko to, co potrzebne.
+ */
+async function resolveItems(
+  lang: string,
+  cards: readonly CardState[],
+): Promise<Map<string, DeckItem>> {
+  const found = new Map<string, DeckItem>()
+
+  for (const stage of ['script', 'core'] as const) {
+    const ids = new Set(cards.filter((card) => card.stage === stage).map((card) => card.id))
+    if (ids.size === 0) continue
+    const deck = await loadStage(lang, stage)
+    for (const item of deck.items) if (ids.has(item.id)) found.set(item.id, item)
+  }
+
+  const sentences = cards.filter((card) => card.stage === 'sentences').map((card) => card.id)
+  for (const [id, item] of await loadByIds(lang, sentences)) found.set(id, item)
+
+  return found
+}
+
+/** Pula, z której biorą się nowe pozycje na bieżącym etapie. */
+async function poolFor(
+  lang: string,
+  stage: GatedStage,
+  config: LangSettings,
+  freshLimit: number,
+): Promise<DeckItem[]> {
+  if (freshLimit <= 0) return []
+  if (stage === 'sentences') return loadBand(lang, config.bandFrom, config.bandTo)
+  return (await loadStage(lang, stage)).items
+}
+
+/**
+ * Słownik opcji. Scalamy etapy, których dotyczy ta sesja: identyfikatory są rozłączne
+ * (`ja-w-*`, `ja-c-*`, lematy zdań), więc scalenie nie może niczego przesłonić.
+ */
+async function lexiconFor(
+  lang: string,
+  stage: GatedStage,
+  due: readonly CardState[],
+): Promise<Lexicon> {
+  const needed = new Set<GatedStage>([stage, ...due.map((card) => card.stage as GatedStage)])
+  let merged: Lexicon = {}
+
+  for (const each of needed) {
+    const part = each === 'sentences' ? await loadLexicon(lang) : (await loadStage(lang, each)).lexicon
+    merged = { ...merged, ...part }
+  }
+  return merged
+}
+
 export function useSession(lang: string) {
   const [phase, setPhase] = useState<Phase>('loading')
   const [current, setCurrent] = useState<SessionCard | null>(null)
@@ -86,6 +164,7 @@ export function useSession(lang: string) {
   const [progress, setProgress] = useState({ done: 0, total: 0, lapses: [] as number[] })
   const [summary, setSummary] = useState<SessionSummary | null>(null)
   const [settings, setSettings] = useState<LangSettings | null>(null)
+  const [stage, setStage] = useState<GatedStage>('sentences')
 
   const queue = useRef<SessionQueue | null>(null)
   const lexicon = useRef<Lexicon>({})
@@ -122,7 +201,7 @@ export function useSession(lang: string) {
       })
     }
     shownAt.current = Date.now()
-    return { entry, options: built, mode: built ? 'quiz-cloze' : 'reveal' }
+    return { entry, options: built, mode: built ? modeFor(entry.card.stage) : 'reveal' }
   }, [])
 
   // ---- budowa sesji ----------------------------------------------------------
@@ -137,21 +216,26 @@ export function useSession(lang: string) {
       setSettings(config)
 
       const limits = INTENSITY[config.intensity]
-      lexicon.current = await loadLexicon(lang)
+      const adapter = adapterFor(lang)
+      const meta = await loadMeta(lang)
+      const allCards = await db.cards.where('lang').equals(lang).toArray()
+
+      // Etap decyduje, skąd biorą się NOWE pozycje. Powtórki przychodzą ze wszystkich
+      // etapów naraz — kana opanowana miesiąc temu ma wracać także wtedy, gdy użytkownik
+      // jest już przy zdaniach (sekcja 2a).
+      const stage = currentStage(adapter, allCards, meta, config.stageOverride)
+      setStage(stage)
 
       const due = await dueCards(lang, now, limits.due)
-      const dueItems = await loadByIds(
-        lang,
-        due.map((card) => card.id),
-      )
+      const dueItems = await resolveItems(lang, due)
 
       // Zaległości: powyżej progu nie dokładamy nowych i mówimy o tym na ekranie startu.
       const backlog = await backlogCount(lang)
       const freshLimit = config.active && backlog < BACKLOG_LIMIT ? limits.fresh : 0
 
-      const pool = freshLimit > 0 ? await loadBand(lang, config.bandFrom, config.bandTo) : []
+      const pool = await poolFor(lang, stage, config, freshLimit)
+      lexicon.current = await lexiconFor(lang, stage, due)
       const seen = await seenIds(lang)
-      const allCards = await db.cards.where('lang').equals(lang).toArray()
       const known = knownLemmas(allCards, dueItems)
       const freshItems = selectFresh(pool, known, seen, freshLimit, cardedLemmas(allCards, dueItems))
 
@@ -172,7 +256,7 @@ export function useSession(lang: string) {
         ...freshItems.map((item) => {
           const target = item.tokens[item.cloze]
           const lemma = target ? (target.lemma ?? target.s.toLocaleLowerCase()) : undefined
-          return { card: newCard(item.id, lang, 'sentences', now, lemma), item, fresh: true }
+          return { card: newCard(item.id, lang, stage, now, lemma), item, fresh: true }
         }),
       ]
 
@@ -319,6 +403,7 @@ export function useSession(lang: string) {
   return {
     phase,
     current,
+    stage,
     reveal,
     progress,
     summary,

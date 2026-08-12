@@ -40,4 +40,8 @@ export const zh: LangAdapter = {
     minOptions: 4,
   },
   production: ['draw'],
+  // Pinyin nad każdym słowem: z samego znaku nie da się odczytać wymowy, a ton jest
+  // częścią słowa. To jest dokładnie odwrotny przypadek niż japońska furigana, która
+  // nad kaną byłaby powtórzeniem.
+  showReading: () => true,
 }

@@ -143,6 +143,12 @@ ruby {
 
 rt {
   font-weight: 400;
+  /* Czytanie ma być czytelne, ale nigdy nie konkurować z tekstem docelowym. Miejsce
+     na nie rezerwuje interlinia adaptera, więc pojawienie się furigany nie przesuwa
+     zdania — układ nie może skakać w połowie karty. */
+  font-size: 0.42em;
+  color: var(--nabu-text-2);
+  letter-spacing: 0.02em;
 }
 
 /* Fokus klawiatury musi być widoczny: na desktopie opcje wybiera się klawiszami 1–6
