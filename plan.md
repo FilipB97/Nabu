@@ -1173,6 +1173,41 @@ To już czwarty raz, gdy wada widoczna wyłącznie na wyrenderowanej karcie prze
 dane i testy (poprzednie: `見 = けん opinia`, „Lo ___ hecho está", CC-CEDICT z CRLF).
 Ręczny przegląd na urządzeniu jest osobną bramką, nie formalnością.
 
+### Poprawka jakości kart (12.08.2026, po użyciu na telefonie)
+
+Sesja szwedzka pokazała kartę `Vad vill du ___?` z opcjami `bli / ha / ge / gå`. Poprawną
+odpowiedzią było `ha`, ale **co najmniej trzy opcje tworzą sensowne zdanie**, a polskie
+tłumaczenie „Czego chcesz?" nie rozstrzyga, o którą chodzi. Chwilę później ta sama rama
+wróciła z odpowiedzią `då`. Karta, na którą nie da się odpowiedzieć, jest gorsza niż brak
+karty — uczy nieufności do aplikacji.
+
+Cztery wady naraz, wszystkie w danych:
+
+1. **Luka padała na słowa funkcyjne.** `ha` miało pasmo 52, `då` — 50. Czoło każdej listy
+   częstości to słowa funkcyjne i czasowniki lekkie; ich uczy ETAP RDZENIA, gdzie kartą
+   jest samo słowo i pytanie ma jedną odpowiedź. Luka wymaga teraz pasma ≥ 150.
+2. **Glosa bez oparcia w tłumaczeniu.** „Czego chcesz?" nie zawiera śladu „mieć, posiadać".
+   Odpowiedzi nie da się wywnioskować — zostaje zgadywanie. Glosa luki musi mieć wspólny
+   rdzeń z którymś słowem polskiego zdania.
+3. **Ta sama rama, dwie różne odpowiedzi.** `Vad vill du ___?` istniało w talii dwa razy.
+   Odrzucamy całą kolidującą grupę: nie da się wybrać, która z dwóch sprzecznych odpowiedzi
+   jest właściwa, a druga karta unieważnia pierwszą wstecz.
+4. **Zła część mowy w glosie.** `göra` („robić") dostawało glosę „robota, praca, zajęcie"
+   jako rzeczownik. Reguła 2 usuwa te przypadki mimochodem, bo taka glosa nie ma oparcia
+   w tłumaczeniu czasownikowym.
+
+**Koszt: talie kurczą się o 40–50%.** Hiszpański 10 909 → 6 398, japoński 18 490 → 11 011,
+szwedzki 2 315 → 1 163, koreański 752 → **378, czyli poniżej bramki M1**. To jest cena
+świadoma i w tę stronę, w którą trzeba: lepiej 378 kart, na które da się odpowiedzieć,
+niż 752 z połową nierozstrzygalnych. Koreański domknie dopiero tokenizer morfologiczny
+(mecab-ko), bo tam problemem jest jakość lematów, nie sama reguła.
+
+Znany koszt drugiego rzędu: dopasowanie rdzeni ma cztery znaki, więc oboczność `kupować`
+/ `kupić` gubi dobre karty. Rdzeń trzyznakowy złapałby je razem z fałszywymi trafieniami
+(`prawie` / `praca`). Właściwym lekarstwem jest prawdziwy stemmer polski — zadanie po v1.
+
+---
+
 ### M3 — koreański: etap 0 i obce pismo (0,5 dnia)
 Karty `script` (hangul), etapy i bramy, `hasScriptStage` w adapterze.
 Koreański jest tu celowo przed japońskim: wprowadza obcy alfabet, ale bez segmentacji

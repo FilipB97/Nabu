@@ -26,18 +26,18 @@ są świadomie odłożone.
 | statystyki z mylonymi parami, wybór presetu motywu | |
 | pipeline 01–07, sześć języków z dystraktorami | |
 | 17 tokenów motywu, 5 presetów, bramka kontrastu w CI | |
-| kroje zsubsetowane do znaków z talii, razem 1,36 MB | |
+| kroje zsubsetowane do znaków z talii, razem 1,33 MB | |
 
 ### Dane
 
 | język | zdań | rdzeń | pismo | odrzuty jakościowe | pasma |
 |---|---|---|---|---|---|
-| hiszpański | 10 909 | 100 | — | 25% | 63–11 998 |
-| portugalski | 8 398 | 100 | — | 24% | 57–11 978 |
-| szwedzki | 2 315 | 100 | — | 15% | 50–11 973 |
-| koreański | 752 | 100 | 40 | 16% | 85–29 831 |
-| japoński | 18 490 | 100 | 92 | 8% | 55–19 998 |
-| chiński | 1 481 | 100 | — | 18% | 72–12 000 |
+| hiszpański | 6 398 | 100 | — | 25% | 63–11 998 |
+| portugalski | 4 274 | 100 | — | 24% | 57–11 978 |
+| szwedzki | 1 163 | 100 | — | 15% | 50–11 973 |
+| koreański | 378 | 100 | 40 | 16% | 85–29 831 |
+| japoński | 11 011 | 100 | 92 | 8% | 55–19 998 |
+| chiński | 1 022 | 100 | — | 18% | 72–12 000 |
 
 Japoński ma pełną segmentację i czytania: `毎日[まいにち]`, `興味深い[きょうみぶかい]`,
 katakana bez furigany. Koreański ma rozdzielone partykuły, więc luka wypada na samym

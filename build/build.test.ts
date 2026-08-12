@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { glossSupported } from './05-assemble.ts'
 import { es, ja, ko, LANG_CODES, adapterFor } from '../src/langs/index.ts'
 import { tokenize } from './02-tokenize.ts'
 import { senseInContext, type Entry } from './04-glosses.ts'
@@ -234,5 +235,36 @@ describe('chiński: pinyin', () => {
   it('składa całe wyrażenie', () => {
     expect(toDiacritics('chuan2 tong3')).toBe('chuán tǒng')
     expect(toDiacritics('tu2 shu1 guan3')).toBe('tú shū guǎn')
+  })
+})
+
+describe('karta musi być rozstrzygalna', () => {
+  it('glosa ma oparcie, gdy polskie zdanie niesie jej rdzeń', () => {
+    expect(glossSupported('jeść', 'Co chcesz jeść?')).toBe(true)
+    expect(glossSupported('lekarstwo', 'Czy muszę brać to lekarstwo?')).toBe(true)
+    expect(glossSupported('założyciel', 'Uniwersytet nosi imię swego założyciela.')).toBe(true)
+  })
+
+  it('oboczność rdzenia gubi kartę i to jest znany koszt', () => {
+    // `kupować` i `kupić` różnią się na czwartym znaku, więc rdzeń ich nie skleja
+    // i karta „Co chcesz kupić?" wypada, choć jest dobra. Rdzeń trzyznakowy złapałby
+    // ją razem z fałszywymi trafieniami w rodzaju `prawie` / `praca`. Właściwym
+    // lekarstwem jest prawdziwy stemmer polski — zadanie po v1.
+    expect(glossSupported('kupować', 'Co chcesz kupić?')).toBe(false)
+  })
+
+  it('bez śladu w tłumaczeniu nie ma z czego wywnioskować odpowiedzi', () => {
+    // Dokładnie te dwie karty wyszły na telefonie: „Vad vill du ha?" i „Vad vill du då?".
+    expect(glossSupported('mieć, posiadać (np. samochód)', 'Czego chcesz?')).toBe(false)
+    expect(glossSupported('wtedy, w tamtym czasie', 'Czego zatem chcesz?')).toBe(false)
+  })
+
+  it('krótkie słowa nie łapią się przypadkiem', () => {
+    // Rdzeń liczy cztery znaki, więc „ma" i „to" nie mogą uzasadnić żadnej glosy.
+    expect(glossSupported('to', 'To jest kot.')).toBe(false)
+  })
+
+  it('rdzeń łapie odmianę, nie tylko formę słownikową', () => {
+    expect(glossSupported('zmęczony', 'Wygląda na zmęczonego.')).toBe(true)
   })
 })

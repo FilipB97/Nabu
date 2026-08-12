@@ -1,10 +1,10 @@
 {
   "lang": "sv",
-  "zdań": 2315,
+  "zdań": 1163,
   "kandydatów": 8080,
   "odrzuconychNaJakości": 1212,
   "odsetekOdrzutówJakościowych": 15,
-  "odsetekNieprzydatnychNaKartę": 56,
+  "odsetekNieprzydatnychNaKartę": 71,
   "pozaZasięgiem": 48738,
   "innyZapis": 0,
   "powodyJakość": {
@@ -16,220 +16,225 @@
   },
   "powodyPrzydatność": {
     "za krótkie": 2375,
-    "brak tokenu nadającego się na lukę": 2163,
+    "brak tokenu nadającego się na lukę": 2255,
+    "glosa bez oparcia w tłumaczeniu": 888,
+    "ta sama rama, inna odpowiedź": 172,
     "za długie": 15
   },
   "tłumaczenia": {
-    "bezpośrednie": 690,
-    "przezAngielski": 1625
+    "bezpośrednie": 362,
+    "przezAngielski": 801
   },
   "pasma": {
-    "min": 50,
-    "mediana": 1248,
-    "p90": 6121,
-    "max": 11973
+    "min": 154,
+    "mediana": 1991,
+    "p90": 7115,
+    "max": 11826
   },
-  "quizNiedostępny": 1,
+  "quizNiedostępny": 0,
   "próbka": [
     {
-      "text": "Vad vill du då?",
-      "pl": "Czego zatem chcesz?",
-      "luka": "då",
-      "band": 50,
+      "text": "Ge mig en dag eller två.",
+      "pl": "Daj mi dzień lub dwa.",
+      "luka": "dag",
+      "band": 154,
       "src": "pivot",
       "dystraktory": [
-        "igen",
-        "mycket",
-        "lite",
-        "tillbaka",
-        "nog"
-      ]
-    },
-    {
-      "text": "Jag var aldrig din vän.",
-      "pl": "Nigdy nie byłam twoją przyjaciółką.",
-      "luka": "vän",
-      "band": 227,
-      "src": "direct",
-      "dystraktory": [
+        "tid",
+        "barn",
+        "hjälp",
+        "pengar",
         "väg",
-        "hand",
         "problem",
-        "sak",
-        "kväll",
-        "far",
-        "gud",
-        "pengar"
+        "vän",
+        "fråga"
       ]
     },
     {
-      "text": "Det var trevligt att göra ingenting.",
-      "pl": "Fajnie było nic nie robić.",
-      "luka": "trevligt",
-      "band": 428,
+      "text": "Jag har fått en bil.",
+      "pl": "Dostałem samochód.",
+      "luka": "bil",
+      "band": 382,
       "src": "direct",
       "dystraktory": [
-        "gott",
-        "heller",
-        "ibland",
-        "alls",
-        "svårt",
-        "tillsammans",
-        "förut",
-        "inne"
+        "bror",
+        "plats",
+        "familj",
+        "dotter",
+        "rum",
+        "ord",
+        "dags",
+        "fara"
       ]
     },
     {
-      "text": "Få bort Tom härifrån.",
-      "pl": "Zabierz stąd Toma.",
-      "luka": "Tom",
-      "band": 659,
+      "text": "Jag vet inte exakt när jag kommer att komma tillbaka.",
+      "pl": "Nie wiem dokładnie kiedy będę z powrotem.",
+      "luka": "exakt",
+      "band": 667,
       "src": "pivot",
       "dystraktory": [
-        "skyldig",
-        "dum",
-        "trött",
-        "sjuk",
-        "snäll",
-        "annorlunda",
-        "full",
-        "orolig"
+        "hemskt",
+        "egentligen",
+        "tillräckligt",
+        "snabbt",
+        "enkelt",
+        "olika",
+        "ofta",
+        "tyvärr"
       ]
     },
     {
-      "text": "Du vet att det här är annorlunda.",
-      "pl": "Wiesz, że to różnica.",
-      "luka": "annorlunda",
-      "band": 735,
+      "text": "Han försökte att göra sin fru lycklig, men han kunde inte.",
+      "pl": "Chciał uczynić żonę szczęśliwą, ale nie mógł.",
+      "luka": "lycklig",
+      "band": 887,
       "src": "pivot",
       "dystraktory": [
+        "försiktig",
+        "stolt",
+        "svart",
+        "stark",
+        "hungrig",
         "ung",
-        "orolig",
-        "dum",
-        "dålig",
-        "tvungen",
-        "sjuk",
-        "trött",
-        "skyldig"
+        "annorlunda",
+        "upptagen"
       ]
     },
     {
-      "text": "Jag tycker om att dansa.",
-      "pl": "Lubię tańczyć.",
-      "luka": "dansa",
-      "band": 1032,
-      "src": "pivot",
-      "dystraktory": [
-        "lösa",
-        "byta",
-        "ändra",
-        "välja",
-        "bevisa",
-        "glömma",
-        "säkra",
-        "arbeta"
-      ]
-    },
-    {
-      "text": "Hon hörde honom sjunga.",
-      "pl": "Słyszała, jak on śpiewa.",
-      "luka": "sjunga",
-      "band": 1436,
+      "text": "Klockan är halv tio.",
+      "pl": "Jest wpół do dziesiątej.",
+      "luka": "halv",
+      "band": 1211,
       "src": "direct",
       "dystraktory": [
-        "stänga",
-        "springa",
-        "ljuga",
-        "fungera",
-        "laga",
-        "backa",
-        "minnas",
-        "gömma"
+        "van",
+        "gravid",
+        "värd",
+        "blå",
+        "viktig",
+        "vit",
+        "upptagen",
+        "nöjd"
       ]
     },
     {
-      "text": "Äntligen är det fredag.",
-      "pl": "Nareszcie piątek.",
-      "luka": "fredag",
-      "band": 2071,
-      "src": "pivot",
+      "text": "Du har ett bra minne.",
+      "pl": "Masz dobrą pamięć.",
+      "luka": "minne",
+      "band": 1553,
+      "src": "direct",
       "dystraktory": [
-        "lördag",
-        "färg",
-        "alternativ",
-        "tyska",
-        "mening",
-        "fiende",
-        "stig",
-        "franska"
+        "procent",
+        "guld",
+        "medicin",
+        "lärare",
+        "exempel",
+        "kött",
+        "dator",
+        "hotell"
       ]
     },
     {
-      "text": "Jag spelade fotboll igår.",
-      "pl": "Grałem wczoraj w piłkę nożną.",
-      "luka": "fotboll",
-      "band": 2816,
+      "text": "Vad skulle det betyda?",
+      "pl": "Co by to znaczyło?",
+      "luka": "betyda",
+      "band": 2121,
+      "src": "direct",
+      "dystraktory": [
+        "skrämma",
+        "röka",
+        "finna",
+        "bestämma",
+        "simma",
+        "övertyga",
+        "handla",
+        "sakna"
+      ]
+    },
+    {
+      "text": "Han har inte hatt på sig.",
+      "pl": "On nie nosi kapelusza.",
+      "luka": "hatt",
+      "band": 2741,
       "src": "pivot",
       "dystraktory": [
-        "morbror",
-        "antal",
-        "flygplan",
-        "otur",
-        "fågel",
+        "choklad",
+        "fotboll",
         "tjuv",
-        "hatt",
-        "kopia"
+        "grönt",
+        "restaurang",
+        "tystnad",
+        "fågel",
+        "spöke"
       ]
     },
     {
-      "text": "Det är fortfarande lite för tidigt för snö.",
-      "pl": "Wciąż trochę za wcześnie na śnieg.",
-      "luka": "snö",
-      "band": 4139,
-      "src": "direct",
-      "dystraktory": [
-        "pension",
-        "brand",
-        "sport",
-        "anställd",
-        "kinesiska",
-        "undantag",
-        "våning",
-        "trädgård"
-      ]
-    },
-    {
-      "text": "Alla måste anpassa sig.",
-      "pl": "Każdy musi się dostosować.",
-      "luka": "anpassa",
-      "band": 6434,
+      "text": "Jag glömde min plånbok.",
+      "pl": "Zapomniałem portfela.",
+      "luka": "plånbok",
+      "band": 3619,
       "src": "pivot",
       "dystraktory": [
-        "reparera",
-        "undervisa",
-        "frysa",
-        "drunkna",
-        "anställa",
-        "kila",
-        "skruva",
-        "reagera"
+        "skrivbord",
+        "ämne",
+        "glasögon",
+        "mask",
+        "lastbil",
+        "tak",
+        "alibi",
+        "politiker"
       ]
     },
     {
-      "text": "Hon skrattade med illa dolt förakt i rösten.",
-      "pl": "Śmiała się ze źle skrywaną wzgardą w głosie.",
-      "luka": "förakt",
-      "band": 11973,
+      "text": "Kan du laga en toalett?",
+      "pl": "Czy możesz naprawić toaletę?",
+      "luka": "toalett",
+      "band": 5050,
+      "src": "pivot",
+      "dystraktory": [
+        "tradition",
+        "italienska",
+        "student",
+        "ko",
+        "golf",
+        "svenska",
+        "slips",
+        "januari"
+      ]
+    },
+    {
+      "text": "Har ni något att tillägga?",
+      "pl": "Macie coś do dodania?",
+      "luka": "tillägga",
+      "band": 7497,
       "src": "direct",
       "dystraktory": [
-        "förkylning",
+        "trösta",
+        "stryka",
+        "regna",
+        "kila",
+        "adoptera",
+        "klargöra",
+        "undervisa",
+        "anpassa"
+      ]
+    },
+    {
+      "text": "Det finns yoghurt i kylen.",
+      "pl": "W lodówce jest jogurt.",
+      "luka": "yoghurt",
+      "band": 11826,
+      "src": "direct",
+      "dystraktory": [
         "turist",
-        "yoghurt",
+        "oljud",
         "kam",
         "sköldpadda",
-        "mjöl",
-        "polska",
-        "oljud"
+        "biologi",
+        "vegetarian",
+        "diet",
+        "fjäril"
       ]
     }
   ]

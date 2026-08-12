@@ -1,10 +1,10 @@
 {
   "lang": "es",
-  "zdań": 10909,
+  "zdań": 6398,
   "kandydatów": 43142,
   "odrzuconychNaJakości": 10667,
   "odsetekOdrzutówJakościowych": 25,
-  "odsetekNieprzydatnychNaKartę": 50,
+  "odsetekNieprzydatnychNaKartę": 60,
   "pozaZasięgiem": 398091,
   "innyZapis": 0,
   "powodyJakość": {
@@ -15,205 +15,205 @@
     "znaki spoza zestawu języka": 11
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 11740,
+    "brak tokenu nadającego się na lukę": 11938,
     "za krótkie": 9626,
+    "glosa bez oparcia w tłumaczeniu": 3548,
+    "ta sama rama, inna odpowiedź": 765,
     "za długie": 200
   },
   "tłumaczenia": {
-    "bezpośrednie": 3178,
-    "przezAngielski": 7731
+    "bezpośrednie": 1887,
+    "przezAngielski": 4511
   },
   "pasma": {
-    "min": 68,
-    "mediana": 2031,
-    "p90": 7444,
+    "min": 154,
+    "mediana": 2214,
+    "p90": 7596,
     "max": 11998
   },
   "quizNiedostępny": 0,
   "próbka": [
     {
-      "text": "Ya no sé qué hacer.",
-      "pl": "Już nie wiem, co robić.",
-      "luka": "hacer",
-      "band": 68,
+      "text": "Sólo puedo hablar de mí mismo.",
+      "pl": "Mogę mówić wyłącznie za siebie.",
+      "luka": "hablar",
+      "band": 154,
       "src": "pivot",
       "dystraktory": [
-        "decir",
-        "ver",
-        "hecho",
-        "ir",
-        "estar",
-        "hablar"
+        "saber",
+        "salir",
+        "pasar",
+        "venir"
       ]
     },
     {
-      "text": "Debes salir del coche.",
-      "pl": "Musisz wysiąść z samochodu.",
-      "luka": "coche",
-      "band": 408,
+      "text": "Esa habitación no es tan grande.",
+      "pl": "Ten pokój nie jest duży.",
+      "luka": "habitación",
+      "band": 496,
+      "src": "pivot",
+      "dystraktory": [
+        "lista",
+        "padres",
+        "comida",
+        "vino",
+        "par",
+        "sentido",
+        "bebé",
+        "arma"
+      ]
+    },
+    {
+      "text": "Hice algo estúpido anoche.",
+      "pl": "Zrobiłem coś głupiego zeszłej nocy.",
+      "luka": "estúpido",
+      "band": 811,
+      "src": "pivot",
+      "dystraktory": [
+        "bonito",
+        "salvo",
+        "propio",
+        "oficial",
+        "tuyo",
+        "blanco",
+        "normal",
+        "necesario"
+      ]
+    },
+    {
+      "text": "Tom nunca ha estado enfermo.",
+      "pl": "Tom nigdy nie był chory.",
+      "luka": "enfermo",
+      "band": 1184,
+      "src": "pivot",
+      "dystraktory": [
+        "lleno",
+        "próximo",
+        "ocupado",
+        "peligroso",
+        "excelente",
+        "temprano",
+        "culpable",
+        "hermoso"
+      ]
+    },
+    {
+      "text": "¿Qué programa de televisión te gusta más?",
+      "pl": "Jaki jest twój ulubiony program telewizyjny?",
+      "luka": "televisión",
+      "band": 1561,
+      "src": "pivot",
+      "dystraktory": [
+        "elección",
+        "colegio",
+        "posibilidad",
+        "camión",
+        "riesgo",
+        "reloj",
+        "velocidad",
+        "asiento"
+      ]
+    },
+    {
+      "text": "El ladrón no quiere comprar los zapatos.",
+      "pl": "Złodziej nie chce kupić butów.",
+      "luka": "ladrón",
+      "band": 2022,
+      "src": "pivot",
+      "dystraktory": [
+        "sensación",
+        "entrenador",
+        "lengua",
+        "examen",
+        "modelo",
+        "salón",
+        "alcohol",
+        "tamaño"
+      ]
+    },
+    {
+      "text": "A él le gusta viajar solo.",
+      "pl": "On lubi podróżować sam.",
+      "luka": "viajar",
+      "band": 2530,
+      "src": "pivot",
+      "dystraktory": [
+        "fumar",
+        "casar",
+        "andar",
+        "estudiar",
+        "saltar",
+        "decidir",
+        "permitir",
+        "huir"
+      ]
+    },
+    {
+      "text": "No necesito una maleta tan grande.",
+      "pl": "Nie potrzebuję tak dużej walizki.",
+      "luka": "maleta",
+      "band": 3226,
+      "src": "pivot",
+      "dystraktory": [
+        "maestra",
+        "metal",
+        "metro",
+        "habilidad",
+        "nacimiento",
+        "rata",
+        "museo",
+        "gasolina"
+      ]
+    },
+    {
+      "text": "El sueldo de un profesor es menor que el de un abogado.",
+      "pl": "Pensja nauczyciela jest niższa od pensji prawnika.",
+      "luka": "sueldo",
+      "band": 4105,
+      "src": "pivot",
+      "dystraktory": [
+        "olvido",
+        "texto",
+        "reto",
+        "mantequilla",
+        "ensalada",
+        "sufrimiento",
+        "cueva",
+        "significado"
+      ]
+    },
+    {
+      "text": "Alicia usa un perfume dulce.",
+      "pl": "Alicja używa słodkich perfum.",
+      "luka": "perfume",
+      "band": 5345,
+      "src": "pivot",
+      "dystraktory": [
+        "poema",
+        "micrófono",
+        "nube",
+        "álbum",
+        "suma",
+        "aparato",
+        "tenis",
+        "perrito"
+      ]
+    },
+    {
+      "text": "Por el aspecto del cielo, parece que va a llover.",
+      "pl": "Sądząc po wyglądzie nieba, może padać.",
+      "luka": "llover",
+      "band": 7868,
       "src": "direct",
       "dystraktory": [
-        "clase",
-        "doctor",
-        "sangre",
-        "llama",
-        "equipo",
-        "haya",
-        "guerra",
-        "punto"
-      ]
-    },
-    {
-      "text": "Sé que suena extraño, pero es verdad.",
-      "pl": "Wiem, że brzmi to dziwnie, ale to prawda.",
-      "luka": "extraño",
-      "band": 647,
-      "src": "pivot",
-      "dystraktory": [
-        "raro",
-        "querido",
-        "general",
-        "cuarto",
-        "perfecto",
-        "duro",
-        "libre",
-        "derecho"
-      ]
-    },
-    {
-      "text": "En este momento está en la iglesia.",
-      "pl": "Teraz jest w kościele.",
-      "luka": "iglesia",
-      "band": 1000,
-      "src": "pivot",
-      "dystraktory": [
-        "intento",
-        "infierno",
-        "vieja",
-        "sorpresa",
-        "mayoría",
-        "busca",
-        "tía",
-        "piso"
-      ]
-    },
-    {
-      "text": "Hoy me voy al cine.",
-      "pl": "Idę dzisiaj do kina.",
-      "luka": "cine",
-      "band": 1406,
-      "src": "pivot",
-      "dystraktory": [
-        "vacaciones",
-        "pantalones",
-        "movimiento",
-        "opción",
-        "visita",
-        "defensa",
-        "bosque",
-        "testigo"
-      ]
-    },
-    {
-      "text": "Todo lo que él hace, lo hace despacio.",
-      "pl": "On wszystko, co robi, robi powoli.",
-      "luka": "despacio",
-      "band": 1760,
-      "src": "direct",
-      "dystraktory": [
-        "directamente",
-        "últimamente",
-        "perfectamente",
-        "normalmente",
-        "deprisa",
-        "suficientemente",
-        "claramente",
-        "solamente"
-      ]
-    },
-    {
-      "text": "Eres un buen estudiante.",
-      "pl": "Jesteś dobrym studentem.",
-      "luka": "estudiante",
-      "band": 2250,
-      "src": "direct",
-      "dystraktory": [
-        "solución",
-        "esquina",
-        "estómago",
-        "entrevista",
-        "artista",
-        "inteligencia",
-        "plato",
-        "tarea"
-      ]
-    },
-    {
-      "text": "No lo puedo demostrar, pero estoy seguro de que fue asesinado.",
-      "pl": "Nie mam dowodu, ale jestem pewny, że on został zamordowany.",
-      "luka": "demostrar",
-      "band": 2991,
-      "src": "pivot",
-      "dystraktory": [
-        "lograr",
-        "visitar",
-        "preparar",
-        "presentar",
-        "abandonar",
-        "preocuparse",
-        "enseñar",
-        "cocinar"
-      ]
-    },
-    {
-      "text": "Él toca bien la guitarra.",
-      "pl": "On dobrze gra na gitarze.",
-      "luka": "guitarra",
-      "band": 3832,
-      "src": "direct",
-      "dystraktory": [
-        "tarta",
-        "alianza",
-        "hierro",
-        "industria",
-        "existencia",
-        "barra",
-        "masa",
-        "estrategia"
-      ]
-    },
-    {
-      "text": "Vamos a echar un partido de tenis.",
-      "pl": "Zagrajmy w tenisa.",
-      "luka": "tenis",
-      "band": 5300,
-      "src": "pivot",
-      "dystraktory": [
-        "iris",
-        "ausencia",
-        "temor",
-        "avenida",
-        "término",
-        "sándwich",
-        "comentario",
-        "toalla"
-      ]
-    },
-    {
-      "text": "Tom parece divertirse mucho tratando de provocar tantos problemas como él pueda.",
-      "pl": "Tom zdaje się mieć sporo zabawy usiłując spowodować jak najwięcej kłopotów.",
-      "luka": "provocar",
-      "band": 7775,
-      "src": "pivot",
-      "dystraktory": [
-        "prestar",
         "cavar",
-        "llover",
-        "arrancar",
-        "ocupar",
-        "navegar",
         "inventar",
-        "perseguir"
+        "alquilar",
+        "prestar",
+        "suicidarse",
+        "combatir",
+        "costar",
+        "ocupar"
       ]
     },
     {
@@ -225,12 +225,12 @@
       "dystraktory": [
         "mudanza",
         "dinosaurio",
-        "panza",
         "aprendizaje",
-        "intensidad",
-        "morada",
         "maratón",
-        "recado"
+        "recado",
+        "pizarra",
+        "tornado",
+        "pony"
       ]
     }
   ]

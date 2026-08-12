@@ -1,10 +1,10 @@
 {
   "lang": "ja",
-  "zdań": 18490,
+  "zdań": 11011,
   "kandydatów": 49453,
   "odrzuconychNaJakości": 4005,
   "odsetekOdrzutówJakościowych": 8,
-  "odsetekNieprzydatnychNaKartę": 55,
+  "odsetekNieprzydatnychNaKartę": 70,
   "pozaZasięgiem": 199396,
   "innyZapis": 0,
   "powodyJakość": {
@@ -13,207 +13,209 @@
     "wulgaryzm": 15
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 22832,
+    "brak tokenu nadającego się na lukę": 25043,
+    "glosa bez oparcia w tłumaczeniu": 4917,
     "za krótkie": 3954,
+    "ta sama rama, inna odpowiedź": 351,
     "za długie": 172
   },
   "tłumaczenia": {
-    "bezpośrednie": 8887,
-    "przezAngielski": 9603
+    "bezpośrednie": 5447,
+    "przezAngielski": 5564
   },
   "pasma": {
-    "min": 55,
-    "mediana": 1376,
-    "p90": 7177,
+    "min": 152,
+    "mediana": 1513,
+    "p90": 7397,
     "max": 19998
   },
   "quizNiedostępny": 0,
   "próbka": [
     {
-      "text": "彼らは仕事中です。",
-      "pl": "Oni są w pracy.",
-      "luka": "仕事",
-      "band": 55,
+      "text": "この語はまだ使われている。",
+      "pl": "To słowo wciąż jest w użyciu.",
+      "luka": "語",
+      "band": 152,
       "src": "pivot",
       "dystraktory": [
-        "本",
-        "日",
-        "時間",
-        "今日",
-        "前",
-        "中",
-        "子供",
-        "年"
-      ]
-    },
-    {
-      "text": "顔は知ってます。",
-      "pl": "Znam go z widzenia.",
-      "luka": "顔",
-      "band": 256,
-      "src": "pivot",
-      "dystraktory": [
-        "頭",
-        "全部",
-        "人間",
-        "運転",
-        "学生",
-        "通り",
-        "ドア",
-        "毎日"
-      ]
-    },
-    {
-      "text": "彼は、町で遊びまわっている。",
-      "pl": "Poszedł na miasto się zabawić.",
-      "luka": "町",
-      "band": 450,
-      "src": "direct",
-      "dystraktory": [
-        "世界",
-        "本当",
-        "東京",
-        "猫",
-        "数",
-        "心",
-        "電車",
-        "通り"
-      ]
-    },
-    {
-      "text": "自分の名前消すの忘れたでしょ。",
-      "pl": "Zapomniałeś wymazać swoje imię.",
-      "luka": "名前",
-      "band": 658,
-      "src": "pivot",
-      "dystraktory": [
-        "事故",
-        "結婚",
         "計画",
-        "一番",
-        "成功",
+        "手紙",
+        "男",
         "一緒",
-        "アメリカ",
-        "映画"
+        "結婚",
+        "名前",
+        "一番",
+        "間"
       ]
     },
     {
-      "text": "私たちは、彼女がカナダで生まれたという事実を知っている。",
-      "pl": "Wiemy że ona urodziła się w Kanadzie.",
-      "luka": "カナダ",
-      "band": 890,
+      "text": "トムはテニスするかな？",
+      "pl": "Zastanawiam się, czy Tom gra w tenisa.",
+      "luka": "テニス",
+      "band": 368,
       "src": "pivot",
       "dystraktory": [
-        "サッカー",
-        "コート",
-        "郵便",
-        "森",
+        "ホテル",
+        "テスト",
+        "クラス",
+        "ニュース",
+        "音",
+        "試合",
+        "口",
+        "一つ"
+      ]
+    },
+    {
+      "text": "私は昨日時計を失いました。",
+      "pl": "Wczoraj straciłem zegarek.",
+      "luka": "時計",
+      "band": 567,
+      "src": "direct",
+      "dystraktory": [
+        "日本語",
+        "場所",
+        "音",
+        "宿題",
+        "注意",
+        "試合",
+        "簡単",
+        "小説"
+      ]
+    },
+    {
+      "text": "雨が降っていたのでタクシーに乗った。",
+      "pl": "Pojechałem taksówką, bo padało.",
+      "luka": "タクシー",
+      "band": 763,
+      "src": "pivot",
+      "dystraktory": [
+        "ニューヨーク",
+        "コンピューター",
+        "ビール",
+        "スポーツ",
         "シャツ",
-        "ラジオ",
+        "ギター",
+        "コート",
+        "サッカー"
+      ]
+    },
+    {
+      "text": "彼女は貧しいけれど幸福です。",
+      "pl": "Jest biedna, ale szczęśliwa.",
+      "luka": "幸福",
+      "band": 1011,
+      "src": "pivot",
+      "dystraktory": [
+        "番号",
+        "真実",
+        "名",
         "敵",
-        "客"
+        "情報",
+        "現在",
+        "春",
+        "答え"
       ]
     },
     {
-      "text": "どこで地図を買えますか。",
-      "pl": "Gdzie mogę dostać mapę?",
-      "luka": "地図",
-      "band": 1200,
-      "src": "pivot",
-      "dystraktory": [
-        "地面",
-        "田舎",
-        "早起き",
-        "調査",
-        "工場",
-        "塩",
-        "週",
-        "人口"
-      ]
-    },
-    {
-      "text": "私はその両方とも大好きだ。",
-      "pl": "Bardzo ich oboje lubię.",
-      "luka": "両方",
-      "band": 1576,
-      "src": "pivot",
-      "dystraktory": [
-        "便",
-        "不安",
-        "否定",
-        "階段",
-        "不幸",
-        "夕方",
-        "富士山",
-        "世紀"
-      ]
-    },
-    {
-      "text": "今日歯医者へ行きました。",
-      "pl": "Poszedłem dziś do dentysty.",
-      "luka": "歯医者",
-      "band": 2177,
+      "text": "彼の年齢を考慮に入れた方がよい。",
+      "pl": "Trzeba brać pod uwagę jego wiek.",
+      "luka": "年齢",
+      "band": 1333,
       "src": "direct",
       "dystraktory": [
-        "医師",
-        "記者",
-        "草",
-        "地下鉄",
-        "漫画",
-        "汽車",
-        "鏡",
-        "惑星"
-      ]
-    },
-    {
-      "text": "私は外の風景にすべての注意を集中した。",
-      "pl": "Poświęciłem całą moją uwagę krajobrazowi na zewnątrz.",
-      "luka": "風景",
-      "band": 3097,
-      "src": "pivot",
-      "dystraktory": [
-        "砂",
-        "砂漠",
-        "影",
-        "人種",
-        "不可欠",
-        "医療",
-        "婚約",
-        "活用"
-      ]
-    },
-    {
-      "text": "そんなに頻繁に遅刻するなら私は君を首にしなければならない。",
-      "pl": "Jeśli będziesz się spóźniał, będę musiał cię wyrzucić.",
-      "luka": "頻繁",
-      "band": 4577,
-      "src": "direct",
-      "dystraktory": [
-        "賄賂",
-        "組合",
-        "苺",
-        "余り",
-        "液体",
-        "矢",
-        "小麦粉",
-        "血液"
-      ]
-    },
-    {
-      "text": "この若者は、自分の国についてろくに知らない。",
-      "pl": "Ten młody człowiek wie niewiele o swym kraju.",
-      "luka": "若者",
-      "band": 7613,
-      "src": "pivot",
-      "dystraktory": [
-        "荷物",
-        "患者",
-        "不可能",
-        "都市",
-        "普段",
+        "来年",
+        "大統領",
+        "機会",
+        "お腹",
         "自動車",
-        "火事",
-        "財布"
+        "答え",
+        "財布",
+        "教会"
+      ]
+    },
+    {
+      "text": "ナンシーはなかなか笑顔を見せない。",
+      "pl": "Nancy uśmiecha się rzadko.",
+      "luka": "笑顔",
+      "band": 1739,
+      "src": "pivot",
+      "dystraktory": [
+        "計算",
+        "利益",
+        "貧乏",
+        "季節",
+        "不幸",
+        "未来",
+        "喉",
+        "便利"
+      ]
+    },
+    {
+      "text": "彼女はメキシコ行きを延期した。",
+      "pl": "Przełożyła swój wyjazd do Meksyku.",
+      "luka": "メキシコ",
+      "band": 2367,
+      "src": "direct",
+      "dystraktory": [
+        "コメント",
+        "システム",
+        "アルコール",
+        "メッセージ",
+        "建築",
+        "熊",
+        "大学生",
+        "音楽家"
+      ]
+    },
+    {
+      "text": "トムはまだ、彼の両親に依存しているのですか。",
+      "pl": "Czy Tom jest wciąż zależny od rodziców?",
+      "luka": "両親",
+      "band": 3338,
+      "src": "direct",
+      "dystraktory": [
+        "東京",
+        "意味",
+        "約束",
+        "音楽",
+        "木",
+        "大変",
+        "写真",
+        "本当"
+      ]
+    },
+    {
+      "text": "彼らは広島に原子爆弾を落とした。",
+      "pl": "Zrzucili bombę atomową na Hiroszimę.",
+      "luka": "原子",
+      "band": 4737,
+      "src": "pivot",
+      "dystraktory": [
+        "石炭",
+        "天文学",
+        "小麦",
+        "組合",
+        "子犬",
+        "小麦粉",
+        "虎",
+        "縁"
+      ]
+    },
+    {
+      "text": "これはセルビアで三番目に大きい町である。",
+      "pl": "To trzecie co do wielkości miasto Serbii.",
+      "luka": "セルビア",
+      "band": 7832,
+      "src": "pivot",
+      "dystraktory": [
+        "アイドル",
+        "エアロビクス",
+        "ウール",
+        "ベルギー",
+        "マイケル",
+        "ホノルル",
+        "ペルー",
+        "アクセント"
       ]
     },
     {

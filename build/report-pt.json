@@ -1,10 +1,10 @@
 {
   "lang": "pt",
-  "zdań": 8398,
+  "zdań": 4274,
   "kandydatów": 32186,
   "odrzuconychNaJakości": 7672,
   "odsetekOdrzutówJakościowych": 24,
-  "odsetekNieprzydatnychNaKartę": 50,
+  "odsetekNieprzydatnychNaKartę": 63,
   "pozaZasięgiem": 411309,
   "innyZapis": 0,
   "powodyJakość": {
@@ -15,224 +15,226 @@
     "znaki spoza zestawu języka": 9
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 9046,
+    "brak tokenu nadającego się na lukę": 9242,
     "za krótkie": 6927,
+    "glosa bez oparcia w tłumaczeniu": 3350,
+    "ta sama rama, inna odpowiedź": 578,
     "za długie": 143
   },
   "tłumaczenia": {
-    "bezpośrednie": 392,
-    "przezAngielski": 8006
+    "bezpośrednie": 229,
+    "przezAngielski": 4045
   },
   "pasma": {
-    "min": 57,
-    "mediana": 1548,
-    "p90": 6519,
-    "max": 11978
+    "min": 150,
+    "mediana": 2237,
+    "p90": 7236,
+    "max": 11928
   },
   "quizNiedostępny": 0,
   "próbka": [
     {
-      "text": "Agora tudo está bem.",
-      "pl": "Teraz wszystko jest w porządku.",
-      "luka": "Agora",
-      "band": 57,
+      "text": "Não pode ser verdade.",
+      "pl": "To nie może być prawda.",
+      "luka": "verdade",
+      "band": 150,
       "src": "pivot",
       "dystraktory": [
-        "lá",
-        "então",
-        "mesmo",
-        "nunca",
-        "ainda",
-        "assim",
-        "talvez",
-        "sempre"
+        "dinheiro",
+        "pouco",
+        "mulher",
+        "certeza",
+        "nome",
+        "mundo",
+        "lado",
+        "parte"
       ]
     },
     {
-      "text": "Quem quer te matar?",
-      "pl": "Kto chce cię zabić?",
-      "luka": "matar",
-      "band": 340,
+      "text": "Você vai parar de falar?",
+      "pl": "Czy przestaniesz rozmawiać?",
+      "luka": "parar",
+      "band": 433,
       "src": "pivot",
       "dystraktory": [
-        "acontecer",
-        "levar",
-        "ouvir",
-        "vir",
-        "morrer",
-        "entrar",
-        "começar",
-        "trabalhar"
+        "esperar",
+        "dormir",
+        "comer",
+        "olhar",
+        "usar",
+        "contar",
+        "pedir",
+        "começar"
       ]
     },
     {
-      "text": "O dinheiro é rei.",
-      "pl": "Pieniądze mają siłę przekonywania.",
-      "luka": "rei",
-      "band": 595,
+      "text": "Quero um quarto com vista.",
+      "pl": "Chcę pokój z widokiem.",
+      "luka": "vista",
+      "band": 749,
       "src": "pivot",
       "dystraktory": [
-        "direito",
-        "oportunidade",
-        "sentido",
-        "prisão",
-        "hospital",
-        "atenção",
-        "livro",
-        "ar"
-      ]
-    },
-    {
-      "text": "Tom vai estar lá.",
-      "pl": "Tom będzie tam.",
-      "luka": "Tom",
-      "band": 760,
-      "src": "pivot",
-      "dystraktory": [
-        "tio",
-        "chama",
-        "ataque",
-        "assunto",
-        "ordem",
-        "doutor",
+        "lista",
         "mesa",
-        "escolha"
+        "tio",
+        "viagem",
+        "assunto",
+        "resposta",
+        "conversa",
+        "escritório"
       ]
     },
     {
-      "text": "Nada de interessante acontece nessa cidade pequena.",
-      "pl": "W tym małym miasteczku nie dzieje się nic ciekawego.",
-      "luka": "interessante",
-      "band": 947,
+      "text": "Está frio lá fora.",
+      "pl": "Na zewnątrz jest zimno.",
+      "luka": "frio",
+      "band": 1047,
       "src": "pivot",
       "dystraktory": [
-        "impossível",
-        "engraçado",
-        "divertido",
-        "quente",
-        "contente",
-        "ótimo",
+        "triste",
         "cheio",
-        "horrível"
+        "ótimo",
+        "branco",
+        "perigoso",
+        "belo",
+        "contente",
+        "público"
       ]
     },
     {
-      "text": "Tenho confiança em ti.",
-      "pl": "Ufam ci.",
-      "luka": "confiança",
-      "band": 1366,
+      "text": "Do nada, minha mãe começou a cantar.",
+      "pl": "Nagle moja matka zaczęła śpiewać.",
+      "luka": "cantar",
+      "band": 1420,
       "src": "pivot",
       "dystraktory": [
-        "calças",
-        "justiça",
-        "inimigo",
-        "cheia",
-        "restaurante",
-        "mala",
-        "estação",
-        "ama"
+        "cuidar",
+        "evitar",
+        "responder",
+        "imaginar",
+        "preparar",
+        "controlar",
+        "voar",
+        "gritar"
       ]
     },
     {
-      "text": "Você tem certeza de que não há solução?",
-      "pl": "Jesteś pewien, że nie ma rozwiązania?",
-      "luka": "solução",
-      "band": 1827,
+      "text": "O nome de Tom era o terceiro na lista.",
+      "pl": "Imię Toma było trzecie na liście.",
+      "luka": "terceiro",
+      "band": 1853,
       "src": "pivot",
       "dystraktory": [
-        "sensação",
-        "bolo",
-        "orgulho",
-        "uso",
-        "beijo",
-        "porco",
-        "política",
-        "bilhete"
+        "escuro",
+        "caro",
+        "vinte",
+        "ferido",
+        "universo",
+        "nervoso",
+        "rico",
+        "óbvio"
       ]
     },
     {
-      "text": "Posso te ensinar a cantar.",
-      "pl": "Mogę nauczyć cię śpiewać.",
-      "luka": "ensinar",
-      "band": 2379,
+      "text": "Eu não uso mais óculos.",
+      "pl": "Nie noszę już okularów.",
+      "luka": "óculos",
+      "band": 2378,
       "src": "pivot",
       "dystraktory": [
-        "assinar",
-        "adivinhar",
-        "telefonar",
-        "trocar",
-        "adorar",
-        "vestir",
-        "garantir",
-        "enganar"
+        "século",
+        "lição",
+        "incêndio",
+        "álcool",
+        "humor",
+        "suicídio",
+        "felicidade",
+        "possibilidade"
       ]
     },
     {
-      "text": "Você sabe a origem?",
-      "pl": "Czy znasz pochodzenie?",
-      "luka": "origem",
-      "band": 3379,
+      "text": "O museu está aberto hoje?",
+      "pl": "Czy muzeum jest dzisiaj otwarte?",
+      "luka": "museu",
+      "band": 3112,
       "src": "pivot",
       "dystraktory": [
-        "primavera",
-        "compromisso",
-        "ombro",
-        "judeu",
-        "costume",
-        "mamãe",
-        "destruição",
-        "expressão"
+        "comissário",
+        "mágico",
+        "combustível",
+        "comunicação",
+        "pulso",
+        "física",
+        "mistério",
+        "desastre"
       ]
     },
     {
-      "text": "O festival começa amanhã.",
-      "pl": "Festiwal rozpocznie się już jutro.",
-      "luka": "festival",
-      "band": 4601,
+      "text": "Você deve ser capaz de falar em inglês ou espanhol nessa empresa.",
+      "pl": "Musisz mówić albo po angielsku, albo po hiszpańsku w tej firmie.",
+      "luka": "espanhol",
+      "band": 4025,
       "src": "pivot",
       "dystraktory": [
-        "mochila",
-        "tortura",
-        "solteira",
-        "química",
-        "prática",
-        "habilidade",
-        "lógica",
-        "meio-dia"
+        "barato",
+        "furioso",
+        "descoberto",
+        "delicioso",
+        "sagrado",
+        "italiano",
+        "curto",
+        "sensível"
       ]
     },
     {
-      "text": "O chão ainda está molhado.",
-      "pl": "Ziemia nadal jest mokra.",
-      "luka": "molhado",
-      "band": 6924,
+      "text": "Meu tio é o autor do livro.",
+      "pl": "Autorem książki jest mój wujek.",
+      "luka": "autor",
+      "band": 5670,
       "src": "pivot",
       "dystraktory": [
-        "malvado",
-        "solto",
-        "criador",
-        "largo",
-        "cor-de-rosa",
-        "temporário",
-        "moderno",
-        "mexicano"
+        "outono",
+        "lanterna",
+        "cauda",
+        "colher",
+        "alívio",
+        "quarta-feira",
+        "riqueza",
+        "diamante"
       ]
     },
     {
-      "text": "Você deveria estudar com mais intensidade.",
-      "pl": "Powinieneś więcej studiować.",
-      "luka": "intensidade",
-      "band": 11978,
+      "text": "Não sou tão interessado em literatura como você.",
+      "pl": "Nie interesuje mnie literatura tak jak ciebie.",
+      "luka": "literatura",
+      "band": 7756,
       "src": "pivot",
       "dystraktory": [
-        "alergia",
-        "patriota",
-        "sereia",
-        "melodia",
+        "telegrama",
+        "cimento",
+        "neta",
+        "pimenta",
+        "cantor",
+        "farmácia",
+        "porão",
+        "bruto"
+      ]
+    },
+    {
+      "text": "O presidente fala como um verdadeiro patriota.",
+      "pl": "Prezydent przemawia jak prawdziwy patriota.",
+      "luka": "patriota",
+      "band": 11928,
+      "src": "pivot",
+      "dystraktory": [
         "madrasta",
+        "sogra",
+        "natação",
         "previsão",
-        "ônibus",
-        "asma"
+        "asma",
+        "sereia",
+        "sobrenome",
+        "espanhola"
       ]
     }
   ]

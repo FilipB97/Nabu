@@ -55,6 +55,21 @@ const CLOZE_POS = new Set(['noun', 'verb', 'adj', 'adv'])
 const CLOZE_MIN_BAND = 50
 
 /**
+ * Poniżej tej rangi słowo NIE MOŻE być luką, choćby zdanie było w porządku.
+ *
+ * Czoło każdej listy częstości to słowa funkcyjne i czasowniki lekkie — po szwedzku
+ * `ha`, `bli`, `ge`, `gå`, `då`. Zasłonięcie takiego słowa daje kartę, na którą pasuje
+ * pół języka: `Vad vill du ___?` z opcjami `bli / ha / ge / gå` ma co najmniej trzy
+ * poprawne odpowiedzi, bo każda tworzy sensowne zdanie, a polskie „Czego chcesz?"
+ * nie rozstrzyga której. Taka karta nie uczy niczego i uczy nieufności do aplikacji.
+ *
+ * Tych słów uczy ETAP RDZENIA, gdzie kartą jest samo słowo i jego znaczenie — czyli
+ * format, w którym pytanie ma jedną odpowiedź. Zdania są od słów treściowych.
+ * Próg jest półtora raza większy od rdzenia, żeby objąć też sąsiedztwo setki.
+ */
+const CLOZE_MIN_TARGET_BAND = 150
+
+/**
  * Filtr po stronie polskiej. Zdanie w języku docelowym bywa neutralne, a jego tłumaczenie
  * nie — i odwrotnie. Polski jest zawsze językiem wyjściowym, więc ta lista jest stała
  * dla całego produktu, w odróżnieniu od `adapter.blocklist`.
@@ -195,6 +210,37 @@ function annotate(
 }
 
 /**
+ * Czy polskie tłumaczenie NIESIE znaczenie słowa, które zasłaniamy.
+ *
+ * To jest warunek, bez którego karta cloze jest nierozstrzygalna. Użytkownik widzi zdanie
+ * z luką i tłumaczenie — jeśli w tłumaczeniu nie ma śladu brakującego słowa, nie ma z czego
+ * wywnioskować odpowiedzi i zostaje zgadywanie. Tak wyglądały `Vad vill du ha?` („Czego
+ * chcesz?" — ani śladu „mieć") i `Vad vill du då?` („Czego zatem chcesz?" — glosa mówi
+ * „wtedy, w tamtym czasie").
+ *
+ * Dopasowanie jest po rdzeniach, bo polski odmienia wszystko: `kupować` musi złapać
+ * `kupić`, `jeść` musi złapać `jeść`. Cztery znaki rdzenia to kompromis — trzy łapią
+ * przypadkiem („pra" w „prawie" i „pracy"), pięć gubi połowę odmian.
+ *
+ * Ta reguła kosztuje materiał i to jest cena świadoma: karta, na którą nie da się
+ * odpowiedzieć, jest gorsza niż brak karty.
+ */
+const STEM = 4
+
+function stems(text: string): string[] {
+  return text
+    .toLocaleLowerCase()
+    .split(/[^\p{L}]+/u)
+    .filter((word) => word.length >= STEM)
+    .map((word) => word.slice(0, STEM))
+}
+
+export function glossSupported(gloss: string, polish: string): boolean {
+  const inSentence = new Set(stems(polish))
+  return stems(gloss).some((stem) => inSentence.has(stem))
+}
+
+/**
  * Wybiera token do zasłonięcia. Preferujemy najrzadszy token, który ma glosę —
  * bez glosy nie da się pokazać opcji z tłumaczeniem, a to psuje kartę.
  */
@@ -219,6 +265,7 @@ function pickCloze(
     // otwierała się na `홈페이지` i `통역사`, bo oba miały pasmo 0 zamiast żadnego.
     if (token.b === null) return
     const band = token.b
+    if (band < CLOZE_MIN_TARGET_BAND) return
     if (band > bestBand) {
       bestBand = band
       best = i
@@ -273,7 +320,7 @@ export async function assemble(lang: string): Promise<{ items: Item[]; rejects: 
     rejects[reason] = (rejects[reason] ?? 0) + 1
   }
 
-  const items: Item[] = []
+  let items: Item[] = []
 
   for await (const [id, , text] of readTsv(sources.sentences)) {
     if (!id || !text) continue
@@ -342,6 +389,11 @@ export async function assemble(lang: string): Promise<{ items: Item[]; rejects: 
     const entry = lexicon.entries.get(tokens[cloze]!.lemma)
     if (entry) target.gloss = senseInContext(entry, translation.pl)
 
+    if (!target.gloss || !glossSupported(target.gloss, translation.pl)) {
+      bump('glosa bez oparcia w tłumaczeniu')
+      continue
+    }
+
     items.push({
       id: `${adapter.code}-s-${id}`,
       text,
@@ -353,6 +405,30 @@ export async function assemble(lang: string): Promise<{ items: Item[]; rejects: 
       distractors: [],
       quiz: false,
     })
+  }
+
+  // Kolizje ram. `Vad vill du ___?` istniało w talii DWA razy — raz z odpowiedzią `ha`,
+  // raz z `då`. Obie karty wyglądają identycznie, więc obie są nierozstrzygalne, a druga
+  // dodatkowo unieważnia pierwszą wstecz. Odrzucamy CAŁĄ kolidującą grupę: nie da się
+  // wybrać, która z dwóch sprzecznych odpowiedzi jest tą właściwą.
+  const byFrame = new Map<string, Item[]>()
+  for (const item of items) {
+    const frame = item.tokens.map((t, i) => (i === item.cloze ? '\u2014' : t.s)).join(' ')
+    const group = byFrame.get(frame)
+    if (group) group.push(item)
+    else byFrame.set(frame, [item])
+  }
+
+  const collided = new Set<string>()
+  for (const group of byFrame.values()) {
+    if (group.length < 2) continue
+    const answers = new Set(group.map((item) => item.tokens[item.cloze]!.s.toLocaleLowerCase()))
+    if (answers.size > 1) for (const item of group) collided.add(item.id)
+  }
+
+  if (collided.size > 0) {
+    rejects['ta sama rama, inna odpowiedź'] = collided.size
+    items = items.filter((item) => !collided.has(item.id))
   }
 
   // Sortowanie po paśmie: najłatwiejsze zdania na początku talii (sekcja 10.1).
