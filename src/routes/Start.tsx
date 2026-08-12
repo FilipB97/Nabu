@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router'
 import { LANG_CODES, adapterFor, interferesWith } from '@/langs'
 import { currentStage, gatedStages, stageProgress, type GatedStage } from '@/session/stages'
+import { LEVELS, levelById, type Level } from '@/session/calibration'
 import { loadMeta, type DeckMeta } from '@/store/decks'
 import {
   BACKLOG_LIMIT,
@@ -68,6 +69,8 @@ export function Start() {
    * To jest domknięcie ryzyka „brak głosu TTS" z sekcji 14 (ADR-001).
    */
   const [voiceTick, setVoiceTick] = useState(0)
+  /** Język wybrany do dodania, czekający na poziom wejściowy (sekcja 3.1). */
+  const [pending, setPending] = useState<string | null>(null)
 
   useEffect(() => onVoicesChanged(() => setVoiceTick((n) => n + 1)), [])
 
@@ -108,8 +111,9 @@ export function Start() {
     [refresh, selected],
   )
 
-  const addLanguage = useCallback(
-    async (code: string) => {
+  /** Krok pierwszy: pytamy o interferencję, potem o poziom wejściowy. */
+  const beginAdd = useCallback(
+    (code: string) => {
       const clash = interferesWith(code).find((other) =>
         rows?.some((r) => r.settings.lang === other),
       )
@@ -122,12 +126,34 @@ export function Start() {
         )
         if (!ok) return
       }
-      await settingsFor(code)
-      await updateSettings(code, { addedAt: Date.now() })
-      await refresh()
-      setSelected(code)
+      setPending(code)
     },
-    [refresh, rows],
+    [rows],
+  )
+
+  /**
+   * Krok drugi: poziom ustawia pasmo doboru i to, czy zaczynamy od pisma. Kalibracja
+   * rusza od razu — jej sens jest w tym, żeby PIERWSZA sesja miała właściwy materiał,
+   * więc odłożenie jej na później czyni ją bezużyteczną.
+   */
+  const addLanguage = useCallback(
+    async (code: string, level: Level) => {
+      const spec = levelById(level)
+      await settingsFor(code)
+      await updateSettings(code, {
+        addedAt: Date.now(),
+        level,
+        bandFrom: spec.bandFrom,
+        bandTo: spec.bandTo,
+        ...(spec.skipScript ? { stageOverride: 'core' as const } : {}),
+        calibrated: !spec.calibrate,
+      })
+      setPending(null)
+      setSelected(code)
+      if (spec.calibrate) navigate(`/kalibracja/${code}`)
+      else await refresh()
+    },
+    [navigate, refresh],
   )
 
   if (!rows) {
@@ -366,6 +392,39 @@ export function Start() {
         </>
       )}
 
+      {pending && (
+        <div className="nabu-card flex flex-col gap-5 px-6 py-6">
+          <div className="flex flex-col gap-1">
+            <Mono tone="accent">{adapterFor(pending).name}</Mono>
+            <p className="font-ui text-[14px] leading-[1.6] text-text-2">
+              Od czego zaczynamy? Wybór ustawia pasmo częstości, a przy trzech ostatnich
+              opcjach zapytamy jeszcze o dwadzieścia pięć słów, żeby trafić z materiałem
+              od pierwszej sesji.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            {LEVELS.map((level) => (
+              <button
+                key={level.id}
+                type="button"
+                onClick={() => void addLanguage(pending, level.id)}
+                className="nabu-press nabu-card flex flex-col gap-1 px-5 py-4 text-start"
+              >
+                <span className="font-ui text-[15px] text-text">{level.label}</span>
+                <span className="font-ui text-[12.5px] leading-[1.5] text-text-2">
+                  {level.description}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          <Button variant="ghost" full onClick={() => setPending(null)}>
+            anuluj
+          </Button>
+        </div>
+      )}
+
       {missing.length > 0 && (
         <div className="flex flex-col gap-3 pt-2">
           <Mono>dodaj język</Mono>
@@ -374,7 +433,7 @@ export function Start() {
               <button
                 key={code}
                 type="button"
-                onClick={() => void addLanguage(code)}
+                onClick={() => beginAdd(code)}
                 className="nabu-press nabu-card font-ui min-h-[44px] rounded-full px-5 text-[13px]
                   text-text-2"
               >

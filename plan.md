@@ -1281,6 +1281,31 @@ Kalibracja jest bez quizu — pytanie „znasz to słowo?" z odpowiedzią tak/ni
 Tu chodzi o zasięg słownictwa, nie o test.
 **Bramka:** nowe konto z poziomem „radzę sobie" dostaje zdania i+1 od pierwszej sesji.
 
+**Wynik (12.08.2026):** poziom wybiera się przy dodawaniu języka i ustawia trzy rzeczy naraz:
+pasmo doboru, to czy zaczynamy od pisma, i to czy w ogóle pytamy o zasięg. Kalibracja rusza
+od razu po wyborze — jej sens jest w tym, żeby PIERWSZA sesja miała właściwy materiał, więc
+odłożenie jej na później czyniłoby ją bezużyteczną.
+
+**Wynikiem kalibracji nie jest lista słów, tylko granica pasma.** Dwadzieścia pięć odpowiedzi
+nie wystarczy na listę, ale w zupełności wystarczy na granicę: częstość jest uporządkowana,
+więc znajomość słowa o randze 3 000 mówi coś o wszystkich częstszych. Zbiór znanych lematów
+rośnie potem sam, z kart faktycznie przerobionych, a `selectFresh` traktuje jako znane
+jedno i drugie.
+
+Sondy rozkładamy logarytmicznie, nie równomiernie: różnica między rangą 100 a 600 jest dla
+uczącego się przepaścią, a między 11 000 a 11 500 — niczym. Pokrycie liczymy narastająco,
+bo punktowo wystarczyłby jeden szczęśliwy strzał w rzadkim paśmie, żeby uznać za znane
+wszystko poniżej.
+
+Jedna wada wyszła w teście, zanim zdążyła wyjść na ekranie: granica potrafiła stanąć
+na słowie, o którym użytkownik właśnie powiedział, że go nie zna — samo pokrycie na to
+pozwala, bo trzy „tak" i jedno „nie" to nadal 75%.
+
+Ekran kalibracji celowo **nie wygląda jak test**: bez licznika trafień, bez informacji
+zwrotnej po odpowiedzi, z jawnym „pomiń" i zdaniem o tym, po co to jest. Użytkownik, który
+poczuje się egzaminowany, zacznie zgadywać na korzyść — a wtedy dostanie materiał za trudny
+i porzuci aplikację, nie wiedząc dlaczego.
+
 ### M8 — produkcja (1,5 dnia)
 Karty `produce-*` z sekcji 7. Kolejno: `produce-type` dla klasy A (najtańsze, weryfikuje
 mapowanie ocen z 6.4), klawiatura jamo i `produce-jamo`, klawiatura kana i `produce-kana`,

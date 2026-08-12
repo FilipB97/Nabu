@@ -84,6 +84,7 @@ export function selectFresh(
   seen: ReadonlySet<string>,
   limit: number,
   covered: ReadonlySet<string> = new Set(),
+  knownBand = 0,
 ): DeckItem[] {
   if (limit <= 0) return []
 
@@ -100,9 +101,19 @@ export function selectFresh(
     const lemma = target.lemma ?? target.s.toLocaleLowerCase()
     if (covered.has(lemma)) continue
 
-    const lemmas = new Set(item.tokens.map((token) => token.lemma ?? token.s.toLocaleLowerCase()))
+    // Słowo jest znane, gdy użytkownik ma na nie utrwaloną kartę ALBO gdy mieści się
+    // w paśmie oszacowanym kalibracją (sekcja 3.1). Bez tego drugiego warunku konto
+    // zaawansowane widzi w każdym zdaniu pięć nowych słów i i+1 nie ma czego wybierać.
+    const seenLemmas = new Set<string>()
     let unknown = 0
-    for (const lemma of lemmas) if (!known.has(lemma)) unknown += 1
+    for (const token of item.tokens) {
+      const lemma = token.lemma ?? token.s.toLocaleLowerCase()
+      if (seenLemmas.has(lemma)) continue
+      seenLemmas.add(lemma)
+      if (known.has(lemma)) continue
+      if (knownBand > 0 && token.b > 0 && token.b <= knownBand) continue
+      unknown += 1
+    }
 
     scored.push({ item, lemma, unknown })
   }

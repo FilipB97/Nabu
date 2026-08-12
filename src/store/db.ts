@@ -18,6 +18,15 @@ export type LangSettings = {
    */
   active: boolean
   intensity: 'short' | 'normal' | 'long'
+  /** Poziom wejściowy — sekcja 3.1. Wybierany raz, przy dodaniu języka. */
+  level: 'zero' | 'basics' | 'ok' | 'advanced'
+  /**
+   * Granica pasma, do której zakładamy znajomość słownictwa — wynik kalibracji.
+   * Zero znaczy „nic nie zakładamy" i tak startuje konto od zera.
+   */
+  knownBand: number
+  /** Czy kalibracja została przeprowadzona albo świadomie pominięta. */
+  calibrated: boolean
   /**
    * Ręcznie wybrany etap — sekcja 2a: „etapy nie blokują sztywno". `null` znaczy,
    * że etap wyznacza brama opanowania, i tak jest domyślnie.
@@ -83,6 +92,9 @@ export const db = new NabuDb()
 const DEFAULTS: Omit<LangSettings, 'lang' | 'addedAt'> = {
   active: true,
   intensity: 'normal',
+  level: 'zero',
+  knownBand: 0,
+  calibrated: false,
   stageOverride: null,
   quizOptions: 4,
   // Domyślnie czekamy na dotknięcie. Odsłonięcie niesie treść do nauczenia się —

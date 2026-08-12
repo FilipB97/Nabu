@@ -3,6 +3,7 @@ import { ThemeProvider } from '@/theme/ThemeProvider'
 import { Demo } from '@/routes/Demo'
 import { Start } from '@/routes/Start'
 import { Session } from '@/routes/Session'
+import { Calibration } from '@/routes/Calibration'
 import { Done } from '@/routes/Done'
 import { AudioTest } from '@/routes/AudioTest'
 import { Mono } from '@/ui/Mono'
@@ -50,6 +51,7 @@ export function App() {
         <Routes>
           <Route path="/start" element={<Start />} />
           <Route path="/sesja/:lang" element={<Session />} />
+          <Route path="/kalibracja/:lang" element={<Calibration />} />
           <Route path="/koniec/:lang" element={<Done />} />
           <Route path="/demo" element={<Demo />} />
           <Route path="/audio" element={<AudioTest />} />

@@ -249,7 +249,14 @@ export function useSession(lang: string) {
       lexicon.current = await lexiconFor(lang, stage, due)
       const seen = await seenIds(lang)
       const known = knownLemmas(allCards, dueItems)
-      const freshItems = selectFresh(pool, known, seen, freshLimit, cardedLemmas(allCards, dueItems))
+      const freshItems = selectFresh(
+        pool,
+        known,
+        seen,
+        freshLimit,
+        cardedLemmas(allCards, dueItems),
+        config.knownBand,
+      )
 
       const log = await db.log.where('lang').equals(lang).reverse().limit(400).toArray()
       const samples = log.filter((e) => e.mode.startsWith('quiz')).map((e) => e.ms)
