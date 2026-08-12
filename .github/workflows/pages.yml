@@ -11,8 +11,11 @@ permissions:
   pages: write
   id-token: write
 
+# Sprawdzenia anulują się nawzajem w obrębie tej samej gałęzi i zdarzenia — nowy push
+# unieważnia poprzedni. Deploy ma własną grupę i NIE jest anulowany: jedna grupa dla
+# obu zadań oznaczałaby, że przebieg z pull requesta ubija trwający deploy.
 concurrency:
-  group: pages
+  group: check-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -53,6 +56,11 @@ jobs:
     if: github.event_name == 'push'
     needs: check
     runs-on: ubuntu-latest
+    # Wymaga włączonego Pages ze źródłem „GitHub Actions" w ustawieniach repozytorium.
+    # Bez tego krok kończy się błędem 404 — to nie jest błąd w kodzie.
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: false
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
