@@ -12,6 +12,7 @@ import kuromoji from 'kuromoji'
 import type { LangAdapter } from '../src/langs/types.ts'
 import { needsFurigana, toHiragana } from '../src/langs/ja/kana.ts'
 import { DROPPED, posFromIpadic } from '../src/langs/ja/pos.ts'
+import { loadCedict, segment, type Cedict } from './lib/cedict.ts'
 
 export type Token = {
   /** Forma powierzchniowa, dokładnie jak w zdaniu. */
@@ -61,7 +62,20 @@ type Morph = kuromoji.Tokenizer<kuromoji.IpadicFeatures>
 
 let morphology: Morph | null = null
 
+/** Słownik chiński, wczytywany tylko dla tokenizera `dict`. */
+let cedict: Cedict | null = null
+/** Rangi częstości do rozstrzygania remisów przy cięciu — ustawia je krok 05. */
+let segmentRanks: ReadonlyMap<string, number> | undefined
+
+export function setSegmentRanks(ranks: ReadonlyMap<string, number>): void {
+  segmentRanks = ranks
+}
+
 export async function prepareTokenizer(adapter: LangAdapter): Promise<void> {
+  if (adapter.tokenizer === 'dict' && !cedict) {
+    cedict = await loadCedict()
+    return
+  }
   if (adapter.tokenizer !== 'morph' || morphology) return
   morphology = await new Promise<Morph>((ok, fail) =>
     kuromoji
@@ -104,19 +118,45 @@ const morph: Tokenizer = (text) => {
     .filter((token) => token.pos === null || !DROPPED.has(token.pos))
 }
 
-const notImplemented =
-  (name: string): Tokenizer =>
-  () => {
-    throw new Error(
-      `Tokenizer "${name}" nie jest jeszcze zaimplementowany. ` +
-        'Sekcja 10.1a planu: `dict` wchodzi po v1 (chiński), `morph` w M4 (japoński).',
-    )
+/**
+ * Segmentacja chińskiego przez zachłanne najdłuższe dopasowanie do CC-CEDICT.
+ * Pinyin trafia do pola `r` — pełni tę samą rolę co furigana: ton jest częścią słowa,
+ * a nie ozdobą, więc musi być widoczny.
+ */
+const dict: Tokenizer = (text) => {
+  if (!cedict) {
+    throw new Error('Słownik nie został wczytany — wywołaj prepareTokenizer() przed tokenize()')
   }
+  const loaded = cedict
+
+  return segment(text, loaded, segmentRanks)
+    .filter((part) => /\p{Script=Han}/u.test(part.s))
+    .map((part) => ({
+      s: part.s,
+      r: loaded.entries.get(part.s)?.pinyin ?? null,
+      b: null,
+      pos: null,
+      lemma: part.s,
+    }))
+}
 
 const TOKENIZERS: Record<LangAdapter['tokenizer'], Tokenizer> = {
   space,
-  dict: notImplemented('dict'),
+  dict,
   morph,
+}
+
+/**
+ * Czy zdanie jest w zapisie, którego dana talia nie obsługuje.
+ *
+ * Dotyczy chińskiego: korpus `cmn` w Tatoebie miesza zapis uproszczony i tradycyjny,
+ * a uczący się wybiera jeden. Talia z obydwoma naraz uczyłaby dwóch systemów pisma
+ * pod jedną nazwą — i to bez ostrzeżenia, bo oba są „chińskim".
+ */
+export function wrongScriptVariant(text: string, adapter: LangAdapter): boolean {
+  if (adapter.tokenizer !== 'dict' || !cedict) return false
+  for (const char of text) if (cedict.traditionalOnly.has(char)) return true
+  return false
 }
 
 export function tokenize(text: string, adapter: LangAdapter): Token[] {

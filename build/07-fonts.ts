@@ -102,7 +102,11 @@ const JOBS: FontJob[] = [
   {
     file: 'plex-mono-400-latin',
     url: `${GH}/ofl/ibmplexmono/IBMPlexMono-Regular.ttf`,
-    chars: LATIN,
+    // Krój maszynowy niesie czytania — pinyin z tonami (`chuán`, `nǚ`) i romaji z kreskami
+    // (`ō`, `ū`). Te znaki są w taliach, nie w polskim interfejsie, więc sam `LATIN`
+    // nie wystarcza: brakujący znak nie znika, tylko wypada do kroju systemowego
+    // i czytanie rozjeżdża się w połowie słowa.
+    chars: LATIN + fromData.latin,
   },
   {
     file: 'noto-serif-jp',

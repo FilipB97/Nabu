@@ -11,9 +11,10 @@ ani przetłumaczone maszynowo — zdania, ich polskie tłumaczenia i glosy pocho
 |---|---|---|
 | Zdania w językach docelowych | [Tatoeba](https://tatoeba.org) | CC BY 2.0 FR |
 | Polskie tłumaczenia zdań | Tatoeba, powiązania bezpośrednie i przez angielski | CC BY 2.0 FR |
-| Rangi częstości (es, pt, sv, ko) | [FrequencyWords](https://github.com/hermitdave/FrequencyWords) (OpenSubtitles 2018) | CC BY-SA 3.0 |
+| Rangi częstości (es, pt, sv, ko, zh) | [FrequencyWords](https://github.com/hermitdave/FrequencyWords) (OpenSubtitles 2018) | CC BY-SA 3.0 |
 | Glosy polskie i części mowy | [polski Wikisłownik](https://pl.wiktionary.org) przez [kaikki.org](https://kaikki.org/plwiktionary/) | CC BY-SA 3.0 |
 | Segmentacja i czytania japońskie | [kuromoji.js](https://github.com/takuyaa/kuromoji.js) + IPADIC | Apache 2.0 |
+| Segmentacja i pinyin chiński | [CC-CEDICT](https://www.mdbg.net/chinese/dictionary?page=cc-cedict) | CC BY-SA 4.0 |
 | Rozkład kanji na komponenty | [KRADFILE](http://www.edrdg.org/krad/kradinf.html), EDRDG | CC BY-SA 3.0 |
 | Kroje pisma | Archivo, Spectral, IBM Plex Mono, Noto Serif JP, Noto Serif KR | SIL OFL 1.1 |
 
@@ -61,6 +62,18 @@ odrzutu jest parametrem adaptera, a nie stałą.
 i sprowadzanie form do postaci słownikowej robią reguły w `src/langs/ko/`, nie analizator
 morfologiczny. Doprowadzają talię do stanu używalnego, ale nie rozstrzygają
 niejednoznaczności. mecab-ko jest zadaniem po v1.
+
+**Pinyin pojedynczego znaku bywa nietrafiony.** CC-CEDICT ma osobne hasło dla każdego
+czytania (`重` to i `chóng` „powtórzyć", i `zhòng` „ciężki"), a hasła są ułożone alfabetycznie,
+nie według częstości. Przy jednoznakowym słowie bierzemy pierwsze i czasem jest to czytanie
+rzadsze. Dla słów dwuznakowych i dłuższych — czyli większości talii — problem nie występuje,
+bo tam czytanie jest jednoznaczne. To ten sam rodzaj ograniczenia co przy wyborze glosy wyżej
+i rozwiązuje go dopiero słownik z rangami czytań.
+
+**Zapis tradycyjny jest odrzucany, nie konwertowany.** Tatoeba trzyma oba warianty pisma
+chińskiego pod kodem `cmn`. Talia uczy wyłącznie uproszczonego: zdanie zawierające znak
+występujący tylko w zapisie tradycyjnym wypada (5 219 zdań). Konwersja byłaby możliwa,
+ale dawałaby zdania, których nikt nie napisał — a cała talia stoi na tym, że napisał je człowiek.
 
 **Lematyzacja dla klasy A jest szczątkowa.** Polski Wikisłownik prawie nie zawiera form
 odmienionych dla hiszpańskiego, portugalskiego i szwedzkiego, więc formę powierzchniową

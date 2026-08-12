@@ -1,0 +1,232 @@
+{
+  "lang": "zh",
+  "zdań": 1481,
+  "kandydatów": 6288,
+  "odrzuconychNaJakości": 1141,
+  "odsetekOdrzutówJakościowych": 18,
+  "odsetekNieprzydatnychNaKartę": 58,
+  "pozaZasięgiem": 77105,
+  "innyZapis": 5219,
+  "powodyJakość": {
+    "pasmo powyżej progu języka": 888,
+    "znaki spoza zestawu języka": 194,
+    "za dużo tokenów spoza listy częstości": 53,
+    "wulgaryzm": 6
+  },
+  "powodyPrzydatność": {
+    "brak tokenu nadającego się na lukę": 2284,
+    "za krótkie": 1367,
+    "za długie": 15
+  },
+  "tłumaczenia": {
+    "bezpośrednie": 125,
+    "przezAngielski": 1356
+  },
+  "pasma": {
+    "min": 72,
+    "mediana": 2511,
+    "p90": 7953,
+    "max": 12000
+  },
+  "quizNiedostępny": 8,
+  "próbka": [
+    {
+      "text": "那人是谁？",
+      "pl": "Kim jest ten człowiek?",
+      "luka": "人",
+      "band": 72,
+      "src": "pivot",
+      "dystraktory": [
+        "吧",
+        "事"
+      ]
+    },
+    {
+      "text": "她非常像她的母亲。",
+      "pl": "Jest bardzo podobna do matki.",
+      "luka": "母亲",
+      "band": 497,
+      "src": "pivot",
+      "dystraktory": [
+        "衣服",
+        "房间",
+        "手",
+        "故事",
+        "话",
+        "生命",
+        "原因",
+        "女儿"
+      ]
+    },
+    {
+      "text": "不要忘记您的钱。",
+      "pl": "Nie zapomnij swoich pieniędzy.",
+      "luka": "钱",
+      "band": 879,
+      "src": "pivot",
+      "dystraktory": [
+        "点",
+        "爱",
+        "妈妈",
+        "时间",
+        "天",
+        "爸爸",
+        "女人",
+        "事情"
+      ]
+    },
+    {
+      "text": "没有女人的话，世界会是什么样？",
+      "pl": "Jak wyglądałby świat bez kobiet?",
+      "luka": "世界",
+      "band": 1234,
+      "src": "pivot",
+      "dystraktory": [
+        "男人",
+        "年",
+        "名字",
+        "地",
+        "明天",
+        "妈",
+        "儿子",
+        "生活"
+      ]
+    },
+    {
+      "text": "快点，不然你就要错过火车了。",
+      "pl": "Pospiesz się, inaczej spóźnisz się na pociąg.",
+      "luka": "火车",
+      "band": 1647,
+      "src": "pivot",
+      "dystraktory": [
+        "炸弹",
+        "汽车",
+        "电脑",
+        "爱情",
+        "队长",
+        "宇宙",
+        "旅行",
+        "名"
+      ]
+    },
+    {
+      "text": "我父亲会游泳但我母亲不会。",
+      "pl": "Mój ojciec może pływać, ale moja matka nie.",
+      "luka": "母亲",
+      "band": 2243,
+      "src": "pivot",
+      "dystraktory": [
+        "衣服",
+        "房间",
+        "手",
+        "故事",
+        "话",
+        "生命",
+        "原因",
+        "女儿"
+      ]
+    },
+    {
+      "text": "了解一家公司的文化为什么是重要的？",
+      "pl": "Czemu ważne jest poznanie kultury firmy?",
+      "luka": "文化",
+      "band": 2837,
+      "src": "pivot",
+      "dystraktory": [
+        "花园",
+        "老人",
+        "猴子",
+        "作家",
+        "风",
+        "课",
+        "蛋",
+        "树"
+      ]
+    },
+    {
+      "text": "敌人的敌人就是同伴。",
+      "pl": "Wróg mojego wroga jest moim przyjacielem.",
+      "luka": "同伴",
+      "band": 3721,
+      "src": "pivot",
+      "dystraktory": [
+        "周",
+        "三明治",
+        "冬天",
+        "出租车",
+        "短信",
+        "护照",
+        "花园",
+        "热情"
+      ]
+    },
+    {
+      "text": "他不知道如何用英语写信。",
+      "pl": "On nie wie, jak napisać list po angielsku.",
+      "luka": "英语",
+      "band": 4763,
+      "src": "pivot",
+      "dystraktory": [
+        "椅子",
+        "菜",
+        "作家",
+        "看法",
+        "上学",
+        "面包",
+        "天气",
+        "票"
+      ]
+    },
+    {
+      "text": "我想去外国。",
+      "pl": "Chciałabym wyjechać za granicę.",
+      "luka": "外国",
+      "band": 6057,
+      "src": "pivot",
+      "dystraktory": [
+        "外国人",
+        "碗",
+        "牛肉",
+        "全家",
+        "湖",
+        "葡萄酒",
+        "领带",
+        "半夜"
+      ]
+    },
+    {
+      "text": "这本书非常厚。",
+      "pl": "Ta książka jest bardzo gruba.",
+      "luka": "书",
+      "band": 8065,
+      "src": "pivot",
+      "dystraktory": [
+        "学生",
+        "礼物",
+        "弟弟",
+        "动物",
+        "大学",
+        "米",
+        "笨蛋",
+        "白痴"
+      ]
+    },
+    {
+      "text": "我喝水因为我渴了。",
+      "pl": "Piję wodę, bo chce mi się pić.",
+      "luka": "水",
+      "band": 12000,
+      "src": "pivot",
+      "dystraktory": [
+        "游戏",
+        "本",
+        "音乐",
+        "办公室",
+        "家人",
+        "心",
+        "家里",
+        "城市"
+      ]
+    }
+  ]
+}

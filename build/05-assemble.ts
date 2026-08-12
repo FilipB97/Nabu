@@ -19,7 +19,13 @@ import { copyFile, writeFile } from 'node:fs/promises'
 import { adapterFor } from '../src/langs/index.ts'
 import type { LangAdapter } from '../src/langs/types.ts'
 import { fetchSources } from './01-fetch.ts'
-import { prepareTokenizer, tokenize, type Token } from './02-tokenize.ts'
+import {
+  prepareTokenizer,
+  setSegmentRanks,
+  tokenize,
+  wrongScriptVariant,
+  type Token,
+} from './02-tokenize.ts'
 import {
   buildFrequencyFromCorpus,
   loadFrequency,
@@ -248,6 +254,8 @@ export async function assemble(lang: string): Promise<{ items: Item[]; rejects: 
     adapter.freqSource === 'corpus'
       ? await buildFrequencyFromCorpus(adapter, sources.sentences)
       : await loadFrequency(sources.frequency)
+  // Segmentacja chińskiego rozstrzyga remisy częstością — patrz `segment()`.
+  setSegmentRanks(ranks)
   const lexicon = await loadLexicon(adapter.code)
   const translations = await buildTranslations(sources)
   console.log(`  tłumaczeń polskich: ${translations.size}`)
@@ -275,6 +283,10 @@ export async function assemble(lang: string): Promise<{ items: Item[]; rejects: 
     }
     if (adapter.blocklist.test(text) || POLISH_BLOCKLIST.test(translation.pl)) {
       bump('wulgaryzm')
+      continue
+    }
+    if (wrongScriptVariant(text, adapter)) {
+      bump('zapis tradycyjny')
       continue
     }
 
@@ -368,7 +380,14 @@ export async function writeReport(lang: string, items: Item[], rejects: Rejects)
     'za dużo tokenów spoza listy częstości',
   ])
 
-  const { 'brak tłumaczenia polskiego': outOfReach = 0, ...rest } = rejects
+  const {
+    'brak tłumaczenia polskiego': outOfReach = 0,
+    // Zapis tradycyjny nie jest wadą zdania, tylko innym wariantem pisma — tak samo
+    // jak brak tłumaczenia nie jest wadą, tylko granicą korpusu. Wliczony do jakości
+    // dawałby 56% przy chińskim i sugerował problem, którego nie ma.
+    'zapis tradycyjny': otherScript = 0,
+    ...rest
+  } = rejects
   const quality = Object.entries(rest).filter(([k]) => QUALITY.has(k))
   const usefulness = Object.entries(rest).filter(([k]) => !QUALITY.has(k))
   const sum = (xs: [string, number][]) => xs.reduce((a, [, v]) => a + v, 0)
@@ -385,6 +404,7 @@ export async function writeReport(lang: string, items: Item[], rejects: Rejects)
     odsetekNieprzydatnychNaKartę:
       candidates > 0 ? Math.round((sum(usefulness) / candidates) * 100) : 0,
     pozaZasięgiem: outOfReach,
+    innyZapis: otherScript,
     powodyJakość: Object.fromEntries(quality.sort((a, b) => b[1] - a[1])),
     powodyPrzydatność: Object.fromEntries(usefulness.sort((a, b) => b[1] - a[1])),
     tłumaczenia: {

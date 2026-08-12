@@ -7,6 +7,7 @@ import { needsFurigana, toHiragana } from '../src/langs/ja/kana.ts'
 import { posFromIpadic } from '../src/langs/ja/pos.ts'
 import { splitParticle } from '../src/langs/ko/particles.ts'
 import { lemmaCandidates } from '../src/langs/ko/lemma.ts'
+import { syllableToDiacritics, toDiacritics } from '../src/langs/zh/pinyin.ts'
 
 /**
  * Testy logiki builda. Nie sprawdzają danych — te ocenia się ręcznie przez `report-*.json`
@@ -34,8 +35,8 @@ describe('tokenizer space', () => {
     expect(() => tokenize('水をください。', ja)).toThrow(/prepareTokenizer/)
   })
 
-  it('tokenizer `dict` (chiński) jeszcze nie istnieje i mówi o tym wprost', () => {
-    expect(() => tokenize('水', { ...ja, tokenizer: 'dict' })).toThrow(/dict/)
+  it('tokenizer słownikowy odmawia pracy przed wczytaniem słownika', () => {
+    expect(() => tokenize('我喜欢', { ...ja, tokenizer: 'dict' })).toThrow(/prepareTokenizer/)
   })
 })
 
@@ -203,5 +204,35 @@ describe('koreański: partykuły i formy słownikowe', () => {
   it('nie skraca po samej końcówce 다 — `했습니다` też ją ma, a jest formą odmienioną', () => {
     expect(lemmaCandidates('했습니다')).toContain('하다')
     expect(lemmaCandidates('갔다')).toContain('가다')
+  })
+})
+
+describe('chiński: pinyin', () => {
+  it('stawia znak tonu na właściwej samogłosce', () => {
+    expect(syllableToDiacritics('chuan2')).toBe('chuán')
+    expect(syllableToDiacritics('tong3')).toBe('tǒng')
+    expect(syllableToDiacritics('hao3')).toBe('hǎo')
+    expect(syllableToDiacritics('gou3')).toBe('gǒu')
+  })
+
+  it('`a` i `e` mają pierwszeństwo, w `ou` znak idzie na `o`', () => {
+    expect(syllableToDiacritics('xiao3')).toBe('xiǎo')
+    expect(syllableToDiacritics('bei3')).toBe('běi')
+    expect(syllableToDiacritics('dou1')).toBe('dōu')
+  })
+
+  it('ton neutralny nie ma znaku — i to jest informacja, nie jego brak', () => {
+    expect(syllableToDiacritics('ma5')).toBe('ma')
+    expect(syllableToDiacritics('de5')).toBe('de')
+  })
+
+  it('rozwija zapis `u:` i `v` na `ü`', () => {
+    expect(syllableToDiacritics('nu:3')).toBe('nǚ')
+    expect(syllableToDiacritics('lv4')).toBe('lǜ')
+  })
+
+  it('składa całe wyrażenie', () => {
+    expect(toDiacritics('chuan2 tong3')).toBe('chuán tǒng')
+    expect(toDiacritics('tu2 shu1 guan3')).toBe('tú shū guǎn')
   })
 })
