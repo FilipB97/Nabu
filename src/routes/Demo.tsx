@@ -1,7 +1,7 @@
 import { es, ja, ko } from '@/langs'
 import { QuizCard, type QuizContent } from '@/session/QuizCard'
 import { Mono } from '@/ui/Mono'
-import { Ticks } from '@/ui/Ticks'
+import { Mark } from '@/ui/Ticks'
 import { MODES, PRESETS, PRESETS_IDS, useTheme } from '@/theme/ThemeProvider'
 
 /**
@@ -82,9 +82,7 @@ const MODE_LABELS: Record<(typeof MODES)[number], string> = {
 function BrandMark() {
   return (
     <div className="flex items-center gap-4">
-      <div className="w-[22px]">
-        <Ticks total={3} done={0} height={22} label="Nabu" />
-      </div>
+      <Mark />
       <span className="font-display text-[40px] leading-none font-light tracking-[0.02em] text-text">
         Nabu
       </span>

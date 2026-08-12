@@ -85,3 +85,28 @@ export function Bars({ values, height = 56, className, label }: BarsProps) {
     </div>
   )
 }
+
+type MarkProps = {
+  /** Wysokość kresek w px. 22 w nagłówku, mniej w pasku bocznym. */
+  height?: number
+  className?: string
+}
+
+/**
+ * Znak marki — ten sam motyw równo rozłożonych znaczników, ale bez znaczenia
+ * „postępu": pierwsza kreska w akcencie, dwie kolejne wygaszone.
+ *
+ * Osobny komponent, a nie `Ticks` z wymuszonymi wartościami, bo `done` i `lapses`
+ * opisują stan sesji. Sygnatura marki nie ma stanu, więc każde ich ustawienie tutaj
+ * byłoby kłamstwem — i widać to od razu: `Ticks total=3 done=0` daje białą kreskę
+ * bieżącej karty i dwie prawie niewidoczne kreski przyszłych.
+ */
+export function Mark({ height = 22, className }: MarkProps) {
+  return (
+    <div className={`flex items-end gap-[5px] ${className ?? ''}`} role="img" aria-label="Nabu">
+      {['bg-accent', 'bg-tick-done', 'bg-tick-done'].map((color, i) => (
+        <div key={i} className={`w-1 rounded-[1px] ${color}`} style={{ height: `${height}px` }} />
+      ))}
+    </div>
+  )
+}
