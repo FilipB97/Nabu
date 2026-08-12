@@ -1,0 +1,236 @@
+{
+  "lang": "ja",
+  "zdań": 16699,
+  "kandydatów": 49453,
+  "odrzuconychNaJakości": 4005,
+  "odsetekOdrzutówJakościowych": 8,
+  "odsetekNieprzydatnychNaKartę": 58,
+  "pozaZasięgiem": 199396,
+  "powodyJakość": {
+    "znaki spoza zestawu języka": 2276,
+    "pasmo powyżej progu języka": 1714,
+    "wulgaryzm": 15
+  },
+  "powodyPrzydatność": {
+    "brak tokenu nadającego się na lukę": 24623,
+    "za krótkie": 3954,
+    "za długie": 172
+  },
+  "tłumaczenia": {
+    "bezpośrednie": 7982,
+    "przezAngielski": 8717
+  },
+  "pasma": {
+    "min": 57,
+    "mediana": 1377,
+    "p90": 7166,
+    "max": 19998
+  },
+  "quizNiedostępny": 59,
+  "próbka": [
+    {
+      "text": "私は時間がない。",
+      "pl": "Nie mam czasu.",
+      "luka": "時間",
+      "band": 57,
+      "src": "pivot",
+      "dystraktory": [
+        "日",
+        "本",
+        "車",
+        "問題",
+        "中",
+        "日本",
+        "子供",
+        "年"
+      ]
+    },
+    {
+      "text": "あなたの言う通りかもね。",
+      "pl": "Może masz rację.",
+      "luka": "通り",
+      "band": 260,
+      "src": "direct",
+      "dystraktory": [
+        "運転",
+        "道",
+        "あまり",
+        "人間",
+        "顔",
+        "町",
+        "数",
+        "学生"
+      ]
+    },
+    {
+      "text": "あなたの辞書を私に貸してくれませんか。",
+      "pl": "Czy mógłbym pożyczyć pana słownik?",
+      "luka": "辞書",
+      "band": 455,
+      "src": "direct",
+      "dystraktory": [
+        "新聞",
+        "簡単",
+        "嘘",
+        "午後",
+        "船",
+        "足",
+        "クラス",
+        "箱"
+      ]
+    },
+    {
+      "text": "自分の名前消すの忘れたでしょ。",
+      "pl": "Zapomniałeś wymazać swoje imię.",
+      "luka": "名前",
+      "band": 658,
+      "src": "pivot",
+      "dystraktory": [
+        "事故",
+        "結婚",
+        "計画",
+        "一番",
+        "成功",
+        "一緒",
+        "アメリカ",
+        "映画"
+      ]
+    },
+    {
+      "text": "成功するつもりならもっと頑張れ。",
+      "pl": "Pracuj ciężej jeśli planujesz odnieść sukces.",
+      "luka": "成功",
+      "band": 885,
+      "src": "pivot",
+      "dystraktory": [
+        "男",
+        "名前",
+        "アメリカ",
+        "映画",
+        "事故",
+        "言葉",
+        "結婚",
+        "旅行"
+      ]
+    },
+    {
+      "text": "どうして君は出る時に地図を持ってこなかったのだ。",
+      "pl": "Dlaczego nie wziąłeś mapy, jak wychodziłeś?",
+      "luka": "地図",
+      "band": 1200,
+      "src": "direct",
+      "dystraktory": [
+        "田舎",
+        "早起き",
+        "調査",
+        "工場",
+        "塩",
+        "週",
+        "人口",
+        "過去"
+      ]
+    },
+    {
+      "text": "何でトムとメアリーが離婚するつもりだって思うわけ？",
+      "pl": "Czemu myślisz, że Tom i Maria planują się rozwieźć?",
+      "luka": "離婚",
+      "band": 1575,
+      "src": "pivot",
+      "dystraktory": [
+        "結婚式",
+        "景色",
+        "明かり",
+        "桜",
+        "便",
+        "不安",
+        "土曜日",
+        "不幸"
+      ]
+    },
+    {
+      "text": "この橋は2年前に建設された。",
+      "pl": "Ten most został wybudowany dwa lata temu.",
+      "luka": "橋",
+      "band": 2179,
+      "src": "pivot",
+      "dystraktory": [
+        "歴史",
+        "機械",
+        "品",
+        "味",
+        "森",
+        "湖",
+        "中国",
+        "客"
+      ]
+    },
+    {
+      "text": "何としても戦争は防がねばならない。",
+      "pl": "Za wszelką cenę musimy zapobiec wojnie.",
+      "luka": "戦争",
+      "band": 3108,
+      "src": "direct",
+      "dystraktory": [
+        "価値",
+        "歌",
+        "政治",
+        "色",
+        "日曜日",
+        "会議",
+        "妻",
+        "海"
+      ]
+    },
+    {
+      "text": "彼は私にこの辞書を推薦してくれた。",
+      "pl": "Polecił mi ten słownik.",
+      "luka": "辞書",
+      "band": 4581,
+      "src": "direct",
+      "dystraktory": [
+        "新聞",
+        "簡単",
+        "嘘",
+        "午後",
+        "船",
+        "足",
+        "クラス",
+        "箱"
+      ]
+    },
+    {
+      "text": "残念ですが、私には先約があります。",
+      "pl": "Przykro mi, ale już mam umówione spotkanie.",
+      "luka": "残念",
+      "band": 7595,
+      "src": "pivot",
+      "dystraktory": [
+        "春",
+        "満足",
+        "現在",
+        "夫",
+        "政府",
+        "腹",
+        "経済",
+        "死"
+      ]
+    },
+    {
+      "text": "彼はペンをとり上げて書き始めた。",
+      "pl": "Wziął długopis i zaczął pisać.",
+      "luka": "ペン",
+      "band": 19998,
+      "src": "direct",
+      "dystraktory": [
+        "ワイン",
+        "スペイン",
+        "パン",
+        "プレゼント",
+        "ロンドン",
+        "レストラン",
+        "フランス",
+        "パソコン"
+      ]
+    }
+  ]
+}

@@ -832,7 +832,7 @@ pokazuje tekst japoński krojem systemowym albo nie pokazuje go wcale.
 |---|---|---|---|
 | `01-fetch` | Tatoeba downloads (bz2) | surowe TSV w `cache/` | na laptopie, nie w przeglądarce — CORS znika |
 | `02-tokenize` | zdania + kod języka | tokeny, czytania, lematy | wtyczka wg `adapter.tokenizer` (poniżej) |
-| `03-frequency` | FrequencyWords `{lang}_50k` | mapa lemat → ranga | lemat z tokenizera, fallback na formę powierzchniową |
+| `03-frequency` | FrequencyWords `{lang}_50k` **albo korpus** | mapa lemat → ranga | patrz `freqSource` poniżej |
 | `04-glosses` | polski Wikisłownik | glosy PL + części mowy | **bez modelu językowego**, patrz 10.3 |
 | `05-assemble` | powyższe | `data/{lang}/*.json` | filtry jakości, sortowanie po `band` |
 | `06-distractors` | złożona talia | `distractors[]` + flaga `quiz` | część mowy, pasmo, kształt (10.1b) |
@@ -843,13 +843,25 @@ pokazuje tekst japoński krojem systemowym albo nie pokazuje go wcale.
 
 | `adapter.tokenizer` | Implementacja | Języki |
 |---|---|---|
-| `space` | podział regexem `\p{L}+`, lemat = forma z małej litery | es, pt, sv i cała klasa A |
+| `space` | podział regexem `\p{L}+`, lemat = forma z małej litery | es, pt, sv, ko (z hakami adaptera) |
 | `dict` | zachłanne najdłuższe dopasowanie do słownika | zh (po v1) |
-| `morph` | analizator morfologiczny | ja (kuromoji + IPADIC), ko (opcjonalnie mecab-ko) |
+| `morph` | analizator morfologiczny | ja (kuromoji + IPADIC) |
 
-Koreański formalnie ma spacje, więc `space` wystarczy do v1 — aglutynacja końcówek
-obniża trafność dopasowania do listy częstości, ale nie na tyle, żeby to blokowało start.
-Podniesienie go do `morph` to osobne zadanie po v1, nie warunek wejścia.
+**Korekta wobec pierwszej wersji planu.** Pisało tu, że koreański obsłuży `space`, bo
+formalnie ma spacje, a aglutynacja tylko „obniża trafność dopasowania". Pomiar pokazał
+19 zdań przy bramce 400 — nie obniża trafności, likwiduje materiał. `space` wystarcza,
+ale dopiero z trzema hakami w adapterze:
+
+- `splitToken` — rozdziela wyraz na rdzeń i partykułę. Bez tego luka wypadała na `일을`
+  albo `밤은`, czyli na rzeczowniku zrośniętym z końcówką: karta uczyła złej jednostki,
+  a różnica kształtu między opcjami była wskazówką gramatyczną.
+- `lemmaCandidates` — heurystycznie sprowadza formę odmienioną do postaci słownikowej,
+  bo Wikisłownik ma wyłącznie te ostatnie. Obsługuje też ściągnięcia (`했` → `하`),
+  co pokrywa całą klasę czasowników na `하다`.
+- `quiz.clozePos` — zawęża luki do form nieodmiennych.
+
+Podniesienie koreańskiego do `morph` (mecab-ko) zostaje zadaniem po v1. Te haki
+doprowadzają go do stanu używalnego, ale nie zastępują analizy morfologicznej.
 
 Wtyczka zwraca zawsze ten sam kształt: `{ s, r, b, pos, lemma }`. Dla języków łacińskich
 `r` jest `null` — pipeline i UI muszą to znosić bez rozgałęzień. `pos` przestaje być
@@ -888,7 +900,7 @@ wzorcem co tokenizery wyżej:
 | wtyczka | jak liczy | efekt |
 |---|---|---|
 | `edit` | odległość edycyjna na formie zapisanej, waga niska | dla es/pt/sv decyduje znaczenie: `agua` / `leche` / `pan` / `tiempo` |
-| `kanji-components` | Jaccard po rozkładzie na komponenty z KRADFILE, z mapą aliasów `水 ↔ 氵` | `水` / `氷` / `湯` |
+| `kanji-components` | Jaccard po rozkładzie na komponenty z KRADFILE, z mapą aliasów `水 ↔ 氵 ↔ 汁` | `水` / `氷` / `湯` |
 | `jamo` | odległość edycyjna po rozłożeniu sylab na jamo | `물` / `불` / `말` |
 
 Funkcja rozkładu hangulu jest ta sama, której używa klawiatura jamo z sekcji 7.2 — jedna
@@ -898,6 +910,28 @@ implementacja, dwa zastosowania, w katalogu adaptera.
 dwóch rzeczy — czy wśród dystraktorów nie ma drugiej poprawnej odpowiedzi i czy nie są
 tak odległe, że karta rozwiązuje się sama. Odsetek `quiz: false` zapisz do `build/report.json`;
 powyżej 15% oznacza za ostry próg albo za małą talię.
+
+### 10.1c Skąd biorą się rangi częstości
+
+Adapter wybiera źródło polem `freqSource`:
+
+- **`list`** — gotowa lista FrequencyWords. Właściwa wszędzie tam, gdzie da się ją
+  sensownie podzielić na słowa, czyli w językach ze spacjami.
+- **`corpus`** — liczymy sami, tokenizując korpus tym samym analizatorem, którego używa
+  pipeline.
+
+Japoński wymusił drugą ścieżkę. Lista FrequencyWords dla japońskiego powstała z naiwnego
+podziału, więc jej czoło to pojedyncze kany (い, の, は, て), a **formy słownikowe
+czasowników i przymiotników w ogóle w niej nie występują**: `食べる`, `起きる`, `大きい`,
+`くださる` — wszystkie nieobecne, choć rzeczowniki (`水` 485, `建物` 1255) są w porządku.
+Ranga liczona z korpusu ma dodatkowo tę zaletę, że opisuje dokładnie ten materiał,
+którego uczymy.
+
+Przy liczeniu z korpusu pomijamy cząstki gramatyczne i końcówki posiłkowe — zdominowałyby
+czoło listy tak samo, jak psują listę gotową. **Nie znaczy to, że są „nieznane":** dostają
+pasmo 0 i nie liczą się do limitu `maxUnknown`. Bez tego rozróżnienia każde japońskie
+zdanie miało po kilka tokenów bez pasma i wypadało na filtrze — pierwszy przebieg odrzucał
+86% materiału właśnie z tego powodu.
 
 ### 10.2 Filtry jakości w `05-assemble`
 
@@ -962,10 +996,10 @@ Definicja słownikowa bywa dla tych słów za szeroka, a użytkownik zobaczy je 
 
 ### 10.4 Licencje
 
-`data/ATTRIBUTION.md` w repo, link ze stopki aplikacji:
+`docs/ATTRIBUTION.md` w repo (krok `05` kopiuje go do `data/`), link ze stopki aplikacji:
 Tatoeba — CC BY 2.0 FR; FrequencyWords — CC BY-SA 3.0; **polski Wikisłownik — CC BY-SA 3.0**;
 JMdict/EDRDG — CC BY-SA; KRADFILE/EDRDG — CC BY-SA; KanjiVG — CC BY-SA 3.0;
-kuromoji — Apache 2.0. Dane pochodne dziedziczą SA — dotyczy to katalogu `data/`,
+kuromoji i IPADIC — Apache 2.0. Dane pochodne dziedziczą SA — dotyczy to katalogu `data/`,
 nie kodu aplikacji.
 
 Kroje pisma mają własne licencje i też trafiają do pliku: Spectral, Archivo, Noto Serif JP,
@@ -1043,9 +1077,19 @@ uruchamiany tą samą komendą z innym kodem języka.
 | hiszpański | 10 949 | 2 445 | 25% | 50% | 0 | 63–11 998 |
 | portugalski | 8 423 | 1 771 | 24% | 50% | 0 | 57–11 978 |
 | szwedzki | 2 323 | 974 | 15% | 56% | 1 | 50–11 973 |
+| koreański | 761 | 301 | 16% | 79% | 4% | 85–29 831 |
+| japoński | 16 699 | 1 323 | 8% | 55% | 0% | 57–19 998 |
 
-Bramka przechodzi. Talia waży 10 MB w paczkach po 500 zdań; kroje zsubsetowane
-do znaków z `data/` mieszczą się w 190 kB.
+Bramka przechodzi we wszystkich pięciu językach. Talia waży 22 MB w paczkach po 500 zdań;
+kroje zsubsetowane do znaków z `data/` mieszczą się w 1,25 MB, z czego Noto Serif JP
+878 kB przy 2032 znakach (pełny krój ma 12,9 MB).
+
+Koreański i japoński weszły wcześniej, niż przewidywał plan (M3 i M4), i to celowo:
+uruchomienie pipeline'u na obcym piśmie ujawniło osiem założeń zaszytych pod klasę A,
+z których każde poprawiono w adapterze, a nie w rdzeniu. To jest ta sama logika,
+dla której M1 bierze trzy języki naraz zamiast jednego — tylko zastosowana o poziom wyżej.
+Co z M3 i M4 zostaje: etapy i bramy dla obcego pisma, renderowanie `<ruby>` w sesji
+oraz karty `script`.
 
 ### M2 — silnik SRS + sesja quizowa (2 dni)
 Czysty TS, testy jednostkowe na kroki nauki, przejścia interwałów **oraz mapowanie wyniku

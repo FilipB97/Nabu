@@ -1,0 +1,213 @@
+{
+  "lang": "ja",
+  "version": "2026-08-12",
+  "license": "Tatoeba CC BY 2.0 FR; FrequencyWords CC BY-SA 3.0; Wikisłownik (plwiktionary) CC BY-SA 3.0",
+  "sentences": 16699,
+  "lexicon": 1323,
+  "packs": [
+    {
+      "file": "sentences-000.json",
+      "from": 57,
+      "to": 129,
+      "count": 500
+    },
+    {
+      "file": "sentences-001.json",
+      "from": 129,
+      "to": 198,
+      "count": 500
+    },
+    {
+      "file": "sentences-002.json",
+      "from": 198,
+      "to": 258,
+      "count": 500
+    },
+    {
+      "file": "sentences-003.json",
+      "from": 258,
+      "to": 333,
+      "count": 500
+    },
+    {
+      "file": "sentences-004.json",
+      "from": 333,
+      "to": 392,
+      "count": 500
+    },
+    {
+      "file": "sentences-005.json",
+      "from": 392,
+      "to": 451,
+      "count": 500
+    },
+    {
+      "file": "sentences-006.json",
+      "from": 451,
+      "to": 519,
+      "count": 500
+    },
+    {
+      "file": "sentences-007.json",
+      "from": 519,
+      "to": 580,
+      "count": 500
+    },
+    {
+      "file": "sentences-008.json",
+      "from": 580,
+      "to": 654,
+      "count": 500
+    },
+    {
+      "file": "sentences-009.json",
+      "from": 654,
+      "to": 718,
+      "count": 500
+    },
+    {
+      "file": "sentences-010.json",
+      "from": 718,
+      "to": 785,
+      "count": 500
+    },
+    {
+      "file": "sentences-011.json",
+      "from": 785,
+      "to": 871,
+      "count": 500
+    },
+    {
+      "file": "sentences-012.json",
+      "from": 871,
+      "to": 961,
+      "count": 500
+    },
+    {
+      "file": "sentences-013.json",
+      "from": 961,
+      "to": 1057,
+      "count": 500
+    },
+    {
+      "file": "sentences-014.json",
+      "from": 1058,
+      "to": 1179,
+      "count": 500
+    },
+    {
+      "file": "sentences-015.json",
+      "from": 1179,
+      "to": 1289,
+      "count": 500
+    },
+    {
+      "file": "sentences-016.json",
+      "from": 1290,
+      "to": 1424,
+      "count": 500
+    },
+    {
+      "file": "sentences-017.json",
+      "from": 1424,
+      "to": 1551,
+      "count": 500
+    },
+    {
+      "file": "sentences-018.json",
+      "from": 1551,
+      "to": 1722,
+      "count": 500
+    },
+    {
+      "file": "sentences-019.json",
+      "from": 1722,
+      "to": 1899,
+      "count": 500
+    },
+    {
+      "file": "sentences-020.json",
+      "from": 1899,
+      "to": 2115,
+      "count": 500
+    },
+    {
+      "file": "sentences-021.json",
+      "from": 2118,
+      "to": 2379,
+      "count": 500
+    },
+    {
+      "file": "sentences-022.json",
+      "from": 2380,
+      "to": 2674,
+      "count": 500
+    },
+    {
+      "file": "sentences-023.json",
+      "from": 2674,
+      "to": 3000,
+      "count": 500
+    },
+    {
+      "file": "sentences-024.json",
+      "from": 3000,
+      "to": 3398,
+      "count": 500
+    },
+    {
+      "file": "sentences-025.json",
+      "from": 3398,
+      "to": 3848,
+      "count": 500
+    },
+    {
+      "file": "sentences-026.json",
+      "from": 3848,
+      "to": 4379,
+      "count": 500
+    },
+    {
+      "file": "sentences-027.json",
+      "from": 4379,
+      "to": 4962,
+      "count": 500
+    },
+    {
+      "file": "sentences-028.json",
+      "from": 4962,
+      "to": 5850,
+      "count": 500
+    },
+    {
+      "file": "sentences-029.json",
+      "from": 5850,
+      "to": 7079,
+      "count": 500
+    },
+    {
+      "file": "sentences-030.json",
+      "from": 7079,
+      "to": 8716,
+      "count": 500
+    },
+    {
+      "file": "sentences-031.json",
+      "from": 8717,
+      "to": 11350,
+      "count": 500
+    },
+    {
+      "file": "sentences-032.json",
+      "from": 11353,
+      "to": 16287,
+      "count": 500
+    },
+    {
+      "file": "sentences-033.json",
+      "from": 16300,
+      "to": 19998,
+      "count": 199
+    }
+  ]
+}

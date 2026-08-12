@@ -16,10 +16,10 @@ danych dla trzech języków klasy A**. Nie ma jeszcze silnika powtórek ani logo
 | Vite + React + TypeScript, PWA z precache | silnika SRS i kolejki sesji |
 | 13 tokenów motywu, 5 presetów × jasny/ciemny/systemowy | Firebase, kont, synchronizacji |
 | bramka kontrastu AA w CI | kart produkcji i rysowania |
-| karta quizu w trzech systemach pisma, obsługa klawiatury | japońskiego i koreańskiego (M3, M4) |
+| karta quizu w trzech systemach pisma, obsługa klawiatury | etapów i bram dla obcego pisma (M3) |
 | adaptery pięciu języków wg kontraktu z sekcji 2.1 | podpięcia danych pod sesję (M2) |
-| pipeline danych 01–07, `data/{es,pt,sv}` z dystraktorami | |
-| kroje zsubsetowane do znaków z talii, razem 190 kB | |
+| pipeline 01–07, pięć języków z dystraktorami | renderowania ruby w sesji (M4) |
+| kroje zsubsetowane do znaków z talii, razem 1,25 MB | chińskiego |
 
 ### Dane
 
@@ -28,11 +28,23 @@ danych dla trzech języków klasy A**. Nie ma jeszcze silnika powtórek ani logo
 | hiszpański | 10 949 | 2 445 | 25% | 63–11 998 |
 | portugalski | 8 423 | 1 771 | 24% | 57–11 978 |
 | szwedzki | 2 323 | 974 | 15% | 50–11 973 |
+| koreański | 761 | 301 | 16% | 85–29 831 |
+| japoński | 16 699 | 1 323 | 8% | 57–19 998 |
+
+Japoński ma pełną segmentację i czytania: `毎日[まいにち]`, `興味深い[きょうみぶかい]`,
+katakana bez furigany. Koreański ma rozdzielone partykuły, więc luka wypada na samym
+rzeczowniku, a partykuła zostaje w zdaniu jako wskazówka składniowa.
+| koreański | 761 | 301 | 16% | 85–29 831 |
+| japoński | 16 699 | 1 323 | 8% | 57–19 998 |
+
+Japoński ma pełną segmentację i czytania: `毎日[まいにち]`, `興味深い[きょうみぶかい]`,
+katakana bez furigany. Koreański ma rozdzielone partykuły, więc luka wypada na samym
+rzeczowniku, a partykuła zostaje w zdaniu jako wskazówka składniowa.
 
 **Nic w `data/` nie jest napisane maszynowo.** Zdania i ich polskie tłumaczenia pochodzą
 z Tatoeby, glosy z polskiego Wikisłownika, rangi z list częstości napisów filmowych.
 Build nie wymaga klucza API i da się go powtórzyć w całości — szczegóły w
-[`data/ATTRIBUTION.md`](data/ATTRIBUTION.md) i sekcji 10.3 planu.
+[`docs/ATTRIBUTION.md`](docs/ATTRIBUTION.md) i sekcji 10.3 planu.
 
 ## Uruchomienie
 
@@ -57,7 +69,7 @@ Trasy w M1:
 | `npm run lint` | ESLint, w tym reguła o kodach języków i kolorach |
 | `npm run check` | wszystko naraz, tak jak w CI |
 | `npm run build:data es` | pełny pipeline danych dla języka → `data/es/` |
-| `npm run build:fonts` | subsetuje kroje do znaków obecnych w `data/` |
+| `npm run build:fonts` | subsetuje kroje lokalnie (wymaga `pip install fonttools brotli`) |
 
 ## Dwie reguły, których pilnuje CI
 

@@ -22,6 +22,7 @@ import { adapterFor } from '../src/langs/index.ts'
 import type { LangAdapter, ShapeSimilarity } from '../src/langs/types.ts'
 import { toJamoSequence } from '../src/langs/ko/hangul.ts'
 import type { Item } from './05-assemble.ts'
+import { kanjiSimilarity, loadComponents, type Components } from './lib/kradfile.ts'
 
 /** Ilu kandydatów zapisujemy. Runtime losuje z nich `n − 1`, więc zestaw się nie powtarza. */
 const CANDIDATES = 8
@@ -62,12 +63,19 @@ export function jamoSimilarity(a: string, b: string): number {
   return editSimilarity(toJamoSequence(a).join(''), toJamoSequence(b).join(''))
 }
 
+/** Rozkład kanji, wczytywany tylko dla języków, które go używają. */
+let components: Components | null = null
+
+export async function prepareShape(shape: ShapeSimilarity): Promise<void> {
+  if (shape === 'kanji-components' && !components) components = await loadComponents()
+}
+
 const SHAPE: Record<ShapeSimilarity, (a: string, b: string) => number> = {
   edit: editSimilarity,
   jamo: jamoSimilarity,
-  // Wchodzi w M4 razem z japońskim: rozkład na komponenty z KRADFILE, mapa aliasów 水 ↔ 氵.
-  'kanji-components': () => {
-    throw new Error('Wtyczka "kanji-components" wchodzi w M4 (sekcja 10.1b planu).')
+  'kanji-components': (a, b) => {
+    if (!components) throw new Error('Rozkład kanji niewczytany — wywołaj prepareShape()')
+    return kanjiSimilarity(a, b, components)
   },
 }
 
@@ -129,8 +137,9 @@ export function buildPool(items: Item[]): Map<string, Candidate> {
   return pool
 }
 
-export function assignDistractors(items: Item[], lang: string): void {
+export async function assignDistractors(items: Item[], lang: string): Promise<void> {
   const adapter: LangAdapter = adapterFor(lang)
+  await prepareShape(adapter.quiz.shape)
   const pool = buildPool(items)
   const byPos = new Map<string, Candidate[]>()
 

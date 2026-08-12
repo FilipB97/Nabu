@@ -57,11 +57,12 @@ export async function fetchSources(lang: string): Promise<Sources> {
   )
 
   // Lista częstości nie jest spakowana i jest mała, więc idzie zwykłym pobraniem.
+  // Języki liczące częstość z korpusu (japoński — patrz `freqSource`) jej nie potrzebują.
   const { download } = await import('./lib/io.ts')
-  const frequency = await download(
-    `${FREQ}/${adapter.freq}/${adapter.freq}_50k.txt`,
-    `${adapter.freq}_50k.txt`,
-  )
+  const frequency =
+    adapter.freqSource === 'list'
+      ? await download(`${FREQ}/${adapter.freq}/${adapter.freq}_50k.txt`, `${adapter.freq}_50k.txt`)
+      : ''
 
   return { sentences, polish, directLinks, pivotLinks, pivotToPolish, frequency }
 }

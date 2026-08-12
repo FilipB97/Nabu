@@ -2,20 +2,20 @@
   "lang": "ko",
   "version": "2026-08-12",
   "license": "Tatoeba CC BY 2.0 FR; FrequencyWords CC BY-SA 3.0; Wikisłownik (plwiktionary) CC BY-SA 3.0",
-  "sentences": 729,
-  "lexicon": 297,
+  "sentences": 761,
+  "lexicon": 301,
   "packs": [
     {
       "file": "sentences-000.json",
       "from": 85,
-      "to": 10420,
+      "to": 12020,
       "count": 500
     },
     {
       "file": "sentences-001.json",
-      "from": 10444,
+      "from": 12059,
       "to": 29831,
-      "count": 229
+      "count": 261
     }
   ]
 }

@@ -16,6 +16,7 @@ export const ja: LangAdapter = {
   name: 'japoński',
   tatoeba: 'jpn',
   freq: 'ja',
+  freqSource: 'corpus',
   script: /^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{P}\p{Zs}\dー々]+$/u,
   rtl: false,
   hasScriptStage: true,
@@ -28,7 +29,14 @@ export const ja: LangAdapter = {
   // Analizator morfologiczny rozbija na cząstki gramatyczne, więc to samo zdanie
   // daje więcej tokenów niż podział po spacjach. Progi odpowiednio wyżej.
   sentence: { minTokens: 5, maxTokens: 24, maxUnknown: 1, clozeSlack: 1 },
-  maxBand: 12000,
-  quiz: { shape: 'kanji-components', minOptions: 4 },
+  maxBand: 20000,
+  quiz: {
+    // Tylko rzeczowniki. Czasowniki i przymiotniki trafiałyby do opcji w formie
+    // odmienionej (`大きく`, `歌い`), a ich glosa opisuje formę słownikową — cztery
+    // opcje w różnych formach są wskazówką gramatyczną, nie testem znajomości słowa.
+    clozePos: ['noun'],
+    shape: 'kanji-components',
+    minOptions: 4,
+  },
   production: ['draw', 'kana'],
 }

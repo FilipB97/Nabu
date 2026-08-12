@@ -16,6 +16,7 @@ export const ko: LangAdapter = {
   name: 'koreański',
   tatoeba: 'kor',
   freq: 'ko',
+  freqSource: 'list',
   script: /^[\p{Script=Hangul}\p{P}\p{Zs}\d]+$/u,
   rtl: false,
   hasScriptStage: true,

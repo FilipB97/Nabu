@@ -39,6 +39,19 @@ export type LangAdapter = {
   tatoeba: string
   /** Kod listy częstości FrequencyWords, do kroku `03-frequency`. */
   freq: string
+
+  /**
+   * Skąd biorą się rangi częstości.
+   *
+   * `list` — gotowa lista FrequencyWords. Właściwa wszędzie tam, gdzie da się ją
+   *   sensownie podzielić na słowa, czyli w językach ze spacjami.
+   * `corpus` — liczymy sami, tokenizując korpus tym samym analizatorem, którego używa
+   *   pipeline. Konieczne dla japońskiego: lista FrequencyWords powstała z naiwnego
+   *   podziału, więc jej czoło to pojedyncze kany (い, の, は), a formy słownikowe
+   *   czasowników (`食べる`, `起きる`, `大きい`) w ogóle w niej nie występują.
+   *   Ranga z korpusu ma dodatkową zaletę: opisuje dokładnie ten materiał, którego uczymy.
+   */
+  freqSource: 'list' | 'corpus'
   /** Dozwolony zestaw znaków. Zdanie z czymkolwiek spoza niego odrzuca krok `05`. */
   script: RegExp
   rtl: boolean

@@ -6,6 +6,7 @@ export const sv: LangAdapter = {
   name: 'szwedzki',
   tatoeba: 'swe',
   freq: 'sv',
+  freqSource: 'list',
   script: /^[\p{Script=Latin}\p{P}\p{Zs}\d]+$/u,
   rtl: false,
   hasScriptStage: false,

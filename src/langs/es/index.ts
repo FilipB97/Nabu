@@ -6,6 +6,7 @@ export const es: LangAdapter = {
   name: 'hiszpański',
   tatoeba: 'spa',
   freq: 'es',
+  freqSource: 'list',
   script: /^[\p{Script=Latin}\p{P}\p{Zs}\d¡¿]+$/u,
   rtl: false,
   hasScriptStage: false,

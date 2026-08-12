@@ -15,12 +15,17 @@
  * jest najbardziej prawdopodobny.
  */
 
-import { writeFile } from 'node:fs/promises'
+import { copyFile, writeFile } from 'node:fs/promises'
 import { adapterFor } from '../src/langs/index.ts'
 import type { LangAdapter } from '../src/langs/types.ts'
 import { fetchSources } from './01-fetch.ts'
-import { tokenize, type Token } from './02-tokenize.ts'
-import { loadFrequency, bandOf, type FrequencyMap } from './03-frequency.ts'
+import { prepareTokenizer, tokenize, type Token } from './02-tokenize.ts'
+import {
+  buildFrequencyFromCorpus,
+  loadFrequency,
+  bandOf,
+  type FrequencyMap,
+} from './03-frequency.ts'
 import { loadLexicon, lemmaOf, senseInContext, type Lexicon } from './04-glosses.ts'
 import { assignDistractors, buildPool } from './06-distractors.ts'
 import { dataPath, ensureDir, readTsv, ROOT } from './lib/io.ts'
@@ -57,6 +62,15 @@ const POLISH_BLOCKLIST = /kurw|chuj|pizd|jeba|pierdol|dupek|skurwi|zajeb/iu
  * Rozpoznajemy je po cyfrze w glosie: Wikisłownik podaje „dwadzieścia, 20".
  */
 const NUMERAL_GLOSS = /\d/
+
+/**
+ * Części mowy, które są gramatyką, nie słownictwem: partykuły, końcówki posiłkowe,
+ * sufiksy, spójniki. Nie liczymy ich do częstości (zdominowałyby czoło listy tak samo,
+ * jak psują gotową listę FrequencyWords dla japońskiego), więc nie mają rangi — ale
+ * NIE są przez to „nieznane". Bez tego rozróżnienia każde japońskie zdanie miało po
+ * kilka tokenów bez pasma i wypadało na filtrze `maxUnknown`.
+ */
+const GRAMMAR_POS = new Set(['particle', 'aux', 'affix', 'adnominal', 'conj', 'interj', 'prefix'])
 
 /** Token w postaci zapisywanej do pliku: pola puste są pomijane (sekcja 5.1). */
 export type SlimToken = {
@@ -149,12 +163,24 @@ function annotate(
   adapter: LangAdapter,
 ): Token[] {
   return tokens.map((token) => {
-    const lemma = lemmaOf(token.s, lexicon, adapter.lemmaCandidates)
+    // Analizator morfologiczny podaje formę podstawową sam i wie o niej więcej niż my:
+    // `見` w „見ます" to `見る` (patrzeć), a nie rzeczownik `見` (けん, opinia). Wyszukiwanie
+    // po formie powierzchniowej dawało tam błędną glosę i wywalało token poza listę
+    // częstości, przez co odrzucaliśmy 86% zdań japońskich.
+    const fromTokenizer = token.lemma !== token.s.toLocaleLowerCase() ? token.lemma : null
+    const lemma =
+      fromTokenizer && lexicon.entries.has(fromTokenizer)
+        ? fromTokenizer
+        : (fromTokenizer ?? lemmaOf(token.s, lexicon, adapter.lemmaCandidates))
     const entry = lexicon.entries.get(lemma)
     return {
       ...token,
       lemma,
-      b: bandOf(token.s, ranks) ?? bandOf(lemma, ranks),
+      // Gramatyka dostaje pasmo 0 — jest zawsze „znana" i nie podnosi trudności zdania.
+      b:
+        token.pos && GRAMMAR_POS.has(token.pos)
+          ? 0
+          : (bandOf(lemma, ranks) ?? bandOf(token.s, ranks)),
       // Część mowy nadana przez tokenizer (partykuły) ma pierwszeństwo przed słownikową.
       pos: token.pos ?? entry?.pos ?? null,
     }
@@ -211,7 +237,11 @@ export async function assemble(lang: string): Promise<{ items: Item[]; rejects: 
   const sources = await fetchSources(lang)
 
   console.log(`\n[05-assemble] ${adapter.name}`)
-  const ranks = await loadFrequency(sources.frequency)
+  await prepareTokenizer(adapter)
+  const ranks =
+    adapter.freqSource === 'corpus'
+      ? await buildFrequencyFromCorpus(adapter, sources.sentences)
+      : await loadFrequency(sources.frequency)
   const lexicon = await loadLexicon(adapter.code)
   const translations = await buildTranslations(sources)
   console.log(`  tłumaczeń polskich: ${translations.size}`)
@@ -416,6 +446,11 @@ export async function writeDeck(lang: string, items: Item[]): Promise<void> {
   )
   await writeFile(dataPath(adapter.code, 'lexicon.json'), JSON.stringify(lexicon), 'utf8')
 
+  // Licencje kopiujemy do katalogu wynikowego przy każdym przebiegu. Plik źródłowy
+  // leży w `docs/`, bo `data/` jest kasowane przy strojeniu filtrów — i raz już
+  // przez to zniknął, mimo że commit twierdził, że licencje są w repo.
+  await copyFile(resolve(ROOT, 'docs/ATTRIBUTION.md'), dataPath(adapter.code, '../ATTRIBUTION.md'))
+
   const meta = {
     lang: adapter.code,
     version: new Date().toISOString().slice(0, 10),
@@ -432,7 +467,7 @@ if (import.meta.filename === process.argv[1]) {
   const lang = process.argv[2]
   if (!lang) throw new Error('Użycie: node build/05-assemble.ts <kod-języka>')
   const { items, rejects } = await assemble(lang)
-  assignDistractors(items, lang)
+  await assignDistractors(items, lang)
   await writeReport(lang, items, rejects)
   await writeDeck(lang, items)
   console.log('\nGotowe. Przejrzyj build/report-*.json.')

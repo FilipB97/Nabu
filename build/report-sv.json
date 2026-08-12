@@ -7,8 +7,8 @@
   "odsetekNieprzydatnychNaKartę": 56,
   "pozaZasięgiem": 48738,
   "powodyJakość": {
-    "pasmo powyżej 12000": 726,
-    "token spoza listy częstości": 295,
+    "pasmo powyżej progu języka": 726,
+    "za dużo tokenów spoza listy częstości": 295,
     "nazwa własna": 174,
     "wulgaryzm": 15,
     "znaki spoza zestawu języka": 2

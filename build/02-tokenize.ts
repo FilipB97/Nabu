@@ -8,7 +8,10 @@
  * (japoński przez kuromoji, koreański opcjonalnie) dochodzą w M4 i po v1.
  */
 
+import kuromoji from 'kuromoji'
 import type { LangAdapter } from '../src/langs/types.ts'
+import { needsFurigana, toHiragana } from '../src/langs/ja/kana.ts'
+import { DROPPED, posFromIpadic } from '../src/langs/ja/pos.ts'
 
 export type Token = {
   /** Forma powierzchniowa, dokładnie jak w zdaniu. */
@@ -50,6 +53,57 @@ const space: Tokenizer = (text, adapter) => {
   }))
 }
 
+/**
+ * Analizator morfologiczny. Budowa wczytuje kilkanaście megabajtów słownika, więc
+ * robimy to raz i trzymamy instancję — `prepareTokenizer` woła krok 05 przed pętlą.
+ */
+type Morph = kuromoji.Tokenizer<kuromoji.IpadicFeatures>
+
+let morphology: Morph | null = null
+
+export async function prepareTokenizer(adapter: LangAdapter): Promise<void> {
+  if (adapter.tokenizer !== 'morph' || morphology) return
+  morphology = await new Promise<Morph>((ok, fail) =>
+    kuromoji
+      .builder({ dicPath: 'node_modules/kuromoji/dict' })
+      .build((error, built) => (error ? fail(error) : ok(built))),
+  )
+}
+
+/**
+ * Segmentacja przez IPADIC. Daje naraz trzy rzeczy, których podział po spacjach dać
+ * nie może: granice słów tam, gdzie nie ma spacji; formę podstawową (`ください` →
+ * `くださる`), po której trafiamy w słownik; oraz czytanie, z którego powstaje furigana.
+ *
+ * Czytanie zapisujemy WYŁĄCZNIE tam, gdzie różni się od zapisu i gdzie w ogóle jest
+ * kanji (sekcja 5.1) — furigana nad samą kaną powtarzałaby to, co widać, i zabierała
+ * miejsce zarezerwowane w interlinii.
+ */
+const morph: Tokenizer = (text) => {
+  if (!morphology) {
+    throw new Error('Analizator nie został zbudowany — wywołaj prepareTokenizer() przed tokenize()')
+  }
+
+  return morphology
+    .tokenize(text)
+    .map((token) => {
+      const pos = posFromIpadic(token.pos, token.pos_detail_1)
+      // Analizator nie zna czytania dla wyrazów spoza słownika — wtedy furigany nie ma.
+      const raw = token.reading
+      const reading = raw ? toHiragana(raw) : null
+      const base =
+        token.basic_form && token.basic_form !== '*' ? token.basic_form : token.surface_form
+      return {
+        s: token.surface_form,
+        r: reading && raw && needsFurigana(token.surface_form, raw) ? reading : null,
+        b: null,
+        pos,
+        lemma: base.toLocaleLowerCase(),
+      }
+    })
+    .filter((token) => token.pos === null || !DROPPED.has(token.pos))
+}
+
 const notImplemented =
   (name: string): Tokenizer =>
   () => {
@@ -62,7 +116,7 @@ const notImplemented =
 const TOKENIZERS: Record<LangAdapter['tokenizer'], Tokenizer> = {
   space,
   dict: notImplemented('dict'),
-  morph: notImplemented('morph'),
+  morph,
 }
 
 export function tokenize(text: string, adapter: LangAdapter): Token[] {

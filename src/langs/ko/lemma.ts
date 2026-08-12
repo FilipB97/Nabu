@@ -60,7 +60,30 @@ const ENDINGS = [
   '해',
   '아',
   '어',
+  // Samo `다` też jest końcówką: `갔다` to `가` + ściągnięte `았` + `다`. Bez tego wpisu
+  // formy przeszłe zrośnięte z rdzeniem nie znajdowały postaci słownikowej.
+  '다',
 ]
+
+/**
+ * Ściągnięcia samogłoskowe. Koreański skleja rdzeń z końcówką tak, że samogłoska się
+ * zmienia: `하` + `였` daje `했`, a nie `하였`. Samo odcięcie wygłosu dałoby `해다`
+ * zamiast `하다` — a czasowniki na `하다` to jedna z największych klas w języku.
+ */
+const CONTRACTIONS: Record<string, string> = {
+  해: '하',
+  했: '하',
+  와: '오',
+  왔: '오',
+  봐: '보',
+  봤: '보',
+  줘: '주',
+  줬: '주',
+  돼: '되',
+  됐: '되',
+  셔: '시',
+  셨: '시',
+}
 
 /**
  * Odcina wygłosową spółgłoskę ostatniej sylaby. `없으` → `없`, ale też `먹었` → `먹어`.
@@ -85,19 +108,24 @@ export function lemmaCandidates(surface: string): string[] {
     if (candidate.length > 0 && !out.includes(candidate)) out.push(candidate)
   }
 
-  // Forma już słownikowa.
-  if (word.endsWith(DA)) return out
-
+  // UWAGA: nie da się tu skrócić przez „kończy się na 다, więc jest słownikowa".
+  // `했습니다`, `았다`, `는다` też kończą się na 다, a są formami odmienionymi. Forma
+  // wyjściowa i tak stoi na początku listy, więc prawdziwe hasło słownikowe wygra
+  // jako pierwsze trafienie w słowniku — kolejność załatwia rozstrzygnięcie za nas.
   for (const ending of ENDINGS) {
     if (!word.endsWith(ending) || word.length <= ending.length) continue
     const stem = word.slice(0, word.length - ending.length)
     push(stem + DA)
 
-    // `했` → `하`, `먹었` → `먹어`: wygłos ostatniej sylaby bywa częścią końcówki.
+    // `먹었` → `먹어`: wygłos ostatniej sylaby bywa częścią końcówki.
     const last = stem.at(-1)
     if (last && isSyllable(last)) {
       const bare = stripFinal(last)
       if (bare) push(stem.slice(0, -1) + bare + DA)
+
+      // `했` → `하`, `왔` → `오`: ściągnięcie cofnięte do postaci sprzed sklejenia.
+      const undone = CONTRACTIONS[last] ?? (bare ? CONTRACTIONS[bare] : undefined)
+      if (undone) push(stem.slice(0, -1) + undone + DA)
     }
   }
 

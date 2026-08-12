@@ -6,6 +6,7 @@ export const pt: LangAdapter = {
   name: 'portugalski',
   tatoeba: 'por',
   freq: 'pt',
+  freqSource: 'list',
   script: /^[\p{Script=Latin}\p{P}\p{Zs}\d]+$/u,
   rtl: false,
   hasScriptStage: false,
