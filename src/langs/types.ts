@@ -198,6 +198,22 @@ export type LangAdapter = {
    * ZAWSZE, bo z samego znaku wymowy nie da się odczytać.
    */
   showReading?: (surface: string, reading: string) => boolean
+
+  /**
+   * Klawiatura w aplikacji dla kart produkcji — sekcja 7.2.
+   *
+   * Obecna tam, gdzie klawiatura systemowa fałszuje test: japoński IME podaje listę
+   * kandydatów (użytkownik rozpoznaje zamiast przypominać), a koreańska wymaga osobnej
+   * instalacji. Języki łacińskie jej nie mają i mieć nie powinny — tam systemowa
+   * klawiatura testuje dokładnie to, co trzeba.
+   *
+   * `compose` składa naciśnięte klawisze w tekst: dla hangulu to arytmetyka sylab,
+   * dla kany doklejenie znaku dźwięczności do poprzedniej sylaby.
+   */
+  keyboard?: {
+    rows: readonly (readonly string[])[]
+    compose: (keys: readonly string[]) => string
+  }
 }
 
 /** Etapy, przez które prowadzimy użytkownika, w kolejności. */

@@ -2,6 +2,7 @@ import type { LangAdapter } from '../types.ts'
 import { lemmaCandidates } from './lemma.ts'
 import { splitParticle } from './particles.ts'
 import { jamoItems } from './hangul.ts'
+import { JAMO_ROWS, composeJamo } from './keyboard.ts'
 
 /**
  * Koreański — klasa B. Hangul jest w pełni fonetyczny i ma spacje, więc potrzebny
@@ -36,4 +37,5 @@ export const ko: LangAdapter = {
   lemmaCandidates,
   splitToken: splitParticle,
   scriptItems: jamoItems,
+  keyboard: { rows: JAMO_ROWS, compose: composeJamo },
 }

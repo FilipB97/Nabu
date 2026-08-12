@@ -348,6 +348,18 @@ export function Start() {
                   />
 
                   <Choice
+                    label="produkcja"
+                    value={chosen.settings.production}
+                    options={[
+                      { value: 'off' as const, label: 'wyłączona' },
+                      { value: 'mature' as const, label: 'od dojrzałych' },
+                      { value: 'always' as const, label: 'zawsze' },
+                    ]}
+                    onChange={(production) => void change({ production })}
+                    hint="Karta dojrzała przestaje być quizem i prosi o odtworzenie słowa z pamięci."
+                  />
+
+                  <Choice
                     label="tempo mowy"
                     value={chosen.settings.rate}
                     options={[

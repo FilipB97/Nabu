@@ -5,6 +5,7 @@ import { AGAIN, GOOD } from '@/srs/types'
 import { useSession } from '@/session/useSession'
 import { layoutAroundCloze, type Piece } from '@/session/cloze'
 import { speak, stopSpeaking } from '@/audio/speak'
+import { ProduceCard } from '@/session/ProduceCard'
 import { QuizOption, type OptionState } from '@/ui/QuizOption'
 import { Button } from '@/ui/Button'
 import { Mono } from '@/ui/Mono'
@@ -48,12 +49,13 @@ export function Session() {
     summary,
     settings,
     answer,
+    answerProduction,
     next,
     restartClock,
     undoLast,
   } = useSession(lang)
 
-  const hit = reveal !== null && reveal.chosen === reveal.correct
+  const hit = reveal?.hit ?? false
   const listening = current?.mode === 'quiz-listen'
   const sentence = current?.entry.item.text ?? ''
 
@@ -100,6 +102,7 @@ export function Session() {
         return
       }
 
+      if (current?.production) return
       const options = current?.options?.options.length ?? 0
       const digit = Number.parseInt(event.key, 10)
       if (options > 0 && digit >= 1 && digit <= options) {
@@ -226,7 +229,14 @@ export function Session() {
       </header>
 
       <main className="flex flex-1 flex-col justify-center gap-7 px-7 py-10">
-        {listening && !reveal ? (
+        {current.production && !reveal ? (
+          <ProduceCard
+            production={current.production}
+            adapter={adapter}
+            fontClass={fontClass}
+            onAnswer={(given, hints) => void answerProduction(given, hints)}
+          />
+        ) : listening && !reveal ? (
           // Karta ze słuchu — sekcja 7.2. Nie ma tu nic do przeczytania i to jest cała
           // jej treść: ten sam materiał, inny kanał. Zdanie pokazujemy dopiero przy
           // odsłonięciu, żeby dało się sprawdzić, co się usłyszało.
@@ -309,6 +319,9 @@ export function Session() {
             aria-live="polite"
           >
             <Mono tone={hit ? 'accent' : 'normal'}>{hit ? 'dobrze' : 'źle'}</Mono>
+            {reveal.given !== undefined && !hit && (
+              <span className={`${fontClass} text-[15px] text-wrong-text`}>{reveal.given}</span>
+            )}
             {reveal.reading && !rubyVisible && reveal.reading !== reveal.answer.gloss && (
               <span className="font-mono text-[13px] text-text-2">{reveal.reading}</span>
             )}
@@ -318,7 +331,13 @@ export function Session() {
       </main>
 
       <div className="flex flex-col gap-[10px] px-5 pb-[calc(env(safe-area-inset-bottom)+24px)]">
-        {options ? (
+        {current.production ? (
+          reveal && (
+            <Button variant="primary" full onClick={next}>
+              Dalej
+            </Button>
+          )
+        ) : options ? (
           <>
             {options.options.map((option, index) => (
               <QuizOption

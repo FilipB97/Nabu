@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { adapterFor } from '@/langs'
-import { gradeFromQuiz, measure, medianOf, type QuizOutcome } from '@/srs/grade'
+import {
+  gradeFromProduction,
+  gradeFromQuiz,
+  measure,
+  medianOf,
+  type QuizOutcome,
+} from '@/srs/grade'
 import { review } from '@/srs/sm2'
 import {
   AGAIN,
@@ -32,6 +38,7 @@ import {
 } from '@/store/decks'
 import { hasVoice } from '@/audio/speak'
 import { currentStage, type GatedStage } from './stages.ts'
+import { checkProduction, productionFor, type Production } from './produce.ts'
 import {
   buildConfusions,
   buildOptions,
@@ -59,6 +66,8 @@ export type SessionCard = {
   entry: QueueEntry
   /** Zestaw opcji albo `null`, gdy pozycja spada na kartę `reveal` (sekcja 7.1). */
   options: OptionSet | null
+  /** Zadanie produkcji albo `null`, gdy karta jest quizem. */
+  production: Production | null
   mode: CardType
 }
 
@@ -70,14 +79,18 @@ export type SessionCard = {
  * do karty, bo w trakcie odsłonięcia karta jest już policzona i odłożona.
  */
 export type Reveal = {
+  /** Czy odpowiedź była trafna. Przy produkcji nie ma indeksów, więc to jest jedyny nośnik. */
+  hit: boolean
   /** Indeks wybranej opcji; `null` przy karcie bez opcji. */
   chosen: number | null
-  correct: number
+  correct: number | null
   grade: Grade
   /** Poprawna opcja — słowo i glosa, do wypełnienia luki. */
   answer: Option | null
   /** Czytanie: furigana dla japońskiego, pinyin dla chińskiego. */
   reading?: string
+  /** Co użytkownik wpisał albo narysował — tylko przy produkcji. */
+  given?: string
 }
 
 export type SessionSummary = {
@@ -197,23 +210,45 @@ export function useSession(lang: string) {
     null,
   )
 
-  const prepare = useCallback((entry: QueueEntry, options: number): SessionCard => {
-    const built = buildOptions(
-      entry.item,
-      lexicon.current,
-      options,
-      lastShown.current.get(entry.card.id) ?? null,
-      confusions.current,
-    )
-    if (built) {
-      lastShown.current.set(entry.card.id, {
-        correctAt: built.correct,
-        distractorIds: built.options.filter((_, i) => i !== built.correct).map((o) => o.id),
-      })
-    }
-    shownAt.current = Date.now()
-    return { entry, options: built, mode: built ? modeFor(entry.card, canListen.current) : 'reveal' }
-  }, [])
+  const prepare = useCallback(
+    (entry: QueueEntry, config: LangSettings): SessionCard => {
+      // Produkcja ma pierwszeństwo przed quizem: karta dojrzała sprawdza wiedzę czynną,
+      // a rozpoznanie jednej z czterech opcji da się wyćwiczyć, nie znając słowa (6.4).
+      const production = productionFor(
+        adapterFor(lang),
+        entry.card,
+        entry.item,
+        config.production,
+      )
+      if (production) {
+        shownAt.current = Date.now()
+        const mode = `produce-${production.mode}` as CardType
+        return { entry, options: null, production, mode }
+      }
+
+      const built = buildOptions(
+        entry.item,
+        lexicon.current,
+        config.quizOptions,
+        lastShown.current.get(entry.card.id) ?? null,
+        confusions.current,
+      )
+      if (built) {
+        lastShown.current.set(entry.card.id, {
+          correctAt: built.correct,
+          distractorIds: built.options.filter((_, i) => i !== built.correct).map((o) => o.id),
+        })
+      }
+      shownAt.current = Date.now()
+      return {
+        entry,
+        options: built,
+        production: null,
+        mode: built ? modeFor(entry.card, canListen.current) : 'reveal',
+      }
+    },
+    [lang],
+  )
 
   // ---- budowa sesji ----------------------------------------------------------
   useEffect(() => {
@@ -293,7 +328,7 @@ export function useSession(lang: string) {
       setProgress({ done: 0, total: entries.length, lapses: [] })
 
       const first = queue.current.peek()
-      setCurrent(first ? prepare(first, config.quizOptions) : null)
+      setCurrent(first ? prepare(first, config) : null)
       setPhase('running')
     }
 
@@ -335,7 +370,7 @@ export function useSession(lang: string) {
       setPhase('done')
       return
     }
-    setCurrent(prepare(upcoming, settings.quizOptions))
+    setCurrent(prepare(upcoming, settings))
   }, [prepare, settings])
 
   // ---- odpowiedź -------------------------------------------------------------
@@ -390,6 +425,7 @@ export function useSession(lang: string) {
 
       const reading = card.entry.item.tokens[card.entry.item.cloze]?.r
       setReveal({
+        hit: correct,
         chosen,
         correct: card.options.correct,
         grade,
@@ -398,6 +434,68 @@ export function useSession(lang: string) {
       })
     },
     [current, lang, next, settings],
+  )
+
+  /**
+   * Odpowiedź na karcie produkcji — sekcja 6.4.
+   *
+   * Ocena nie pyta użytkownika o nic: bierze fakt (trafił albo nie), liczbę podpowiedzi
+   * i to, czy pomyłka dotyczyła wyłącznie znaków diakrytycznych. `café` zamiast `cafe`
+   * jest inną pomyłką niż `mesa` zamiast `casa` i harmonogram ma to widzieć.
+   */
+  const answerProduction = useCallback(
+    async (given: string, hints: number) => {
+      const active = queue.current
+      const card = current
+      if (!active || !card?.production || !settings || pending.current) return
+
+      const now = Date.now()
+      const { ms } = measure(now - shownAt.current)
+      const check = checkProduction(given, card.production.expected)
+
+      const grade = gradeFromProduction(card.entry.card, {
+        correct: check.correct,
+        ms,
+        hints,
+        retries: 0,
+        ...(check.nearMiss ? { nearMiss: true } : {}),
+      })
+
+      const result = review(card.entry.card, grade, now)
+      const log: LogEntry = {
+        ts: now,
+        id: card.entry.card.id,
+        lang,
+        grade,
+        ms,
+        mode: card.mode,
+      }
+      await recordAnswer(result.card, log)
+
+      undo.current = { before: card.entry.card, entry: card.entry }
+      pending.current = { result, log, entry: card.entry }
+
+      stats.current.answered += 1
+      if (card.entry.fresh) stats.current.fresh += 1
+      if (grade === AGAIN) stats.current.missed += 1
+      else stats.current.firstTry += 1
+
+      const target = card.entry.item.tokens[card.entry.item.cloze]
+      setReveal({
+        hit: check.correct,
+        chosen: null,
+        correct: null,
+        grade,
+        answer: {
+          id: card.entry.card.id,
+          term: card.production.expected,
+          gloss: target?.gloss ?? '',
+        },
+        ...(target?.r ? { reading: target.r } : {}),
+        given,
+      })
+    },
+    [current, lang, settings],
   )
 
   /**
@@ -415,7 +513,7 @@ export function useSession(lang: string) {
     const last = await db.log.orderBy('seq').last()
     if (last?.seq !== undefined && last.id === previous.before.id) await db.log.delete(last.seq)
 
-    setCurrent(prepare({ ...previous.entry, card: previous.before }, settings.quizOptions))
+    setCurrent(prepare({ ...previous.entry, card: previous.before }, settings))
     setPhase('running')
   }, [prepare, settings])
 
@@ -437,6 +535,7 @@ export function useSession(lang: string) {
     summary,
     settings,
     answer,
+    answerProduction,
     next,
     restartClock,
     undoLast,

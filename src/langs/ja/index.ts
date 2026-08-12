@@ -1,5 +1,6 @@
 import type { LangAdapter } from '../types.ts'
 import { kanaItems, needsFurigana } from './kana.ts'
+import { KANA_ROWS, composeKana } from './keyboard.ts'
 
 /**
  * Japoński — klasa C. Brak spacji wymusza segmentację morfologiczną, a kanji mają
@@ -42,4 +43,5 @@ export const ja: LangAdapter = {
   production: ['draw', 'kana'],
   scriptItems: kanaItems,
   showReading: needsFurigana,
+  keyboard: { rows: KANA_ROWS, compose: composeKana },
 }
