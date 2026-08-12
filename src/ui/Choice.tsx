@@ -1,19 +1,21 @@
-import { Mono } from './Mono'
-
 /**
- * Wybór jednej wartości z kilku — powtarzający się element ustawień (sekcja 8.5).
+ * Przełącznik segmentowy — wybór jednej wartości z dwóch do czterech.
  *
- * Nie jest to `<select>`: opcji są zawsze dwie do czterech, a lista rozwijana na telefonie
- * kosztuje dwa dotknięcia i przykrywa ekran systemowym arkuszem. Rząd podkreślonych etykiet
- * pokazuje przy okazji, jakie są możliwości, zanim użytkownik czegokolwiek dotknie.
+ * Kontrolka jest iOS-owa nie z sentymentu, tylko dlatego, że rozwiązuje konkretny problem:
+ * pokazuje WSZYSTKIE możliwości naraz i to, która jest wybrana, w jednym elemencie
+ * i bez otwierania czegokolwiek. Lista rozwijana kosztuje dwa dotknięcia i przykrywa
+ * ekran systemowym arkuszem; rząd luźnych przycisków nie mówi, że wykluczają się wzajemnie.
+ *
+ * Zaznaczenie jest wypełnieniem, nie samym kolorem tekstu: przy trzech poziomach tekstu
+ * na ciemnym tle różnice jasności są małe, a kształt widać zawsze.
  */
 
 type ChoiceProps<T extends string | number | boolean> = {
-  label: string
+  label?: string
   value: T
   options: readonly { value: T; label: string }[]
   onChange: (value: T) => void
-  /** Zdanie wyjaśniające, gdy sama etykieta nie wystarcza. */
+  /** Opis pod kontrolką, gdy sama etykieta nie wystarcza. */
   hint?: string
 }
 
@@ -25,25 +27,29 @@ export function Choice<T extends string | number | boolean>({
   hint,
 }: ChoiceProps<T>) {
   return (
-    <div className="flex flex-col gap-2">
-      <Mono>{label}</Mono>
-      <div className="flex flex-wrap gap-2" role="group" aria-label={label}>
-        {options.map((option) => (
-          <button
-            key={String(option.value)}
-            type="button"
-            onClick={() => onChange(option.value)}
-            aria-pressed={option.value === value}
-            className={`nabu-press font-ui flex min-h-[40px] items-center rounded-full px-4
-              text-[13px] transition-colors duration-150 ${
-                option.value === value
-                  ? 'bg-surface-2 text-accent'
-                  : 'text-text-2 hover:text-text'
-              }`}
-          >
-            {option.label}
-          </button>
-        ))}
+    <div className="flex w-full flex-col gap-2">
+      <div
+        className="flex w-full gap-[3px] rounded-[12px] bg-bg p-[3px]"
+        role="group"
+        aria-label={label}
+      >
+        {options.map((option) => {
+          const selected = option.value === value
+          return (
+            <button
+              key={String(option.value)}
+              type="button"
+              onClick={() => onChange(option.value)}
+              aria-pressed={selected}
+              className={`font-ui min-h-[36px] min-w-0 flex-1 rounded-[9px] px-2 text-[13px]
+                transition-colors duration-150 ${
+                  selected ? 'nabu-card-raised text-accent' : 'text-text-2'
+                }`}
+            >
+              {option.label}
+            </button>
+          )
+        })}
       </div>
       {hint && <p className="font-ui text-[12.5px] leading-[1.5] text-text-3">{hint}</p>}
     </div>

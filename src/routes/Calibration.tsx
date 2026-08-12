@@ -12,6 +12,7 @@ import { loadLexicon } from '@/store/decks'
 import { settingsFor, updateSettings } from '@/store/db'
 import { Button } from '@/ui/Button'
 import { Mono } from '@/ui/Mono'
+import { NavBar } from '@/ui/NavBar'
 import { Progress } from '@/ui/Ticks'
 
 /**
@@ -107,14 +108,22 @@ export function Calibration() {
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[460px] flex-col bg-bg">
-      <header className="px-6 pt-[calc(env(safe-area-inset-top)+18px)]">
-        <Progress total={probes.length} done={at} label={`słowo ${at + 1} z ${probes.length}`} />
-        <div className="mt-[14px] flex items-center justify-between gap-3">
-          <Mono>{adapter.name} · zasięg słownictwa</Mono>
-          <Mono tone="normal">
-            {at + 1} / {probes.length}
-          </Mono>
-        </div>
+      <header className="px-5 pt-[calc(env(safe-area-inset-top)+14px)]">
+        <NavBar
+          title={`${adapter.name} · zasięg`}
+          back="/start"
+          action={
+            <Mono tone="normal">
+              {at + 1} / {probes.length}
+            </Mono>
+          }
+        />
+        <Progress
+          className="mt-2"
+          total={probes.length}
+          done={at}
+          label={`słowo ${at + 1} z ${probes.length}`}
+        />
       </header>
 
       <main className="flex flex-1 flex-col justify-center gap-6 px-7 py-6">

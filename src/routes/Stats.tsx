@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { adapterFor } from '@/langs'
 import { buildConfusions } from '@/session/options'
 import { isMature } from '@/srs/sm2'
 import { loadLexicon, loadStage, type Lexicon } from '@/store/decks'
 import { db } from '@/store/db'
 import { Bars } from '@/ui/Ticks'
+import { Group, Row } from '@/ui/List'
+import { NavBar } from '@/ui/NavBar'
 import { Mono } from '@/ui/Mono'
 
 /**
@@ -119,66 +121,55 @@ export function Stats() {
 
   return (
     <div
-      className="mx-auto flex min-h-screen w-full max-w-[460px] flex-col gap-8 bg-bg px-6
-        pt-[calc(env(safe-area-inset-top)+28px)] pb-[calc(env(safe-area-inset-bottom)+32px)]"
+      className="mx-auto flex min-h-screen w-full max-w-[460px] flex-col gap-7 bg-bg px-5
+        pt-[calc(env(safe-area-inset-top)+14px)] pb-[calc(env(safe-area-inset-bottom)+32px)]"
     >
-      <div className="flex items-center justify-between gap-3">
-        <Link to="/start" className="nabu-press -m-3 rounded-full p-3">
-          <Mono tone="normal">← wróć</Mono>
-        </Link>
-        <Mono>{adapter.name} · postęp</Mono>
+      <NavBar title={`${adapter.name} · postęp`} back="/start" backLabel="Start" />
+
+      <div className="flex items-baseline gap-3 px-1">
+        <span className="font-display text-[64px] leading-none text-text">{summary.mature}</span>
+        <span className="font-ui text-[15px] text-text-2">słów utrwalonych</span>
       </div>
 
-      <div className="nabu-card flex flex-col gap-5 px-6 py-7">
-        <div className="flex items-baseline gap-3">
-          <span className="font-display text-[56px] leading-none text-text">{summary.mature}</span>
-          <span className="font-ui text-[14px] text-text-2">słów utrwalonych</span>
+      <Group>
+        <Row label="Wprowadzone" value={<span className="font-display text-[17px] text-text">{summary.cards}</span>} />
+        <Row label="W trakcie nauki" value={<span className="font-display text-[17px] text-text">{summary.learning}</span>} />
+      </Group>
+
+      <Group
+        label="powtórki przez dwa tygodnie"
+        hint="Pierwszy słupek to dziś. Wysoki słupek za tydzień znaczy tylko tyle, że wtedy
+          wypada dużo powtórek — nie trzeba nic z tym robić."
+      >
+        <div className="py-5">
+          <Bars values={summary.forecast} label="prognoza powtórek na czternaście dni" />
         </div>
-        <dl className="flex flex-col gap-3">
-          {[
-            ['Wprowadzone', summary.cards],
-            ['W trakcie nauki', summary.learning],
-          ].map(([label, value]) => (
-            <div key={String(label)} className="flex justify-between gap-4">
-              <dt className="font-ui text-[14px] text-text-2">{label}</dt>
-              <dd className="font-display text-[18px] text-text">{value}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
+      </Group>
 
-      <div className="flex flex-col gap-3">
-        <Mono>powtórki przez dwa tygodnie</Mono>
-        <Bars values={summary.forecast} label="prognoza powtórek na czternaście dni" />
-        <p className="font-ui text-[12.5px] leading-[1.5] text-text-3">
-          Pierwszy słupek to dziś. Wysoki słupek za tydzień znaczy tylko tyle, że wtedy
-          wypada dużo powtórek — nie trzeba nic z tym robić.
-        </p>
-      </div>
-
-      <div className="flex flex-col gap-3">
-        <Mono>najczęściej mylone pary</Mono>
-        {summary.pairs.length === 0 ? (
-          <p className="font-ui text-[13px] leading-[1.5] text-text-2">
-            Jeszcze nic się nie powtórzyło. Pary zbierają się z odpowiedzi, więc pojawią się
-            po kilku sesjach.
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-2">
-            {summary.pairs.map((pair) => (
-              <li
-                key={`${pair.correct}-${pair.chosen}`}
-                className="nabu-card flex items-center justify-between gap-4 px-5 py-4"
-              >
-                <span className={`${fontClass} text-[20px] text-text`}>
+      {summary.pairs.length === 0 ? (
+        <Group label="najczęściej mylone pary">
+          <div className="py-4">
+            <p className="font-ui text-[13px] leading-[1.5] text-text-2">
+              Jeszcze nic się nie powtórzyło. Pary zbierają się z odpowiedzi, więc pojawią się
+              po kilku sesjach.
+            </p>
+          </div>
+        </Group>
+      ) : (
+        <Group label="najczęściej mylone pary">
+          {summary.pairs.map((pair) => (
+            <Row
+              key={`${pair.correct}-${pair.chosen}`}
+              label={
+                <span className={`${fontClass} text-[19px]`}>
                   {pair.correct} <span className="text-text-3">→</span> {pair.chosen}
                 </span>
-                <span className="font-mono text-[13px] text-text-2">{pair.count} ×</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+              }
+              value={<span className="font-mono text-[13px] text-text-2">{pair.count} ×</span>}
+            />
+          ))}
+        </Group>
+      )}
     </div>
   )
 }
