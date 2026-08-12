@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nabu — wariant quizowy · referencja designu</title>
+
+<!--
+  Referencja designu z sesji Claude Design, rozpakowana do czytelnego HTML.
+
+  Oryginalny plik z sesji ważył 19 MB, bo miał wbudowane kroje pisma w base64
+  i własny runtime szablonów. Tutaj kroje są ładowane z Google Fonts, a paski
+  segmentów i interaktywna karta są wygenerowane przez skrypt na dole pliku —
+  port logiki z oryginału, wiernie co do wartości.
+
+  To jest referencja układu, typografii i zachowania, NIE kod do skopiowania.
+  Kolory z tego pliku przechodzą do tokenów motywu (plan.md 9.1), nie do JSX.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Spectral:wght@300;400&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+JP:wght@400&family=Noto+Serif+KR:wght@400&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { margin: 0; background: #0A0F18; font-family: Archivo, sans-serif; }
+    a { color: #8FA8F0; text-decoration: none; }
+    a:hover { color: #B3C2F6; }
+    ruby { ruby-position: over; }
+    rt { font-weight: 400; }
+    @keyframes nabuReveal { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+
+<div style="padding:56px 64px 80px;display:flex;flex-direction:column;gap:56px;color:#E7EAF2;background:#0A0F18;min-height:100vh;box-sizing:border-box">
+
+  <div style="display:flex;flex-direction:column;gap:26px;max-width:900px">
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:flex-end;gap:5px"><div style="width:4px;height:22px;background:#8FA8F0"></div><div style="width:4px;height:22px;background:#5A6580"></div><div style="width:4px;height:22px;background:#5A6580"></div></div>
+      <div style="font:300 40px/1 Spectral, serif;letter-spacing:0.02em">Nabu</div>
+      <div style="font:400 11px/1 'IBM Plex Mono', monospace;letter-spacing:.14em;text-transform:uppercase;color:#8A94A9;padding-inline-start:10px;border-inline-start:1px solid #232E44">wariant quizowy · referencja designu</div>
+    </div>
+
+    <div style="border:1px solid #2C3852;padding:30px 32px;display:flex;flex-direction:column;gap:18px;max-width:820px">
+      <div style="font:500 11px/1 'IBM Plex Mono', monospace;letter-spacing:.14em;color:#8FA8F0">NOTATKA DLA SESJI CLAUDE CODE</div>
+      <div style="font:400 20px/1.45 Spectral, serif;color:#E7EAF2;text-wrap:pretty">Tak ma wyglądać i działać karta w sesji: użytkownik wybiera jedno z czterech słów, nie ocenia się sam.</div>
+      <div style="font:400 14.5px/1.7 Archivo, sans-serif;color:#B9C0CF;text-wrap:pretty">Ten plik jest referencją designu w HTML — nie kodem do skopiowania. Odtwórz układ, typografię i zachowanie w środowisku docelowym aplikacji. Wierność: hi-fi, kolory i skala są ostateczne.</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:22px;padding-top:20px;border-top:1px solid #1D2739;font:400 13.5px/1.6 Archivo, sans-serif;color:#B9C0CF">
+        <div style="display:flex;flex-direction:column;gap:7px"><span style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">MECHANIKA</span>Karta cloze z luką w zdaniu. Pod spodem cztery słowa w piśmie docelowym. Jedno dotknięcie kończy odpowiedź — bez potwierdzania, bez cofania wyboru.</div>
+        <div style="display:flex;flex-direction:column;gap:7px"><span style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">OCENA DLA PLANERA</span>Trafienie → <span style="color:#E7EAF2">Dobrze</span>. Pudło → <span style="color:#E7EAF2">Nie pamiętam</span>, karta wraca w tej samej sesji. <span style="color:#E7EAF2">Trudne</span> to opcjonalny dopisek po trafieniu. <span style="color:#E7EAF2">Łatwe</span> nadaje się automatycznie przy trafieniu poniżej 2 s na dojrzałej karcie.</div>
+        <div style="display:flex;flex-direction:column;gap:7px"><span style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">DYSTRAKTORY</span>Z tego samego pasma częstości i pola znaczeniowego; przy CJK dodatkowo podobny kształt znaku (水 / 氷 / 湯, 물 / 불 / 말). Nigdy losowe słowa — zrobiłyby z tego test czytania.</div>
+        <div style="display:flex;flex-direction:column;gap:7px"><span style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">PODPOWIEDZI</span>Tłumaczenia przy opcjach są ukryte do momentu wyboru. Furigana pojawia się dopiero w odsłoniętym zdaniu.</div>
+        <div style="display:flex;flex-direction:column;gap:7px"><span style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">PO ODPOWIEDZI</span>Trafienie: karta może przejść dalej sama po 900 ms. Pudło: czeka na „Dalej" i pokazuje, czym różni się wybrane słowo od poprawnego.</div>
+        <div style="display:flex;flex-direction:column;gap:7px"><span style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">POZA QUIZEM</span>Karty typu <span style="color:#E7EAF2">script</span> (kana, hangul) i słowa bez czterech sensownych dystraktorów zostają przy odsłanianiu z samooceną. To cichy fallback, bez komunikatu.</div>
+        <div style="display:flex;flex-direction:column;gap:7px"><span style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">CO JEST NIŻEJ</span>Reszta aplikacji w tym samym kierunku: start i koniec sesji, onboarding, kalibracja, statystyki, ustawienia, stany brzegowe — mobile 390 × 844 i desktop 1280.</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:18px;padding-top:20px;border-top:1px solid #1D2739;font:400 11px/1.7 'IBM Plex Mono', monospace;color:#8A94A9">
+        <div><div style="color:#E7EAF2;letter-spacing:.12em">TŁO</div>#0F1622 · jasny #F3F2EE</div>
+        <div><div style="color:#E7EAF2;letter-spacing:.12em">AKCENT</div><span style="color:#8FA8F0">#8FA8F0</span> · jasny #4358C9</div>
+        <div><div style="color:#E7EAF2;letter-spacing:.12em">TEKST</div>#E7EAF2 / #8A94A9 / #4C5670</div>
+        <div><div style="color:#E7EAF2;letter-spacing:.12em">OBRYSY</div>#2C3852 aktywny · #1D2739 cichy</div>
+        <div><div style="color:#E7EAF2;letter-spacing:.12em">PISMO</div>Spectral · Noto Serif JP/KR · Archivo · IBM Plex Mono</div>
+        <div><div style="color:#E7EAF2;letter-spacing:.12em">RUCH</div>0.18 s ease-out, tylko odsłonięcie</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:22px">
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+      <h2 style="margin:0;font:400 22px/1.2 Spectral, serif;color:#E7EAF2">Trzy stany karty</h2>
+      <span style="font:400 12px/1.5 Archivo, sans-serif;color:#8A94A9">390 × 844</span>
+    </div>
+    <div style="display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start">
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="width:390px;height:844px;background:#0F1622;border:1px solid #232E44;border-radius:34px;overflow:hidden;display:flex;flex-direction:column">
+          <div style="padding:22px 24px 0">
+            <div style="display:flex;align-items:flex-end;gap:3px;width:100%"><span data-gen="ticksA"></span></div>
+            <div style="display:flex;justify-content:space-between;margin-top:11px;font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#8A94A9"><span>JAPOŃSKI · CLOZE</span><span>12 / 33</span></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 30px">
+            <div style="font:400 34px/2 'Noto Serif JP', serif;color:#E7EAF2"><span style="display:inline-block;width:2em;border-bottom:2px solid #8FA8F0;vertical-align:-0.1em"></span>をください。</div>
+            <div style="margin-top:26px;font:400 15px/1.5 Archivo, sans-serif;color:#8A94A9">Poproszę wodę.</div>
+          </div>
+          <div style="padding:0 24px 34px;display:flex;flex-direction:column;gap:8px">
+            <div style="border:1px solid #2C3852;min-height:62px;display:flex;align-items:center;padding:0 18px;font:400 24px/1.35 'Noto Serif JP', serif;color:#E7EAF2">水</div>
+            <div style="border:1px solid #2C3852;min-height:62px;display:flex;align-items:center;padding:0 18px;font:400 24px/1.35 'Noto Serif JP', serif;color:#E7EAF2">氷</div>
+            <div style="border:1px solid #2C3852;min-height:62px;display:flex;align-items:center;padding:0 18px;font:400 24px/1.35 'Noto Serif JP', serif;color:#E7EAF2">湯</div>
+            <div style="border:1px solid #2C3852;min-height:62px;display:flex;align-items:center;padding:0 18px;font:400 24px/1.35 'Noto Serif JP', serif;color:#E7EAF2">米</div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">przed wyborem</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="width:390px;height:844px;background:#0F1622;border:1px solid #232E44;border-radius:34px;overflow:hidden;display:flex;flex-direction:column">
+          <div style="padding:22px 24px 0">
+            <div style="display:flex;align-items:flex-end;gap:3px;width:100%"><span data-gen="ticksA"></span></div>
+            <div style="display:flex;justify-content:space-between;margin-top:11px;font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#8A94A9"><span>JAPOŃSKI · CLOZE</span><span>12 / 33</span></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 30px">
+            <div style="font:400 34px/2 'Noto Serif JP', serif;color:#E7EAF2;animation:nabuReveal .18s ease-out"><ruby style="color:#8FA8F0">水<rt style="font-size:.42em;color:#8FA8F0">みず</rt></ruby>をください。</div>
+            <div style="margin-top:26px;font:400 15px/1.5 Archivo, sans-serif;color:#8A94A9">Poproszę wodę.</div>
+            <div style="margin-top:30px;padding-top:20px;border-top:1px solid #1D2739;display:flex;flex-direction:column;gap:7px;animation:nabuReveal .18s ease-out">
+              <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">NOWE SŁOWO · RANGA 412</div>
+              <div style="font:400 20px/1.4 'Noto Serif JP', serif;color:#E7EAF2">水 <span style="color:#8A94A9;font-size:15px">みず</span> — woda</div>
+            </div>
+          </div>
+          <div style="padding:0 24px 34px;display:flex;flex-direction:column;gap:8px">
+            <div style="border:1px solid #8FA8F0;background:#131C2B;min-height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 18px"><span style="font:400 24px/1.35 'Noto Serif JP', serif;color:#8FA8F0">水 <span style="font:400 12.5px Archivo, sans-serif">woda</span></span><span style="font:400 15px 'IBM Plex Mono', monospace;color:#8FA8F0">✓</span></div>
+            <div style="border:1px solid #1D2739;min-height:62px;display:flex;align-items:center;padding:0 18px;font:400 24px/1.35 'Noto Serif JP', serif;color:#4C5670">氷 <span style="font:400 12.5px Archivo, sans-serif">&nbsp;lód</span></div>
+            <div style="border:1px solid #1D2739;min-height:62px;display:flex;align-items:center;padding:0 18px;font:400 24px/1.35 'Noto Serif JP', serif;color:#4C5670">湯 <span style="font:400 12.5px Archivo, sans-serif">&nbsp;wrzątek</span></div>
+            <div style="border:1px solid #1D2739;min-height:62px;display:flex;align-items:center;padding:0 18px;font:400 24px/1.35 'Noto Serif JP', serif;color:#4C5670">米 <span style="font:400 12.5px Archivo, sans-serif">&nbsp;ryż</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+              <span style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">DOBRZE · 1 DZIEŃ</span>
+              <span style="font:400 12.5px Archivo, sans-serif;color:#8A94A9;border-bottom:1px solid #2C3852;padding-bottom:3px">było trudne</span>
+            </div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">trafienie · przechodzi dalej po 900 ms</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="width:390px;height:844px;background:#0F1622;border:1px solid #232E44;border-radius:34px;overflow:hidden;display:flex;flex-direction:column">
+          <div style="padding:22px 24px 0">
+            <div style="display:flex;align-items:flex-end;gap:3px;width:100%"><span data-gen="ticksB"></span></div>
+            <div style="display:flex;justify-content:space-between;margin-top:11px;font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#8A94A9"><span>JAPOŃSKI · CLOZE</span><span>12 / 33</span></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 30px">
+            <div style="font:400 34px/2 'Noto Serif JP', serif;color:#E7EAF2;animation:nabuReveal .18s ease-out"><ruby style="color:#8FA8F0">水<rt style="font-size:.42em;color:#8FA8F0">みず</rt></ruby>をください。</div>
+            <div style="margin-top:26px;font:400 15px/1.5 Archivo, sans-serif;color:#8A94A9">Poproszę wodę.</div>
+            <div style="margin-top:30px;padding-top:20px;border-top:1px solid #1D2739;display:flex;flex-direction:column;gap:9px;animation:nabuReveal .18s ease-out">
+              <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">WYBRANE: 氷 こおり — LÓD</div>
+              <div style="font:400 20px/1.4 'Noto Serif JP', serif;color:#E7EAF2">水 <span style="color:#8A94A9;font-size:15px">みず</span> — woda</div>
+              <div style="font:400 13px/1.55 Archivo, sans-serif;color:#8A94A9">Oba znaki mają ten sam element 水. 氷 to woda zamarznięta — kreska u góry.</div>
+            </div>
+          </div>
+          <div style="padding:0 24px 34px;display:flex;flex-direction:column;gap:8px">
+            <div style="border:1px solid #8FA8F0;background:#131C2B;min-height:62px;display:flex;align-items:center;padding:0 18px;font:400 24px/1.35 'Noto Serif JP', serif;color:#8FA8F0">水 <span style="font:400 12.5px Archivo, sans-serif">&nbsp;woda</span></div>
+            <div style="border:1px solid #3A2A33;min-height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 18px"><span style="font:400 24px/1.35 'Noto Serif JP', serif;color:#6E7788">氷 <span style="font:400 12.5px Archivo, sans-serif">lód</span></span><span style="font:400 15px 'IBM Plex Mono', monospace;color:#6E7788">×</span></div>
+            <div style="border:1px solid #1D2739;min-height:62px;display:flex;align-items:center;padding:0 18px;font:400 24px/1.35 'Noto Serif JP', serif;color:#4C5670">湯 <span style="font:400 12.5px Archivo, sans-serif">&nbsp;wrzątek</span></div>
+            <div style="border:1px solid #1D2739;min-height:62px;display:flex;align-items:center;padding:0 18px;font:400 24px/1.35 'Noto Serif JP', serif;color:#4C5670">米 <span style="font:400 12.5px Archivo, sans-serif">&nbsp;ryż</span></div>
+            <div style="margin-top:8px;height:54px;border:1px solid #2C3852;display:flex;align-items:center;justify-content:center;font:500 15px Archivo, sans-serif;color:#E7EAF2">Dalej</div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">pudło · czeka na dotknięcie</figcaption>
+      </figure>
+
+      <figure id="live-quiz" style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none"></figure>
+
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:22px">
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+      <h2 style="margin:0;font:400 22px/1.2 Spectral, serif;color:#E7EAF2">Desktop i motyw jasny</h2>
+      <span style="font:400 12px/1.5 Archivo, sans-serif;color:#8A94A9">Kolumna 760 px, opcje w rzędzie, klawisze 1–4. Jasny motyw przyciemnia akcent do #4358C9.</span>
+    </div>
+    <div style="display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start">
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="width:1280px;height:800px;background:#0F1622;border:1px solid #232E44;border-radius:10px;overflow:hidden;display:flex;flex-direction:column;padding:30px 40px 40px">
+          <div style="display:flex;flex-direction:column;gap:11px;max-width:760px;margin:0 auto;width:100%">
+            <div style="display:flex;align-items:flex-end;gap:3px;width:100%"><span data-gen="ticksA"></span></div>
+            <div style="display:flex;justify-content:space-between;font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#8A94A9"><span>JAPOŃSKI · CLOZE</span><span>12 / 33</span></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;max-width:760px;margin:0 auto;width:100%">
+            <div style="font:400 44px/2 'Noto Serif JP', serif;color:#E7EAF2"><span style="display:inline-block;width:2em;border-bottom:2px solid #8FA8F0;vertical-align:-0.1em"></span>をください。</div>
+            <div style="margin-top:26px;font:400 17px/1.5 Archivo, sans-serif;color:#8A94A9">Poproszę wodę.</div>
+          </div>
+          <div style="max-width:760px;margin:0 auto;width:100%;display:flex;flex-direction:column;gap:12px">
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+              <div style="border:1px solid #2C3852;min-height:86px;display:flex;align-items:center;justify-content:center;font:400 30px 'Noto Serif JP', serif;color:#E7EAF2">水</div>
+              <div style="border:1px solid #2C3852;min-height:86px;display:flex;align-items:center;justify-content:center;font:400 30px 'Noto Serif JP', serif;color:#E7EAF2">氷</div>
+              <div style="border:1px solid #2C3852;min-height:86px;display:flex;align-items:center;justify-content:center;font:400 30px 'Noto Serif JP', serif;color:#E7EAF2">湯</div>
+              <div style="border:1px solid #2C3852;min-height:86px;display:flex;align-items:center;justify-content:center;font:400 30px 'Noto Serif JP', serif;color:#E7EAF2">米</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font:400 10.5px/1 'IBM Plex Mono', monospace;color:#4C5670;text-align:center"><span>1</span><span>2</span><span>3</span><span>4</span></div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">desktop 1280 · przed wyborem</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="width:390px;height:844px;background:#F3F2EE;border:1px solid #DCD9D1;border-radius:34px;overflow:hidden;display:flex;flex-direction:column">
+          <div style="padding:22px 24px 0">
+            <div style="display:flex;align-items:flex-end;gap:3px;width:100%"><span data-gen="ticksLight"></span></div>
+            <div style="display:flex;justify-content:space-between;margin-top:11px;font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#6B7385"><span>JAPOŃSKI · CLOZE</span><span>12 / 33</span></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 30px">
+            <div style="font:400 34px/2 'Noto Serif JP', serif;color:#1B2233"><ruby style="color:#4358C9">水<rt style="font-size:.42em;color:#4358C9">みず</rt></ruby>をください。</div>
+            <div style="margin-top:26px;font:400 15px/1.5 Archivo, sans-serif;color:#6B7385">Poproszę wodę.</div>
+            <div style="margin-top:30px;padding-top:20px;border-top:1px solid #E0DDD5;display:flex;flex-direction:column;gap:7px">
+              <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#9A9FAC">NOWE SŁOWO · RANGA 412</div>
+              <div style="font:400 20px/1.4 'Noto Serif JP', serif;color:#1B2233">水 <span style="color:#6B7385;font-size:15px">みず</span> — woda</div>
+            </div>
+          </div>
+          <div style="padding:0 24px 34px;display:flex;flex-direction:column;gap:8px">
+            <div style="border:1px solid #4358C9;background:#E7E7F5;min-height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 18px"><span style="font:400 24px/1.35 'Noto Serif JP', serif;color:#4358C9">水 <span style="font:400 12.5px Archivo, sans-serif">woda</span></span><span style="font:400 15px 'IBM Plex Mono', monospace;color:#4358C9">✓</span></div>
+            <div style="border:1px solid #E0DDD5;min-height:62px;display:flex;align-items:center;padding:0 18px;font:400 24px/1.35 'Noto Serif JP', serif;color:#9A9FAC">氷 <span style="font:400 12.5px Archivo, sans-serif">&nbsp;lód</span></div>
+            <div style="border:1px solid #E0DDD5;min-height:62px;display:flex;align-items:center;padding:0 18px;font:400 24px/1.35 'Noto Serif JP', serif;color:#9A9FAC">湯 <span style="font:400 12.5px Archivo, sans-serif">&nbsp;wrzątek</span></div>
+            <div style="border:1px solid #E0DDD5;min-height:62px;display:flex;align-items:center;padding:0 18px;font:400 24px/1.35 'Noto Serif JP', serif;color:#9A9FAC">米 <span style="font:400 12.5px Archivo, sans-serif">&nbsp;ryż</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+              <span style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#9A9FAC">DOBRZE · 1 DZIEŃ</span>
+              <span style="font:400 12.5px Archivo, sans-serif;color:#6B7385;border-bottom:1px solid #D5D2C9;padding-bottom:3px">było trudne</span>
+            </div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">jasny · trafienie</figcaption>
+      </figure>
+
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:22px">
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+      <h2 style="margin:0;font:400 22px/1.2 Spectral, serif;color:#E7EAF2">Start i koniec sesji</h2>
+      <span style="font:400 12px/1.5 Archivo, sans-serif;color:#8A94A9">Przełącznik języka na wierzchu, aktywne oddzielone od utrzymywanych. Przycisk startu jest neutralny — akcent zostaje przy luce i błędzie.</span>
+    </div>
+    <div style="display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start">
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="width:390px;height:844px;background:#0F1622;border:1px solid #232E44;border-radius:34px;overflow:hidden;display:flex;flex-direction:column;padding:26px 24px 34px">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.14em;color:#4C5670">AKTYWNE</div>
+            <div style="display:flex;gap:22px;font:400 17px/1 Spectral, serif">
+              <span style="color:#E7EAF2;padding-bottom:7px;border-bottom:2px solid #8FA8F0">japoński</span>
+              <span style="color:#8A94A9;padding-bottom:7px;border-bottom:2px solid transparent">hiszpański<span style="font:400 10.5px 'IBM Plex Mono', monospace;color:#4C5670;padding-inline-start:6px">14</span></span>
+            </div>
+            <div style="display:flex;gap:18px;margin-top:6px;font:400 13px/1 Archivo, sans-serif;color:#4C5670">
+              <span style="font:400 10.5px 'IBM Plex Mono', monospace;letter-spacing:.14em">UTRZYMYWANE</span>
+              <span>portugalski 3</span><span>szwedzki 0</span><span>koreański 6</span>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:4px">
+            <div style="display:flex;align-items:baseline;gap:14px"><span style="font:300 72px/1 Spectral, serif;color:#E7EAF2">23</span><span style="font:400 15px Archivo, sans-serif;color:#8A94A9">do powtórki</span></div>
+            <div style="display:flex;align-items:baseline;gap:14px"><span style="font:300 40px/1.4 Spectral, serif;color:#8FA8F0">+ 8</span><span style="font:400 15px Archivo, sans-serif;color:#8A94A9">nowych</span></div>
+            <div style="margin-top:22px;font:400 11px/1 'IBM Plex Mono', monospace;color:#4C5670">~10 MIN · OSTATNIA SYNCHRONIZACJA 21:04</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:20px">
+            <div style="height:60px;background:#E7EAF2;display:flex;align-items:center;justify-content:center;font:500 16px Archivo, sans-serif;color:#0F1622">Zacznij</div>
+            <div style="display:flex;justify-content:center;gap:26px;font:400 14px Archivo, sans-serif;color:#8A94A9">
+              <span>krótka</span><span style="color:#E7EAF2;border-bottom:1px solid #E7EAF2;padding-bottom:4px">normalna</span><span>długa</span>
+            </div>
+            <div style="padding-top:20px;border-top:1px solid #1D2739;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;justify-content:space-between;font:400 11px/1 'IBM Plex Mono', monospace;color:#8A94A9"><span>KANA</span><span>38 / 46 opanowane</span></div>
+              <div style="display:flex;align-items:flex-end;gap:3px;width:100%"><span data-gen="ticksKana"></span></div>
+            </div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">start sesji · mobile</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="width:390px;height:844px;background:#0F1622;border:1px solid #232E44;border-radius:34px;overflow:hidden;display:flex;flex-direction:column;padding:26px 24px 34px">
+          <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.14em;color:#4C5670">JAPOŃSKI · SESJA ZAKOŃCZONA</div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+            <div style="display:flex;align-items:baseline;gap:14px"><span style="font:300 72px/1 Spectral, serif;color:#E7EAF2">31</span><span style="font:400 15px Archivo, sans-serif;color:#8A94A9">kart · 9 min</span></div>
+            <div style="margin-top:34px;display:flex;flex-direction:column;gap:14px;font:400 15px/1.5 Archivo, sans-serif;color:#B9C0CF">
+              <div style="display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid #1D2739"><span>Trafione za pierwszym razem</span><span style="font-family:'IBM Plex Mono', monospace;color:#E7EAF2">26</span></div>
+              <div style="display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid #1D2739"><span>Pudła</span><span style="font-family:'IBM Plex Mono', monospace;color:#8FA8F0">5</span></div>
+              <div style="display:flex;justify-content:space-between;padding-bottom:12px;border-bottom:1px solid #1D2739"><span>Jutro</span><span style="font-family:'IBM Plex Mono', monospace;color:#E7EAF2">11</span></div>
+              <div style="display:flex;justify-content:space-between"><span>Nowe słowa</span><span style="font-family:'IBM Plex Mono', monospace;color:#E7EAF2">8</span></div>
+            </div>
+            <div style="margin-top:38px;display:flex;flex-direction:column;gap:9px">
+              <div style="font:400 11px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">NAJBLIŻSZE 14 DNI</div>
+              <div style="height:56px;display:flex;align-items:flex-end;gap:3px;width:100%"><span data-gen="forecast"></span></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="height:60px;border:1px solid #2C3852;display:flex;align-items:center;justify-content:center;font:500 15px Archivo, sans-serif;color:#E7EAF2">Ucz się do przodu</div>
+            <div style="text-align:center;font:400 11px/1 'IBM Plex Mono', monospace;color:#4C5670">ZAPISANO LOKALNIE · ZSYNCHRONIZOWANO</div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">koniec sesji · mobile</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="width:1280px;height:800px;background:#0F1622;border:1px solid #232E44;border-radius:10px;overflow:hidden;display:flex">
+          <div style="width:250px;flex:none;border-inline-end:1px solid #1D2739;padding:30px 24px;display:flex;flex-direction:column;gap:30px">
+            <div style="display:flex;align-items:center;gap:11px">
+              <div style="display:flex;align-items:flex-end;gap:4px"><div style="width:3px;height:16px;background:#8FA8F0"></div><div style="width:3px;height:16px;background:#5A6580"></div><div style="width:3px;height:16px;background:#5A6580"></div></div>
+              <div style="font:300 21px/1 Spectral, serif;color:#E7EAF2">Nabu</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:13px">
+              <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.14em;color:#4C5670">AKTYWNE</div>
+              <div style="display:flex;justify-content:space-between;font:400 16px Spectral, serif;color:#E7EAF2;padding-inline-start:10px;border-inline-start:2px solid #8FA8F0">japoński<span style="font:400 11px 'IBM Plex Mono', monospace;color:#8A94A9">31</span></div>
+              <div style="display:flex;justify-content:space-between;font:400 16px Spectral, serif;color:#8A94A9;padding-inline-start:10px;border-inline-start:2px solid transparent">hiszpański<span style="font:400 11px 'IBM Plex Mono', monospace;color:#4C5670">14</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:13px">
+              <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.14em;color:#4C5670">UTRZYMYWANE</div>
+              <div style="display:flex;justify-content:space-between;font:400 15px Spectral, serif;color:#5A6580;padding-inline-start:10px">portugalski<span style="font:400 11px 'IBM Plex Mono', monospace">3</span></div>
+              <div style="display:flex;justify-content:space-between;font:400 15px Spectral, serif;color:#5A6580;padding-inline-start:10px">szwedzki<span style="font:400 11px 'IBM Plex Mono', monospace">0</span></div>
+              <div style="display:flex;justify-content:space-between;font:400 15px Spectral, serif;color:#5A6580;padding-inline-start:10px">koreański<span style="font:400 11px 'IBM Plex Mono', monospace">6</span></div>
+            </div>
+            <div style="flex:1"></div>
+            <div style="display:flex;flex-direction:column;gap:9px;font:400 11px/1.7 'IBM Plex Mono', monospace;color:#4C5670"><span>statystyki</span><span>ustawienia</span><span>eksport stanu</span></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px">
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start">
+              <div style="display:flex;align-items:baseline;gap:16px"><span style="font:300 96px/1 Spectral, serif;color:#E7EAF2">23</span><span style="font:400 16px Archivo, sans-serif;color:#8A94A9">do powtórki</span></div>
+              <div style="display:flex;align-items:baseline;gap:16px"><span style="font:300 48px/1.3 Spectral, serif;color:#8FA8F0">+ 8</span><span style="font:400 16px Archivo, sans-serif;color:#8A94A9">nowych</span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:18px;align-items:center;width:340px">
+              <div style="width:100%;height:60px;background:#E7EAF2;display:flex;align-items:center;justify-content:center;font:500 16px Archivo, sans-serif;color:#0F1622">Zacznij</div>
+              <div style="display:flex;gap:26px;font:400 14px Archivo, sans-serif;color:#8A94A9"><span>krótka</span><span style="color:#E7EAF2;border-bottom:1px solid #E7EAF2;padding-bottom:4px">normalna</span><span>długa</span></div>
+            </div>
+            <div style="width:340px;display:flex;flex-direction:column;gap:9px;padding-top:22px;border-top:1px solid #1D2739">
+              <div style="display:flex;justify-content:space-between;font:400 11px/1 'IBM Plex Mono', monospace;color:#8A94A9"><span>KANA</span><span>38 / 46 opanowane</span></div>
+              <div style="display:flex;align-items:flex-end;gap:3px;width:100%"><span data-gen="ticksKana"></span></div>
+            </div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">start sesji · desktop 1280</figcaption>
+      </figure>
+
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:22px">
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+      <h2 style="margin:0;font:400 22px/1.2 Spectral, serif;color:#E7EAF2">Onboarding i kalibracja</h2>
+      <span style="font:400 12px/1.5 Archivo, sans-serif;color:#8A94A9">Wybór języka pokazuje zdanie w tym języku, nie flagę. Od wyboru poziomu do pierwszej karty: dwa dotknięcia i minuta kalibracji.</span>
+    </div>
+    <div style="display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start">
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="width:390px;height:844px;background:#0F1622;border:1px solid #232E44;border-radius:34px;overflow:hidden;display:flex;flex-direction:column;padding:40px 24px 34px">
+          <div style="font:400 24px/1.4 Spectral, serif;color:#E7EAF2">Czego chcesz się uczyć?</div>
+          <div style="margin-top:8px;font:400 13px/1.5 Archivo, sans-serif;color:#8A94A9">Możesz dodać kolejny język później. Dwa aktywne naraz to rozsądny sufit.</div>
+          <div style="margin-top:30px;display:flex;flex-direction:column">
+            <div style="padding:18px 0;border-top:1px solid #1D2739;display:flex;flex-direction:column;gap:7px">
+              <div style="font:400 16px/1 Archivo, sans-serif;color:#E7EAF2">hiszpański</div>
+              <div style="font:400 19px/1.4 Spectral, serif;color:#8A94A9">Necesito un poco de agua.</div>
+            </div>
+            <div style="padding:18px 0;border-top:1px solid #1D2739;display:flex;flex-direction:column;gap:7px">
+              <div style="font:400 16px/1 Archivo, sans-serif;color:#E7EAF2">portugalski</div>
+              <div style="font:400 19px/1.4 Spectral, serif;color:#8A94A9">Preciso de um pouco de água.</div>
+            </div>
+            <div style="padding:18px 0;border-top:1px solid #1D2739;display:flex;flex-direction:column;gap:7px">
+              <div style="font:400 16px/1 Archivo, sans-serif;color:#E7EAF2">szwedzki</div>
+              <div style="font:400 19px/1.4 Spectral, serif;color:#8A94A9">Kan jag få lite vatten?</div>
+            </div>
+            <div style="padding:18px 0;border-top:1px solid #1D2739;display:flex;flex-direction:column;gap:7px">
+              <div style="font:400 16px/1 Archivo, sans-serif;color:#E7EAF2">koreański<span style="font:400 10.5px 'IBM Plex Mono', monospace;color:#4C5670;padding-inline-start:10px">+ HANGUL</span></div>
+              <div style="font:400 19px/1.5 'Noto Serif KR', serif;color:#8A94A9">물 좀 주세요.</div>
+            </div>
+            <div style="padding:18px 24px;margin-inline:-24px;border-top:1px solid #1D2739;border-bottom:1px solid #1D2739;display:flex;flex-direction:column;gap:7px;background:#131C2B">
+              <div style="font:400 16px/1 Archivo, sans-serif;color:#E7EAF2">japoński<span style="font:400 10.5px 'IBM Plex Mono', monospace;color:#8FA8F0;padding-inline-start:10px">+ KANA</span></div>
+              <div style="font:400 19px/1.6 'Noto Serif JP', serif;color:#8A94A9">水をください。</div>
+            </div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="height:60px;background:#E7EAF2;display:flex;align-items:center;justify-content:center;font:500 16px Archivo, sans-serif;color:#0F1622">Dalej</div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">onboarding · wybór języka</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="width:390px;height:844px;background:#0F1622;border:1px solid #232E44;border-radius:34px;overflow:hidden;display:flex;flex-direction:column;padding:40px 24px 34px">
+          <div style="font:400 24px/1.4 Spectral, serif;color:#E7EAF2">Jak dobrze znasz japoński?</div>
+          <div style="margin-top:8px;font:400 13px/1.5 Archivo, sans-serif;color:#8A94A9">Wybierasz raz. Później poziom dostosowuje się sam, po cichu.</div>
+          <div style="margin-top:30px;display:flex;flex-direction:column;gap:10px">
+            <div style="border:1px solid #2C3852;padding:16px 18px;display:flex;flex-direction:column;gap:5px">
+              <div style="font:500 15px/1 Archivo, sans-serif;color:#E7EAF2">Zaczynam od zera</div>
+              <div style="font:400 12.5px/1.5 Archivo, sans-serif;color:#8A94A9">Start od kany. Pasmo częstości 1–500.</div>
+            </div>
+            <div style="border:1px solid #8FA8F0;background:#131C2B;padding:16px 18px;display:flex;flex-direction:column;gap:5px">
+              <div style="font:500 15px/1 Archivo, sans-serif;color:#E7EAF2">Znam podstawy</div>
+              <div style="font:400 12.5px/1.5 Archivo, sans-serif;color:#8A94A9">Pomijamy kanę. Pasmo 1–1500, z kalibracją.</div>
+            </div>
+            <div style="border:1px solid #2C3852;padding:16px 18px;display:flex;flex-direction:column;gap:5px">
+              <div style="font:500 15px/1 Archivo, sans-serif;color:#E7EAF2">Radzę sobie</div>
+              <div style="font:400 12.5px/1.5 Archivo, sans-serif;color:#8A94A9">Pasmo 500–4000, z kalibracją.</div>
+            </div>
+            <div style="border:1px solid #2C3852;padding:16px 18px;display:flex;flex-direction:column;gap:5px">
+              <div style="font:500 15px/1 Archivo, sans-serif;color:#E7EAF2">Zaawansowany</div>
+              <div style="font:400 12.5px/1.5 Archivo, sans-serif;color:#8A94A9">Pasmo 2000–12000, z kalibracją.</div>
+            </div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="font:400 11px/1.6 'IBM Plex Mono', monospace;color:#4C5670">DALEJ: 25 SŁÓW, OKOŁO MINUTY. USTAWIA DOBÓR ZDAŃ OD PIERWSZEJ SESJI.</div>
+            <div style="height:60px;background:#E7EAF2;display:flex;align-items:center;justify-content:center;font:500 16px Archivo, sans-serif;color:#0F1622">Kalibracja</div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">onboarding · poziom wejściowy</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="width:390px;height:844px;background:#0F1622;border:1px solid #232E44;border-radius:34px;overflow:hidden;display:flex;flex-direction:column;padding:26px 24px 34px">
+          <div style="display:flex;align-items:flex-end;gap:3px;width:100%"><span data-gen="ticksCal"></span></div>
+          <div style="display:flex;justify-content:space-between;margin-top:11px;font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#8A94A9"><span>KALIBRACJA</span><span>8 / 25</span></div>
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:14px">
+            <div style="font:400 64px/1.4 'Noto Serif JP', serif;color:#E7EAF2">建物</div>
+            <div style="font:400 13px/1 'IBM Plex Mono', monospace;color:#4C5670">RANGA 1 812</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="font:400 15px/1.5 Archivo, sans-serif;color:#8A94A9">Znasz to słowo?</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div style="height:64px;border:1px solid #2C3852;display:flex;align-items:center;justify-content:center;font:500 15px Archivo, sans-serif;color:#E7EAF2">Tak</div>
+              <div style="height:64px;border:1px solid #2C3852;display:flex;align-items:center;justify-content:center;font:500 15px Archivo, sans-serif;color:#E7EAF2">Nie</div>
+              <div style="grid-column:1 / -1;height:52px;border:1px solid #1D2739;display:flex;align-items:center;justify-content:center;font:400 14px Archivo, sans-serif;color:#8A94A9;border-radius:999px">Niepewny</div>
+            </div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">kalibracja · 25 pozycji · bez quizu, tu chodzi o zasięg słownictwa</figcaption>
+      </figure>
+
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:22px">
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+      <h2 style="margin:0;font:400 22px/1.2 Spectral, serif;color:#E7EAF2">Statystyki i ustawienia</h2>
+      <span style="font:400 12px/1.5 Archivo, sans-serif;color:#8A94A9">Ustawienia są per język. Statystyki pokazują cztery rzeczy i nic poza tym.</span>
+    </div>
+    <div style="display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start">
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="width:390px;height:844px;background:#0F1622;border:1px solid #232E44;border-radius:34px;overflow:hidden;display:flex;flex-direction:column;padding:32px 24px 34px;gap:30px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <div style="font:400 22px/1 Spectral, serif;color:#E7EAF2">Statystyki</div>
+            <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#8A94A9">JAPOŃSKI</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">PROGNOZA POWTÓREK · 14 DNI</div>
+            <div style="height:76px;display:flex;align-items:flex-end;gap:3px;width:100%"><span data-gen="forecastStats"></span></div>
+            <div style="display:flex;justify-content:space-between;font:400 10px/1 'IBM Plex Mono', monospace;color:#4C5670"><span>DZIŚ</span><span>+7</span><span>+14</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670"><span>TRAFIENIA ZA PIERWSZYM RAZEM · 30 DNI</span><span style="color:#E7EAF2">87%</span></div>
+            <svg sc-camel-view-box="0 0 340 70" width="100%" height="70" sc-camel-preserve-aspect-ratio="none"><polyline points="0,44 28,38 57,46 85,30 113,34 142,22 170,26 198,18 227,24 255,14 284,20 312,12 340,16" fill="none" stroke="#5A6580" stroke-width="1.5"></polyline><line x1="0" y1="60" x2="340" y2="60" stroke="#1D2739" stroke-width="1"></line></svg>
+          </div>
+          <div style="display:flex;gap:34px">
+            <div style="display:flex;flex-direction:column;gap:5px"><span style="font:300 40px/1 Spectral, serif;color:#E7EAF2">412</span><span style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">DOJRZAŁE<br>KARTY</span></div>
+            <div style="display:flex;flex-direction:column;gap:5px"><span style="font:300 40px/1 Spectral, serif;color:#E7EAF2">1 934</span><span style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">WSZYSTKIE<br>POZYCJE</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">NAJCZĘŚCIEJ MYLONE PARY</div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:11px;border-bottom:1px solid #1D2739"><span style="font:400 19px 'Noto Serif JP', serif;color:#E7EAF2">水 → 氷 <span style="font:400 13px Archivo, sans-serif;color:#8A94A9">woda / lód</span></span><span style="font:400 11px 'IBM Plex Mono', monospace;color:#8FA8F0">7 ×</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:11px;border-bottom:1px solid #1D2739"><span style="font:400 19px 'Noto Serif JP', serif;color:#E7EAF2">建物 → 建てる <span style="font:400 13px Archivo, sans-serif;color:#8A94A9">budynek / budować</span></span><span style="font:400 11px 'IBM Plex Mono', monospace;color:#8FA8F0">6 ×</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:400 19px 'Noto Serif JP', serif;color:#E7EAF2">確かめる → 確認 <span style="font:400 13px Archivo, sans-serif;color:#8A94A9">upewnić się / potwierdzenie</span></span><span style="font:400 11px 'IBM Plex Mono', monospace;color:#8FA8F0">5 ×</span></div>
+            <div style="font:400 11px/1.5 'IBM Plex Mono', monospace;color:#4C5670">QUIZ POKAZUJE, CO Z CZYM SIĘ MYLI — TE PARY WRACAJĄ CZĘŚCIEJ JAKO DYSTRAKTORY</div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">statystyki · mylone pary zamiast pojedynczych słów</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="width:390px;height:844px;background:#0F1622;border:1px solid #232E44;border-radius:34px;overflow:hidden;display:flex;flex-direction:column;padding:32px 24px 34px;gap:24px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <div style="font:400 22px/1 Spectral, serif;color:#E7EAF2">Ustawienia</div>
+            <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#8A94A9">JAPOŃSKI</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:11px">
+            <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">LICZBA ODPOWIEDZI W QUIZIE</div>
+            <div style="display:flex;gap:8px;font:400 13.5px Archivo, sans-serif">
+              <span style="flex:1;text-align:center;padding:13px 0;border:1px solid #1D2739;color:#8A94A9">3</span>
+              <span style="flex:1;text-align:center;padding:13px 0;border:1px solid #8FA8F0;background:#131C2B;color:#E7EAF2">4</span>
+              <span style="flex:1;text-align:center;padding:13px 0;border:1px solid #1D2739;color:#8A94A9">6</span>
+            </div>
+            <div style="font:400 12.5px/1.5 Archivo, sans-serif;color:#8A94A9">Sześć opcji przy dłuższych słowach spycha zdanie za wysoko. Domyślnie cztery.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:11px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font:400 15px Archivo, sans-serif;color:#E7EAF2">Przejdź dalej po trafieniu</div>
+              <div style="width:44px;height:26px;border:1px solid #8FA8F0;background:#131C2B;border-radius:999px;display:flex;align-items:center;justify-content:flex-end;padding:0 3px"><div style="width:18px;height:18px;border-radius:999px;background:#8FA8F0"></div></div>
+            </div>
+            <div style="font:400 12.5px/1.5 Archivo, sans-serif;color:#8A94A9">Bez dotykania „Dalej”, po 900 ms. Pudło zawsze czeka na dotknięcie.</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:11px">
+            <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">FURIGANA</div>
+            <div style="display:flex;gap:8px;font:400 13.5px Archivo, sans-serif">
+              <span style="flex:1;text-align:center;padding:13px 0;border:1px solid #1D2739;color:#8A94A9">zawsze</span>
+              <span style="flex:1;text-align:center;padding:13px 0;border:1px solid #8FA8F0;background:#131C2B;color:#E7EAF2">po odpowiedzi</span>
+              <span style="flex:1;text-align:center;padding:13px 0;border:1px solid #1D2739;color:#8A94A9">nigdy</span>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:11px">
+            <div style="display:flex;justify-content:space-between;font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670"><span>TEMPO MOWY</span><span style="color:#E7EAF2">0.4 ×</span></div>
+            <div style="position:relative;height:22px;display:flex;align-items:center">
+              <div style="height:1px;background:#2C3852;width:100%"></div>
+              <div style="position:absolute;inset-inline-start:16%;width:12px;height:12px;background:#E7EAF2;border-radius:999px"></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:11px">
+            <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">MOTYW</div>
+            <div style="display:flex;gap:8px;font:400 13.5px Archivo, sans-serif">
+              <span style="flex:1;text-align:center;padding:13px 0;border:1px solid #8FA8F0;background:#131C2B;color:#E7EAF2">ciemny</span>
+              <span style="flex:1;text-align:center;padding:13px 0;border:1px solid #1D2739;color:#8A94A9">jasny</span>
+              <span style="flex:1;text-align:center;padding:13px 0;border:1px solid #1D2739;color:#8A94A9">systemowy</span>
+            </div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="display:flex;flex-direction:column;gap:13px;padding-top:20px;border-top:1px solid #1D2739;font:400 14px Archivo, sans-serif;color:#B9C0CF">
+            <div style="display:flex;justify-content:space-between"><span>Eksport stanu do pliku</span><span style="color:#4C5670;font-family:'IBM Plex Mono', monospace;font-size:11px">JSON</span></div>
+            <div style="display:flex;justify-content:space-between"><span>Import stanu</span></div>
+            <div style="display:flex;justify-content:space-between"><span>Konto</span><span style="color:#8A94A9;font-size:12.5px">anonimowe</span></div>
+            <div style="font:400 11px/1.6 'IBM Plex Mono', monospace;color:#4C5670">POSTĘP JEST NA TYM URZĄDZENIU. ZALOGUJ SIĘ, ŻEBY PRZENIEŚĆ GO DALEJ.</div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">ustawienia · dwa pierwsze pola są nowe dla quizu</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px;flex:none">
+        <div style="width:390px;height:844px;background:#F3F2EE;border:1px solid #DCD9D1;border-radius:34px;overflow:hidden;display:flex;flex-direction:column;padding:32px 24px 34px;gap:30px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline">
+            <div style="font:400 22px/1 Spectral, serif;color:#1B2233">Statystyki</div>
+            <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#6B7385">JAPOŃSKI</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#9A9FAC">PROGNOZA POWTÓREK · 14 DNI</div>
+            <div style="height:76px;display:flex;align-items:flex-end;gap:3px;width:100%"><span data-gen="forecastLight"></span></div>
+            <div style="display:flex;justify-content:space-between;font:400 10px/1 'IBM Plex Mono', monospace;color:#9A9FAC"><span>DZIŚ</span><span>+7</span><span>+14</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#9A9FAC"><span>TRAFIENIA ZA PIERWSZYM RAZEM</span><span style="color:#1B2233">87%</span></div>
+            <svg sc-camel-view-box="0 0 340 70" width="100%" height="70" sc-camel-preserve-aspect-ratio="none"><polyline points="0,44 28,38 57,46 85,30 113,34 142,22 170,26 198,18 227,24 255,14 284,20 312,12 340,16" fill="none" stroke="#9A9FAC" stroke-width="1.5"></polyline><line x1="0" y1="60" x2="340" y2="60" stroke="#E0DDD5" stroke-width="1"></line></svg>
+          </div>
+          <div style="display:flex;gap:34px">
+            <div style="display:flex;flex-direction:column;gap:5px"><span style="font:300 40px/1 Spectral, serif;color:#1B2233">412</span><span style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#6B7385">DOJRZAŁE<br>KARTY</span></div>
+            <div style="display:flex;flex-direction:column;gap:5px"><span style="font:300 40px/1 Spectral, serif;color:#1B2233">1 934</span><span style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#6B7385">WSZYSTKIE<br>POZYCJE</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#9A9FAC">NAJCZĘŚCIEJ MYLONE PARY</div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:11px;border-bottom:1px solid #E0DDD5"><span style="font:400 19px 'Noto Serif JP', serif;color:#1B2233">水 → 氷 <span style="font:400 13px Archivo, sans-serif;color:#6B7385">woda / lód</span></span><span style="font:400 11px 'IBM Plex Mono', monospace;color:#4358C9">7 ×</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;padding-bottom:11px;border-bottom:1px solid #E0DDD5"><span style="font:400 19px 'Noto Serif JP', serif;color:#1B2233">建物 → 建てる <span style="font:400 13px Archivo, sans-serif;color:#6B7385">budynek / budować</span></span><span style="font:400 11px 'IBM Plex Mono', monospace;color:#4358C9">6 ×</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font:400 19px 'Noto Serif JP', serif;color:#1B2233">確かめる → 確認 <span style="font:400 13px Archivo, sans-serif;color:#6B7385">upewnić się / potwierdzenie</span></span><span style="font:400 11px 'IBM Plex Mono', monospace;color:#4358C9">5 ×</span></div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">statystyki · jasny</figcaption>
+      </figure>
+
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:22px">
+    <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap">
+      <h2 style="margin:0;font:400 22px/1.2 Spectral, serif;color:#E7EAF2">Stany brzegowe</h2>
+      <span style="font:400 12px/1.5 Archivo, sans-serif;color:#8A94A9">Moduły w miejscu treści ekranu startu. Żaden nie jest modalem i żaden nie blokuje sesji.</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,390px);gap:26px">
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+        <div style="width:390px;background:#0F1622;border:1px solid #232E44;border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;gap:18px;min-height:250px">
+          <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">SZWEDZKI</div>
+          <div style="font:300 44px/1 Spectral, serif;color:#E7EAF2">0</div>
+          <div style="font:400 15px/1.6 Archivo, sans-serif;color:#B9C0CF">Na dziś nic nie zostało. Jutro wróci 11 kart.</div>
+          <div style="flex:1"></div>
+          <div style="height:56px;border:1px solid #2C3852;display:flex;align-items:center;justify-content:center;font:500 15px Archivo, sans-serif;color:#E7EAF2">Ucz się do przodu</div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">brak powtórek na dziś</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+        <div style="width:390px;background:#0F1622;border:1px solid #232E44;border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;gap:18px;min-height:250px">
+          <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">KOREAŃSKI · ETAP 0</div>
+          <div style="font:400 17px/1.6 Spectral, serif;color:#E7EAF2">Zdania otworzą się po hangulu. Zostało 6 znaków.</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;align-items:flex-end;gap:3px;width:100%"><span data-gen="ticksHangul"></span></div>
+            <div style="display:flex;justify-content:space-between;font:400 11px/1 'IBM Plex Mono', monospace;color:#8A94A9"><span>34 / 40 OPANOWANE</span><span>OKOŁO 2 SESJI</span></div>
+          </div>
+          <div style="flex:1"></div>
+          <div style="font:400 12.5px/1.5 Archivo, sans-serif;color:#8A94A9">Karty znaków nie mają quizu — cztery sensowne dystraktory dla pojedynczego znaku nie istnieją.</div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">brama etapu</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+        <div style="width:390px;background:#0F1622;border:1px solid #232E44;border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;gap:18px;min-height:250px">
+          <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">JAPOŃSKI</div>
+          <div style="display:flex;align-items:baseline;gap:14px"><span style="font:300 44px/1 Spectral, serif;color:#E7EAF2">58</span><span style="font:400 15px Archivo, sans-serif;color:#8A94A9">do powtórki</span></div>
+          <div style="display:flex;align-items:baseline;gap:14px"><span style="font:300 26px/1 Spectral, serif;color:#4C5670">+ 0</span><span style="font:400 14px Archivo, sans-serif;color:#8A94A9">nowych</span></div>
+          <div style="font:400 13.5px/1.6 Archivo, sans-serif;color:#B9C0CF;padding-top:16px;border-top:1px solid #1D2739">Czeka 24 nowych pozycji z poprzednich dni. Nie dokładamy kolejnych, dopóki nie zejdziesz poniżej 20 — inaczej zaległość rośnie szybciej, niż da się ją nadrobić.</div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">zaległości powyżej 20 nowych</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+        <div style="width:390px;background:#0F1622;border:1px solid #232E44;border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;gap:18px;min-height:250px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">JAPOŃSKI</div>
+            <div style="display:flex;align-items:center;gap:7px;font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#8A94A9"><span style="width:5px;height:5px;border-radius:999px;background:#5A6580"></span>OFFLINE</div>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:14px"><span style="font:300 44px/1 Spectral, serif;color:#E7EAF2">23</span><span style="font:400 15px Archivo, sans-serif;color:#8A94A9">do powtórki</span></div>
+          <div style="font:400 13.5px/1.6 Archivo, sans-serif;color:#8A94A9">Sesja działa normalnie. Dystraktory są w pobranej talii, więc quiz nie potrzebuje sieci.</div>
+          <div style="flex:1"></div>
+          <div style="height:56px;background:#E7EAF2;display:flex;align-items:center;justify-content:center;font:500 15px Archivo, sans-serif;color:#0F1622">Zacznij</div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">offline · znacznik, nie ostrzeżenie</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+        <div style="width:390px;background:#0F1622;border:1px solid #232E44;border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;gap:18px;min-height:250px">
+          <div style="display:flex;align-items:center;gap:7px;font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#8FA8F0"><span style="width:5px;height:5px;border-radius:999px;background:#8FA8F0"></span>SYNCHRONIZACJA WSTRZYMANA</div>
+          <div style="font:400 15px/1.6 Archivo, sans-serif;color:#B9C0CF">Ostatnia synchronizacja: wczoraj, 22:51. Postęp z tego czasu jest bezpieczny na tym urządzeniu.</div>
+          <div style="flex:1"></div>
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;height:52px;border:1px solid #2C3852;display:flex;align-items:center;justify-content:center;font:500 14px Archivo, sans-serif;color:#E7EAF2">Spróbuj teraz</div>
+            <div style="flex:1;height:52px;border:1px solid #1D2739;display:flex;align-items:center;justify-content:center;font:400 14px Archivo, sans-serif;color:#8A94A9">Eksportuj</div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">sync nie działa · nigdy modal</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+        <div style="width:390px;background:#0F1622;border:1px solid #232E44;border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;gap:18px;min-height:250px">
+          <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">PORTUGALSKI · TALIA NIEPOBRANA</div>
+          <div style="font:400 17px/1.6 Spectral, serif;color:#E7EAF2">Talia waży 2,4 MB. Po pobraniu język działa bez sieci.</div>
+          <div style="flex:1"></div>
+          <div style="height:56px;background:#E7EAF2;display:flex;align-items:center;justify-content:center;font:500 15px Archivo, sans-serif;color:#0F1622">Pobierz</div>
+          <div style="font:400 11px/1 'IBM Plex Mono', monospace;color:#4C5670">WYMAGA POŁĄCZENIA · JEDNORAZOWO</div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">talia niepobrana</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+        <div style="width:390px;background:#0F1622;border:1px solid #232E44;border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;gap:18px;min-height:250px">
+          <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#4C5670">DODAJESZ PORTUGALSKI</div>
+          <div style="font:400 17px/1.6 Spectral, serif;color:#E7EAF2">Uczysz się już hiszpańskiego. Te dwa języki mieszają się łatwiej niż inne.</div>
+          <div style="font:400 13.5px/1.6 Archivo, sans-serif;color:#8A94A9">Mówimy o tym raz. Możesz dodać portugalski teraz albo odłożyć go, aż hiszpański będzie w utrzymaniu.</div>
+          <div style="flex:1"></div>
+          <div style="display:flex;gap:8px">
+            <div style="flex:1;height:52px;border:1px solid #2C3852;display:flex;align-items:center;justify-content:center;font:500 14px Archivo, sans-serif;color:#E7EAF2">Dodaję mimo to</div>
+            <div style="flex:1;height:52px;border:1px solid #1D2739;display:flex;align-items:center;justify-content:center;font:400 14px Archivo, sans-serif;color:#8A94A9">Później</div>
+          </div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">interferencja es / pt</figcaption>
+      </figure>
+
+      <figure style="margin:0;display:flex;flex-direction:column;gap:10px">
+        <div style="width:390px;background:#0F1622;border:1px solid #232E44;border-radius:18px;padding:28px 24px;display:flex;flex-direction:column;gap:18px;min-height:250px">
+          <div style="font:400 10.5px/1 'IBM Plex Mono', monospace;letter-spacing:.12em;color:#8FA8F0">ZA MAŁO DYSTRAKTORÓW</div>
+          <div style="font:400 17px/1.6 Spectral, serif;color:#E7EAF2">Rzadkie słowo bez czterech sensownych podobnych. Karta wraca do odsłaniania z samooceną.</div>
+          <div style="font:400 13.5px/1.6 Archivo, sans-serif;color:#8A94A9">Użytkownik nie dostaje o tym komunikatu — widzi po prostu kartę z przyciskiem „Odsłoń”. To zapasowy tryb dla brzegów słownika, nie osobna funkcja.</div>
+        </div>
+        <figcaption style="font:400 11px/1.4 'IBM Plex Mono', monospace;color:#8A94A9">fallback quizu · ważne dla implementacji</figcaption>
+      </figure>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Port logiki z oryginalnej makiety (klasa DCLogic). Wartości bez zmian.
+(function () {
+  function ticks(total, done, lapses, light) {
+    var accent = light ? '#4358C9' : '#8FA8F0';
+    var doneC  = light ? '#9AA0AE' : '#5A6580';
+    var future = light ? '#DCD9D1' : '#222C40';
+    var cur    = light ? '#1B2233' : '#E7EAF2';
+    var out = [];
+    for (var i = 0; i < total; i++) {
+      var bg = future;
+      if (i < done) bg = lapses.indexOf(i) >= 0 ? accent : doneC;
+      if (i === done) bg = cur;
+      out.push('flex:1 1 0;min-width:0;height:13px;border-radius:1px;background:' + bg);
+    }
+    return out;
+  }
+
+  function bars(values, height, light) {
+    var accent = light ? '#4358C9' : '#8FA8F0';
+    var rest   = light ? '#9AA0AE' : '#5A6580';
+    var max = Math.max.apply(null, values);
+    return values.map(function (v, i) {
+      return 'flex:1 1 0;min-width:0;border-radius:1px;height:' +
+        Math.max(2, Math.round(height * v / max)) + 'px;background:' + (i === 0 ? accent : rest);
+    });
+  }
+
+  var GEN = {
+    ticksA:        ticks(33, 11, [4, 9], false),
+    ticksB:        ticks(33, 11, [4, 9, 11], false),
+    ticksLight:    ticks(33, 11, [4, 9], true),
+    ticksKana:     ticks(46, 38, [], false),
+    ticksHangul:   ticks(40, 34, [], false),
+    ticksCal:      ticks(25, 7, [], false),
+    forecast:      bars([11, 7, 14, 9, 4, 18, 6, 12, 5, 9, 3, 8, 15, 7], 56, false),
+    forecastStats: bars([23, 7, 14, 9, 4, 18, 6, 12, 5, 9, 3, 8, 15, 7], 76, false),
+    forecastLight: bars([23, 7, 14, 9, 4, 18, 6, 12, 5, 9, 3, 8, 15, 7], 76, true)
+  };
+
+  document.querySelectorAll('[data-gen]').forEach(function (mount) {
+    var list = GEN[mount.getAttribute('data-gen')] || [];
+    var frag = document.createDocumentFragment();
+    list.forEach(function (st) {
+      var d = document.createElement('div');
+      d.setAttribute('style', st);
+      frag.appendChild(d);
+    });
+    mount.replaceWith(frag);
+  });
+
+  // ---- karta interaktywna -------------------------------------------------
+  var QUIZ = [
+    { label: 'JAPOŃSKI · CLOZE', before: '', after: 'をください。', pl: 'Poproszę wodę.',
+      font: "'Noto Serif JP', serif", size: '34px', lh: '2', gapW: '2em',
+      gloss: '水 みず — woda', correct: 0,
+      opts: [ { t: '水', pl: 'woda' }, { t: '氷', pl: 'lód' }, { t: '湯', pl: 'wrzątek' }, { t: '米', pl: 'ryż' } ] },
+    { label: 'HISZPAŃSKI · CLOZE', before: 'Necesito un poco de ', after: ' ahora.', pl: 'Potrzebuję teraz trochę wody.',
+      font: 'Spectral, serif', size: '30px', lh: '1.55', gapW: '3.4em',
+      gloss: 'agua — woda', correct: 2,
+      opts: [ { t: 'leche', pl: 'mleko' }, { t: 'tiempo', pl: 'czas' }, { t: 'agua', pl: 'woda' }, { t: 'pan', pl: 'chleb' } ] },
+    { label: 'KOREAŃSKI · CLOZE', before: '', after: ' 좀 주세요.', pl: 'Poproszę wodę.',
+      font: "'Noto Serif KR', serif", size: '32px', lh: '1.75', gapW: '2.4em',
+      gloss: '물 mul — woda', correct: 3,
+      opts: [ { t: '불', pl: 'ogień' }, { t: '밀', pl: 'pszenica' }, { t: '말', pl: 'słowo' }, { t: '물', pl: 'woda' } ] }
+  ];
+
+  var qi = 0, pick = null, hard = false, marks = [];
+  var host = document.getElementById('live-quiz');
+  if (!host) return;
+
+  var MONO = "'IBM Plex Mono', monospace";
+  function el(tag, style, html) {
+    var n = document.createElement(tag);
+    if (style) n.setAttribute('style', style);
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+
+  function render() {
+    var q = QUIZ[qi % QUIZ.length];
+    var answered = pick !== null;
+    var right = answered && pick === q.correct;
+    host.innerHTML = '';
+
+    var phone = el('div', 'width:390px;height:844px;background:#0F1622;border:1px solid #232E44;' +
+      'border-radius:34px;overflow:hidden;display:flex;flex-direction:column');
+
+    // pasek postępu
+    var top = el('div', 'padding:22px 24px 0');
+    var bar = el('div', 'display:flex;align-items:flex-end;gap:3px;width:100%');
+    ticks(12, marks.length, marks.map(function (g, n) { return g === 0 ? n : -1; })
+      .filter(function (n) { return n >= 0; }), false)
+      .forEach(function (st) { bar.appendChild(el('div', st)); });
+    top.appendChild(bar);
+    top.appendChild(el('div',
+      'display:flex;justify-content:space-between;margin-top:11px;font:400 10.5px/1 ' + MONO +
+      ';letter-spacing:.12em;color:#8A94A9',
+      '<span>' + q.label + '</span><span>QUIZ</span>'));
+    phone.appendChild(top);
+
+    // zdanie
+    var mid = el('div', 'flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 30px');
+    var gap = answered
+      ? '<span style="color:#8FA8F0">' + q.opts[q.correct].t + '</span>'
+      : '<span style="display:inline-block;width:' + q.gapW +
+        ';border-bottom:2px solid #8FA8F0;vertical-align:-0.1em"></span>';
+    mid.appendChild(el('div',
+      'font:400 ' + q.size + '/' + q.lh + ' ' + q.font + ';color:#E7EAF2' +
+      (answered ? ';animation:nabuReveal .18s ease-out' : ''),
+      q.before + gap + q.after));
+    mid.appendChild(el('div', 'margin-top:26px;font:400 15px/1.5 Archivo, sans-serif;color:#8A94A9', q.pl));
+
+    if (answered) {
+      var note = el('div', 'margin-top:30px;padding-top:20px;border-top:1px solid #1D2739;' +
+        'display:flex;flex-direction:column;gap:7px;animation:nabuReveal .18s ease-out');
+      note.appendChild(el('div', 'font:400 10.5px/1 ' + MONO + ';letter-spacing:.12em;color:#4C5670',
+        right ? (hard ? 'TRUDNE · 10 MIN' : 'DOBRZE · 1 DZIEŃ') : 'NIE PAMIĘTAM · 1 MIN'));
+      note.appendChild(el('div', 'font:400 20px/1.4 ' + q.font + ';color:#E7EAF2', q.gloss));
+      mid.appendChild(note);
+    }
+    phone.appendChild(mid);
+
+    // opcje
+    var bottom = el('div', 'padding:0 24px 34px;display:flex;flex-direction:column;gap:8px');
+    q.opts.forEach(function (o, n) {
+      var isCorrect = n === q.correct, chosen = pick === n;
+      var border = '#2C3852', color = '#E7EAF2', bg = 'transparent', mark = '';
+      if (answered) {
+        if (isCorrect)      { border = '#8FA8F0'; color = '#8FA8F0'; bg = '#131C2B'; mark = chosen ? '✓' : ''; }
+        else if (chosen)    { border = '#3A2A33'; color = '#6E7788'; mark = '×'; }
+        else                { border = '#1D2739'; color = '#4C5670'; }
+      }
+      var row = el('div', 'border:1px solid ' + border + ';background:' + bg + ';min-height:62px;' +
+        'display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 18px;' +
+        'user-select:none;cursor:' + (answered ? 'default' : 'pointer'));
+      var left = el('div', 'display:flex;align-items:baseline;gap:10px');
+      left.appendChild(el('span', 'font:400 24px/1.35 ' + q.font + ';color:' + color, o.t));
+      left.appendChild(el('span', 'font:400 12.5px/1 Archivo, sans-serif;color:' + color +
+        ';opacity:' + (answered ? '1' : '0'), o.pl));
+      row.appendChild(left);
+      row.appendChild(el('span', 'font:400 15px/1 ' + MONO + ';color:' + color, mark));
+      row.onclick = function () { if (pick === null) { pick = n; hard = false; render(); } };
+      bottom.appendChild(row);
+    });
+
+    if (answered) {
+      var foot = el('div', 'display:flex;justify-content:space-between;align-items:center;margin-top:8px');
+      if (right) {
+        var h = el('span', 'font:400 12.5px Archivo, sans-serif;cursor:pointer;padding-bottom:3px;color:' +
+          (hard ? '#8FA8F0' : '#8A94A9') + ';border-bottom:1px solid ' + (hard ? '#8FA8F0' : '#2C3852'),
+          'było trudne');
+        h.onclick = function () { hard = !hard; render(); };
+        foot.appendChild(h);
+      } else {
+        foot.appendChild(el('span',
+          'font:400 10.5px/1 ' + MONO + ';letter-spacing:.12em;color:#4C5670', 'WRÓCI ZA MINUTĘ'));
+      }
+      var next = el('span', 'font:400 12.5px Archivo, sans-serif;color:#E7EAF2;cursor:pointer;' +
+        'border-bottom:1px solid #2C3852;padding-bottom:3px', 'Dalej');
+      next.onclick = function () {
+        marks.push(right ? 1 : 0);
+        qi++; pick = null; hard = false;
+        render();
+      };
+      foot.appendChild(next);
+      bottom.appendChild(foot);
+    }
+
+    phone.appendChild(bottom);
+    host.appendChild(phone);
+    host.appendChild(el('figcaption', 'font:400 11px/1.4 ' + MONO + ';color:#8A94A9',
+      'klikalne · japoński, hiszpański, koreański'));
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

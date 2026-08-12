@@ -5,6 +5,25 @@
 > Wszystko, co jest tu opisane jako **decyzja**, jest przesądzone — nie negocjuj tego od nowa.
 > Wszystko, co jest opisane jako **do sprawdzenia**, wymaga eksperymentu przed implementacją.
 
+### Rewizja z 12 sierpnia 2026
+
+Po sesji Claude Design (makieta w `docs/design/`) zmieniła się podstawowa mechanika karty
+i wszystko, co z niej wynika. Pierwsza wersja dokumentu opisywała klasyczne odsłonięcie
+z czterema ocenami wystawianymi przez użytkownika. Obowiązuje wersja poniżej:
+
+| decyzja | gdzie |
+|---|---|
+| Karta to **quiz** — wybór jednej z 3/4/6 opcji, nie samoocena | 7 |
+| Dojrzała karta wchodzi w **produkcję**: wpisanie, klawiatura jamo, klawiatura kana, rysowanie | 6.4, 7.2, 7.3 |
+| Samoocena zostaje **wyłącznie** na karcie `reveal`, jako cichy fallback | 7.1 |
+| Dystraktory liczone w buildzie, ze słownictwa talii; nowy krok `06` | 5.1, 10.1b |
+| Log zapisuje, **co** użytkownik wybrał — bez tego nie ma mylonych par | 5.3, 8.6 |
+| Motyw to warstwa 13 tokenów i presety barw, z testem kontrastu w CI | 9.1 |
+| Kroje pisma hostowane u siebie i subsetowane; nowy krok `07` | 9.2 |
+| Test audio przechodzi z M5 do M0, bo jego wynik zmienia pipeline | 11 |
+
+Szacunek czasu rośnie z ~8,5 do ~12 dni. Kolejność etapów w sekcji 12 jest zaktualizowana.
+
 ---
 
 ## 0. Nazwa
@@ -73,8 +92,8 @@ w implementacji zobaczysz `if (lang === 'ja')` poza katalogiem adapterów — to
 
 ### 2.1 Kontrakt adaptera
 
-Rdzeń nie wie, jakiego języka uczy. Cała wiedza o języku siedzi w jednym pliku
-`src/langs/{code}.ts` i w danych wyprodukowanych przez build.
+Rdzeń nie wie, jakiego języka uczy. Cała wiedza o języku siedzi w jednym katalogu
+`src/langs/{code}/` i w danych wyprodukowanych przez build.
 
 ```ts
 type LangAdapter = {
@@ -91,10 +110,27 @@ type LangAdapter = {
   display: { font: string; size: number; lineHeight: number };
   tts: { locale: string; rate: number };
   sentence: { minTokens: number; maxTokens: number };
+
+  quiz: {
+    shape: 'edit' | 'kanji-components' | 'jamo';  // wtyczka podobieństwa kształtu
+    minOptions: number;        // poniżej tego → karta spada na `reveal`
+  };
+  production: Array<'type' | 'kana' | 'jamo' | 'draw'>;  // tryby recall, kolejność = priorytet
 };
 ```
 
-Dodanie języka to nowy plik adaptera, przebieg builda i ręcznie przetłumaczony rdzeń
+| język | `quiz.shape` | `production` |
+|---|---|---|
+| es, pt, sv | `edit` | `['type']` |
+| ko | `jamo` | `['jamo']` |
+| ja | `kanji-components` | `['draw', 'kana']` |
+
+Adapter jest katalogiem, a nie pojedynczym plikiem, bo poza konfiguracją mieści też pomocniki
+pisma: składanie i rozkład sylab hangulu (`ko/hangul.ts`), układ gojūon i normalizacja kany
+(`ja/kana.ts`). Reguła „zero rozgałęzień językowych poza adapterami" zostaje bez zmian, tylko
+celuje w katalog. Pilnuje jej reguła ESLint, nie `grep` po fakcie.
+
+Dodanie języka to nowy katalog adaptera, przebieg builda i ręcznie przetłumaczony rdzeń
 słownictwa. Zero zmian w silniku, zero zmian w komponentach.
 
 ### 2.2 Poziomy trudności adaptera
@@ -139,12 +175,17 @@ Chiński i arabski dokładamy po v1, każdy jako osobne, zamknięte zadanie.
 | 0 | `script` | alfabet / kana / hangul | tylko języki z obcym pismem |
 | 1 | `core` | 60–100 słów rdzenia z polskim tłumaczeniem | etap 0 opanowany |
 | 2 | `sentences` | zdania z korpusu, cloze | etap 1 opanowany |
-| 3 | `production` | tłumaczenie PL → język docelowy, dyktowanie | opcjonalny |
+| 3 | `production` | odtworzenie z pamięci: wpisanie, rysowanie | dojrzałość karty, nie ukończenie etapu |
 
 **Opanowany** = 90% pozycji etapu ma `interval >= 7` dni.
 
 Etapy nie blokują sztywno — użytkownik może je odblokować ręcznie w ustawieniach,
 ale domyślnie prowadzimy go po kolei i mówimy dlaczego.
+
+Etap 3 różni się od pozostałych: nie jest bramą, którą się przechodzi, tylko trybem, w który
+wchodzi **pojedyncza karta**, gdy dojrzeje (`interval >= 21`). Ta sama pozycja jest więc
+najpierw quizem, a potem produkcją, i nie ma momentu „odblokowania produkcji" dla całego
+języka. Szczegóły w sekcjach 6.4 i 7.
 
 Etap 0 istnieje tylko tam, gdzie adapter ma `hasScriptStage: true` — czyli dla japońskiego
 (kana) i koreańskiego (hangul). Języki łacińskie startują od `core`.
@@ -221,24 +262,28 @@ Po każdej sesji liczymy skuteczność (odsetek ocen ≥ 3) z ostatnich 100 odpo
 nabu/
 ├─ build/                   skrypty Node (nie wchodzą do bundla)
 │  ├─ 01-fetch-tatoeba.ts
-│  ├─ 02-tokenize-ja.ts     kuromoji + furigana
+│  ├─ 02-tokenize.ts        wtyczki: space | dict | morph
 │  ├─ 03-frequency.ts
 │  ├─ 04-glosses.ts         LLM: EN → PL
 │  ├─ 05-assemble.ts        składa talie, liczy pasma
+│  ├─ 06-distractors.ts     kandydaci na opcje quizu + flaga `quiz`
+│  ├─ 07-fonts.ts           subset krojów do znaków obecnych w data/
+│  ├─ 08-strokes.ts         subset KanjiVG → data/ja/strokes.json
 │  └─ cache/                surowe pobrania, .gitignore
 ├─ data/                    WYNIK builda, commitowany
 │  ├─ es/  pt/  sv/        core.json  sentences.json  meta.json
 │  ├─ ko/                  + script.json  (hangul)
-│  └─ ja/                  + script.json  (kana)
+│  └─ ja/                  + script.json  (kana)  + strokes.json
 ├─ src/
 │  ├─ app/                  routing, layout, providers
 │  ├─ session/              silnik sesji + komponenty kart
 │  ├─ srs/                  algorytm, czysty TS, bez zależności
 │  ├─ store/                Dexie, sync, model
-│  ├─ langs/                adaptery: es.ts pt.ts sv.ts ko.ts ja.ts + index.ts
+│  ├─ langs/                adaptery: es/ pt/ sv/ ko/ ja/ + index.ts
 │  ├─ audio/                TTS + fallback
-│  └─ ui/                   prymitywy: Button, Sheet, Ticks…
-├─ public/                  manifest, ikony, sw
+│  ├─ theme/                tokeny, presety, provider, test kontrastu
+│  └─ ui/                   prymitywy: Button, Sheet, Ticks, QuizOption…
+├─ public/                  manifest, ikony, sw, kroje pisma
 └─ docs/                    ten plik, ADR-y
 ```
 
@@ -265,7 +310,10 @@ nabu/
       "en": "Water, please.",
       "pl": "Poproszę wodę.",
       "band": 412,
-      "audio": null
+      "audio": null,
+      "cloze": "ja-w-mizu",
+      "distractors": ["ja-w-koori", "ja-w-yu", "ja-w-kome", "ja-w-sake", "ja-w-cha", "ja-w-yuki"],
+      "quiz": true
     }
   ]
 }
@@ -278,17 +326,28 @@ segmentację do cloze i informację, które słowo jest nowe.
 **`r` podajemy tylko wtedy, gdy różni się od `s`** — dla kany i alfabetu łacińskiego jest `null`,
 co oszczędza ~40% wagi pliku.
 
+`cloze` wskazuje lemat, który zasłaniamy luką. `distractors` to 6–8 kandydatów na błędne opcje
+policzonych w buildzie (sekcja 10.1b); runtime losuje z nich `n − 1`, więc zestaw opcji nie
+powtarza się między powtórkami tej samej karty. `quiz: false` ustawia build, gdy kandydatów
+jest mniej niż `adapter.quiz.minOptions − 1` — taka pozycja spada na kartę `reveal`
+z samooceną, po cichu, bez komunikatu dla użytkownika.
+
 ### 5.2 Talia słów — `data/{lang}/core.json`
 
 ```jsonc
 {
   "items": [
     { "id": "ja-w-mizu", "term": "水", "reading": "みず", "romaji": "mizu",
-      "pl": "woda", "en": "water", "band": 412, "stage": "core",
-      "examples": ["ja-s-82931"] }
+      "pl": "woda", "en": "water", "band": 412, "stage": "core", "pos": "noun",
+      "examples": ["ja-s-82931"],
+      "distractors": ["ja-w-koori", "ja-w-yu", "ja-w-kome", "ja-w-sake"],
+      "quiz": true }
   ]
 }
 ```
+
+`pos` jest potrzebne do doboru dystraktorów (rzeczownik mylimy z rzeczownikiem), więc
+tokenizer musi je przekazać także dla języków łacińskich, gdzie dotąd mogło być `null`.
 
 ### 5.3 Stan użytkownika — IndexedDB, mirror w Firestore
 
@@ -309,7 +368,25 @@ type CardState = {
 ```
 
 Log odpowiedzi osobno, append-only, miesięczne partycje:
-`{ ts, id, grade, ms, mode }`. Służy statystykom i przyszłemu FSRS.
+
+```ts
+type LogEntry = {
+  ts: number;
+  id: string;
+  grade: 0 | 1 | 2 | 3;   // nie pamiętam / trudne / dobrze / łatwe
+  ms: number;             // czas odpowiedzi, patrz sekcja 6.2
+  mode: CardType;         // 'quiz-cloze' | 'produce-draw' | …
+  chosen?: string;        // TYLKO quiz: id wybranej opcji, także gdy trafiona
+  options?: string[];     // TYLKO quiz: cały pokazany zestaw, w kolejności wyświetlenia
+};
+```
+
+Służy statystykom i przyszłemu FSRS.
+
+**`chosen` i `options` nie są opcjonalnym dodatkiem.** Bez nich nie da się zrobić ekranu
+„najczęściej mylone pary" (sekcja 8.6) ani reguły „mylona para wraca częściej jako dystraktor"
+(sekcja 10.1b), a danych zebranych wstecz nie ma skąd wziąć. Muszą być w schemacie od
+pierwszego zapisu, nawet jeśli ekran statystyk powstanie dopiero w M8.
 
 ### 5.4 Firestore — układ dokumentów
 
@@ -373,24 +450,122 @@ w sposób, który użytkownik odczuwa od razu.
 **Limit zaległości:** jeśli liczba kart z `reps === 0` przekracza 20, nie wprowadzamy
 nowych, tylko mówimy o tym wprost na ekranie startu.
 
+### 6.1 Skąd bierze się ocena
+
+Użytkownik nie wystawia sobie oceny — poza kartą `reveal`, która jest fallbackiem
+(sekcja 7). Silnik dostaje wynik obiektywny i sam mapuje go na jedną z czterech ocen SM-2.
+
+| karta | co silnik dostaje |
+|---|---|
+| `quiz-*` | indeks wybranej opcji + czas odpowiedzi |
+| `produce-type` / `produce-kana` / `produce-jamo` | wpisany ciąg + liczba prób |
+| `produce-draw` | liczba poprawionych kresek i użytych podpowiedzi |
+| `reveal` | ocena użytkownika (jedyny przypadek subiektywny) |
+
+### 6.2 Quiz → ocena, z ochroną przed strzałem
+
+Przy czterech opcjach czysty strzał trafia w 25% przypadków, a każde takie trafienie
+podbija interwał. Samo „trafienie = Dobrze" rozjeżdża harmonogram w kilka tygodni.
+Reguły w kolejności sprawdzania:
+
+| sytuacja | ocena | uwaga |
+|---|---|---|
+| pudło | Nie pamiętam | karta wraca do kroku 1 min, zapisujemy `chosen` |
+| trafienie przy `reps <= 1` | Dobrze, ale tylko **następny krok nauki** | nigdy skok na 1 dzień |
+| trafienie wolniejsze niż 2,5× mediany użytkownika dla tego typu karty | Trudne | mediana krocząca z ostatnich 200 odpowiedzi |
+| trafienie poniżej 2 s przy `interval >= 21` | Łatwe | |
+| dotknięcie „było trudne" po trafieniu | Trudne | nadpisuje ocenę wyżej |
+| pozostałe trafienia | Dobrze | |
+
+**Pomiar `ms` jest elementem nośnym**, a nie statystyką: liczymy od wyrenderowania karty
+do dotknięcia, odejmujemy czas automatycznego odtworzenia dźwięku, obcinamy wartości
+powyżej 60 s (telefon odłożony na stół) i wykluczamy je z mediany.
+
+### 6.3 Zasady prezentacji, bez których quiz uczy układu przycisków
+
+- Pozycja poprawnej odpowiedzi jest losowa i **inna niż przy poprzedniej powtórce tej karty**.
+- Zestaw dystraktorów nie powtarza się dwa razy z rzędu — losujemy `n − 1` z listy 6–8.
+- Dystraktor, na który użytkownik już się nabrał (z `chosen` w logu), wraca z podwyższonym
+  prawdopodobieństwem, dopóki para nie zostanie trafiona trzy razy z rzędu.
+
+### 6.4 Produkcja → ocena
+
+| wynik | ocena |
+|---|---|
+| dokładne trafienie za pierwszym razem, bez podpowiedzi | Dobrze (Łatwe, jeśli poniżej 2 s i `interval >= 21`) |
+| trafienie po poprawce, po jednej podpowiedzi, albo różnica tylko w diakrytykach | Trudne |
+| druga podpowiedź, rezygnacja albo błędna odpowiedź | Nie pamiętam |
+
+Porównanie tekstu: dla `type` normalizujemy wielkość liter i białe znaki; różnica wyłącznie
+w znakach diakrytycznych to Trudne z pokazaniem różnicy, nie pudło. Dla `kana` normalizujemy
+hiraganę i katakanę do jednej postaci. Dla `jamo` porównujemy po złożeniu sylab.
+
+**Kiedy karta idzie w produkcję zamiast quizu:** domyślnie przy `interval >= 21`.
+Ustawienie per język: `wyłączona / od dojrzałych (domyślnie) / zawsze`. Gdy adapter podaje
+kilka trybów (japoński: `['draw','kana']`), wybieramy pierwszy wykonalny dla danej pozycji —
+rysowanie tam, gdzie znak jest w `strokes.json`, wpisanie czytania w pozostałych przypadkach.
+
 ---
 
 ## 7. Typy kart
 
-| Typ | Przód | Tył | Etap |
-|---|---|---|---|
-| `script` | znak: あ | czytanie: *a*, wymowa | 0 |
-| `word` | słowo: 水 | czytanie, PL, przykładowe zdanie | 1 |
-| `cloze` | zdanie z luką + tłumaczenie PL | pełne zdanie z furiganą, słowo + glosa | 2 |
-| `listen` | tylko dźwięk, przycisk „powtórz" | zdanie + tłumaczenie | 2 |
-| `produce` | zdanie po polsku | wersja docelowa + dźwięk | 3 |
+**Decyzja: podstawową mechaniką jest quiz — wybór jednej z kilku opcji, nie samoocena.**
+Użytkownik dotyka opcji, odpowiedź jest natychmiast rozstrzygnięta, bez potwierdzania i bez
+możliwości zmiany wyboru. Samoocena zostaje w jednym miejscu: karcie `reveal`, która jest
+cichym zapasem dla pozycji, dla których quiz nie ma sensu.
 
-**Każda karta musi zadawać pytanie, na które da się odpowiedzieć z pamięci, a odsłonięcie
-musi pokazać coś, czego nie było widać na przodzie.** To brzmi banalnie, ale to jest
-dokładnie ten warunek, który łatwo złamać, budując kartę „pokaż zdanie → pokaż słowo z tego zdania".
+| Typ | Przód | Odpowiedź | Ocena | Etap |
+|---|---|---|---|---|
+| `quiz-word` | słowo w piśmie docelowym | 1 z 3/4/6 glos polskich | obiektywna | 1 |
+| `quiz-cloze` | zdanie z luką + tłumaczenie PL | 1 z 3/4/6 słów w piśmie docelowym | obiektywna | 2 |
+| `quiz-listen` | tylko dźwięk, przycisk „powtórz" | 1 z 3/4/6 | obiektywna | 2 |
+| `produce-type` | słowo albo zdanie po polsku | wpisanie, klawiatura systemowa | porównanie tekstu | 3 |
+| `produce-kana` | słowo w kanji + kontekst | wpisanie czytania, klawiatura kana w aplikacji | dokładne dopasowanie | 3 |
+| `produce-jamo` | słowo po polsku | wpisanie, klawiatura jamo w aplikacji | dokładne dopasowanie | 3 |
+| `produce-draw` | glosa PL + czytanie | narysowanie znaku | kreska po kresce | 3 |
+| `script` | znak: あ | 1 z 4 czytań albo narysowanie | obiektywna | 0 |
+| `reveal` | jak dotąd | odsłonięcie + cztery oceny | **subiektywna** | fallback |
 
-Karta `listen` jest tania w implementacji i bardzo mocna dla początkujących — ta sama treść
-co `cloze`, inny kanał. Wprowadzać ją, gdy karta ma `reps >= 3`.
+**Każda karta musi zadawać pytanie, na które da się odpowiedzieć z pamięci, a odpowiedź musi
+ujawnić coś, czego nie było widać na przodzie.** To brzmi banalnie, ale to jest dokładnie ten
+warunek, który łatwo złamać, budując kartę „pokaż zdanie → pokaż słowo z tego zdania".
+
+### 7.1 Kiedy quiz nie działa i co wtedy
+
+Karta spada na `reveal`, gdy build nie znalazł dość sensownych dystraktorów
+(`quiz: false`, sekcja 5.1). Użytkownik nie dostaje o tym komunikatu — widzi po prostu kartę
+z przyciskiem „Odsłoń". To zapasowy tryb dla brzegów słownika, nie osobna funkcja.
+
+Karty `script` dla pojedynczych znaków kany są tu przypadkiem granicznym: cztery sensowne
+dystraktory dla あ istnieją (podobne kształtem お, ぬ, め), więc quiz działa. Dla hangulu
+podobnie. Ale wszędzie, gdzie zabraknie kandydatów, obowiązuje ta sama ścieżka odwrotu.
+
+### 7.2 Dlaczego japoński nie ma `produce-type`
+
+Wpisywanie kanji przez systemowy IME jest testem pozornym: użytkownik wpisuje `mizu`, IME
+podaje listę kandydatów, użytkownik **rozpoznaje** 水 na liście. Pracę pamięciową wykonał IME.
+Stąd dla japońskiego wyłącznie `produce-kana` (wpisanie czytania z klawiatury w aplikacji,
+bez podpowiedzi kandydatów) i `produce-draw`.
+
+Dla koreańskiego problem jest inny — systemowa klawiatura hangul istnieje, ale wymaga, żeby
+użytkownik ją sobie zainstalował i przełączał. Hangul składa się z jamo arytmetycznie
+(`0xAC00 + 초성 × 588 + 중성 × 28 + 종성`), więc własna klawiatura jamo to kilkadziesiąt linii
+i pełna kontrola nad tym, czego test dotyczy.
+
+Karta `quiz-listen` jest tania w implementacji i bardzo mocna dla początkujących — ta sama
+treść co `quiz-cloze`, inny kanał. Wprowadzać ją, gdy karta ma `reps >= 3`.
+
+### 7.3 `produce-draw` — rysowanie znaków
+
+- **Dane**: KanjiVG (CC BY-SA 3.0), ścieżki SVG osobno dla każdej kreski. Subset do znaków
+  obecnych w `data/ja/` → `data/ja/strokes.json` (krok `08-strokes.ts`). KanjiVG pokrywa też
+  kanę, więc ten sam komponent obsługuje etap 0.
+- **Wejście**: `pointer events` na płótnie, każda kreska jako polilinia.
+- **Ocena bez uczenia maszynowego**: dla oczekiwanej kreski próbkujemy ścieżkę wzorca przez
+  `getPointAtLength`, porównujemy punkt startu, punkt końca, kierunek i średnią odległość
+  od wzorca; tolerancja skalowana do pola znaku. Kolejność kresek jest częścią oceny.
+- **Podpowiedź**: po pierwszej nieudanej próbie pokazujemy kontur bieżącej kreski.
+  Konsekwencje dla oceny — sekcja 6.4.
 
 ---
 
@@ -433,30 +608,59 @@ co się dzieje dalej.
 
 ### 8.4 Sesja
 
-- Postęp: pasek segmentów, jeden na kartę, czerwony tam, gdzie było „nie pamiętam".
-- Odsłonięcie: dotknięcie w dowolnym miejscu karty albo duży przycisk.
-- Cztery oceny z przewidywanym interwałem pod etykietą.
+- Postęp: pasek segmentów, jeden na kartę. Pudła oznaczone **kolorem akcentu**, nie czerwienią
+  — w tej aplikacji nie ma koloru błędu (sekcja 9.1).
+- Odpowiedź: jedno dotknięcie opcji kończy kartę. Bez potwierdzania, bez zmiany wyboru.
+- Po trafieniu karta może przejść dalej sama po 900 ms (ustawienie, domyślnie włączone).
+  **Pudło zawsze czeka na dotknięcie „Dalej"** i pokazuje, czym wybrane słowo różni się
+  od poprawnego.
+- Tłumaczenia przy opcjach są ukryte do momentu wyboru — inaczej karta jest testem czytania
+  po polsku. Furigana pojawia się dopiero w odsłoniętym zdaniu.
 - **Cofnij ostatnią odpowiedź** — nietrafione dotknięcie jest normalne, a bez cofania
   psuje harmonogram i frustruje. Jeden poziom cofnięcia wystarczy.
-- Dźwięk: automatycznie po odsłonięciu, z możliwością wyłączenia. Przycisk „posłuchaj"
+- Dźwięk: automatycznie po odpowiedzi, z możliwością wyłączenia. Przycisk „posłuchaj"
   zawsze dostępny.
 - Przerwanie sesji jest bezpieczne: stan zapisany po każdej odpowiedzi, powrót wznawia.
-- Ekran końcowy: liczba kart, ile wróci dziś, prognoza na jutro. Bez konfetti.
+- Ekran końcowy: liczba kart, trafienia za pierwszym razem, pudła, ile wróci jutro,
+  prognoza 14 dni. Bez konfetti.
 
-### 8.5 Ustawienia wyświetlania (per język)
+**Klawiatura na desktopie jest obowiązkowa, nie dodatkiem.** Aplikacja działa jako PWA także
+na laptopie, gdzie sięganie myszą do opcji jest wolniejsze od dotknięcia na telefonie:
 
-- **Furigana**: zawsze / dopiero po odsłonięciu / nigdy. Domyślnie „po odsłonięciu"
+| klawisz | działanie |
+|---|---|
+| `1`–`6` | wybór opcji quizu |
+| `Enter` / `Spacja` | „Dalej", a na karcie produkcji zatwierdzenie odpowiedzi |
+| `Z` | cofnij ostatnią odpowiedź |
+| `P` | posłuchaj ponownie |
+
+Fokus klawiatury musi być widoczny — obrys w kolorze akcentu na aktywnej opcji.
+
+### 8.5 Ustawienia (per język, poza motywem)
+
+- **Liczba opcji w quizie**: 3 / 4 / 6, domyślnie 4. Sześć opcji przy dłuższych słowach
+  spycha zdanie za wysoko na ekranie — dlatego to wybór, a nie stała.
+- **Przejdź dalej po trafieniu**: włącznik, domyślnie włączony, 900 ms. Pudło zawsze czeka.
+- **Produkcja**: wyłączona / od dojrzałych (domyślnie) / zawsze.
+- **Furigana**: zawsze / dopiero po odpowiedzi / nigdy. Domyślnie „po odpowiedzi"
   dla etapu 2, „zawsze" dla etapu 1.
 - **Romaji**: włączone tylko na etapie 0–1, potem domyślnie wyłączone z komunikatem
   wyjaśniającym dlaczego (transkrypcja przestaje pomagać, a zaczyna blokować).
 - Tempo mowy: suwak 0.3–1.0, domyślnie 0.4 dla japońskiego, 0.6 dla szwedzkiego.
 - Wielkość tekstu docelowego: trzy stopnie.
+- **Motyw** — jedyne ustawienie globalne, nie per język: preset barw plus przełącznik
+  ciemny / jasny / systemowy (sekcja 9.1).
 
 ### 8.6 Statystyki
 
-Jeden ekran, cztery rzeczy: prognoza powtórek na 14 dni (słupki), skuteczność w czasie
-(linia), liczba dojrzałych kart (`interval >= 21`), najczęściej mylone pozycje (lista,
-z możliwością zawieszenia karty).
+Jeden ekran, cztery rzeczy: prognoza powtórek na 14 dni (słupki), trafienia za pierwszym
+razem w czasie (linia), liczba dojrzałych kart (`interval >= 21`) obok liczby wszystkich
+pozycji, oraz **najczęściej mylone pary**.
+
+Para, a nie pojedyncze słowo: quiz wie nie tylko, że użytkownik się pomylił, ale też z czym
+— `水 → 氷`, `7 ×`. To jest informacja, której klasyczna samoocena nie potrafi dać, i to jest
+główny argument za quizem poza obiektywnością oceny. Lista jest jednocześnie wejściem do
+zawieszenia karty i do reguły z sekcji 6.3.
 
 ### 8.7 Stany brzegowe — zaprojektować, nie zostawiać
 
@@ -465,9 +669,14 @@ z możliwością zawieszenia karty).
 | Brak powtórek na dziś | Ile wróci jutro + przycisk „ucz się do przodu" |
 | Brama etapu | Ile znaków zostało do odblokowania zdań |
 | Zaległości > 20 nowych | Wyjaśnienie, czemu nie dokładamy nowych |
-| Offline | Dyskretny znacznik, sesja działa normalnie |
+| Offline | Dyskretny znacznik, sesja działa normalnie — dystraktory są w pobranej talii, quiz nie potrzebuje sieci |
 | Sync nie działa | Znacznik + „ostatnia synchronizacja: …", nigdy modal |
 | Talia nie pobrana | Pobierz teraz (rozmiar w MB), wymaga sieci |
+| Interferencja es / pt | Moduł przy dodawaniu drugiego z pary, „dodaję mimo to" / „później". Mówimy raz |
+| Za mało dystraktorów | **Nic nie pokazujemy.** Karta po cichu spada na `reveal` (sekcja 7.1) |
+
+Żaden z tych stanów nie jest modalem i żaden nie blokuje sesji — to moduły w miejscu treści
+ekranu startu.
 
 ---
 
@@ -515,31 +724,95 @@ o użycie właściwości logicznych CSS zamiast `left` i `right`, nie o pełne w
 ### Ograniczenia
 
 - Ciemne tło domyślnie, jasny motyw jako opcja. Nie czysta czerń — atramentowy granat.
-- **Dokładnie jeden kolor akcentu** i użyty oszczędnie: luka w zdaniu, nowe słowo, błąd.
+- **Dokładnie jeden kolor akcentu** i użyty oszczędnie: luka w zdaniu, nowe słowo, trafienie.
 - Zero ilustracji, maskotek, emoji w UI, gradientów na przyciskach.
-- Cztery przyciski ocen muszą być rozróżnialne kształtem i pozycją, nie tylko kolorem —
-  używane setki razy, często bez patrzenia.
+- Opcje quizu muszą być rozróżnialne pozycją i kształtem, nie samym kolorem — używane setki
+  razy, często bez patrzenia. Ten sam wymóg dotyczy stanów po odpowiedzi: trafiona opcja
+  niesie znak `✓`, wybrana błędnie `×`, a nie tylko inny odcień obrysu.
 - Strefy dotyku minimum 44 px, dolna trzecia ekranu zarezerwowana na akcje (zasięg kciuka).
-- Animacja tylko w jednym miejscu: moment odsłonięcia odpowiedzi. Reszta bez ruchu.
+- Animacja tylko w jednym miejscu: moment ujawnienia odpowiedzi. Reszta bez ruchu.
   `prefers-reduced-motion` respektowane.
 - Kontrast AA na wszystkim, łącznie z tekstem pomocniczym.
 
-### Ekrany do zaprojektowania (priorytet malejąco)
+### Ekrany — stan po sesji Claude Design
 
-1. Karta w sesji — warianty: `script`, `word`, `cloze` przed i po odsłonięciu,
-   każdy pokazany w trzech systemach pisma (łacińskim, hangul, japońskim)
-2. Ekran startu sesji z przełącznikiem języka i podziałem na aktywne / utrzymywane
-3. Ekran końcowy sesji
-4. Onboarding: wybór języka i poziomu
-5. Kalibracja
-6. Statystyki
-7. Ustawienia
-8. Stany brzegowe z tabeli 8.7
+Zaprojektowane i zamknięte, w `docs/design/nabu-wariant-quizowy.html`:
+karta `quiz-cloze` w trzech stanach (przed wyborem, trafienie, pudło) w trzech systemach
+pisma, desktop 1280, wariant jasny, start i koniec sesji, onboarding, kalibracja, statystyki,
+ustawienia oraz komplet stanów brzegowych z tabeli 8.7.
+
+Do zaprojektowania później, przy odpowiednich etapach:
+
+1. Karty produkcji: wpisywanie, klawiatura jamo, klawiatura kana, płótno do rysowania
+   z podpowiedzią konturu (M8)
+2. Karta `reveal` — fallback z samooceną, w tym samym kierunku co reszta (M2)
+3. Ekran wyboru presetu motywu (M9)
 
 ### Elementy, których nie chcemy
 
 Kart z cieniami i zaokrągleniami rodem z szablonu, pasków postępu z procentami,
 odznak, pochwał („Świetnie!"), liczników serii, dużych kolorowych nagłówków sekcji.
+
+---
+
+## 9.1 Motywy — kontrakt tokenów
+
+Makieta (`docs/design/nabu-wariant-quizowy.html`) ma wszystkie kolory wpisane na sztywno
+w atrybutach `style`. Do odtworzenia jest z niej **dokładnie trzynaście wartości
+semantycznych** i to jest cały kontrakt motywu. Żaden komponent nie zna wartości heksowej.
+
+| token | Atrament ciemny | Atrament jasny | użycie |
+|---|---|---|---|
+| `--bg` | `#0F1622` | `#F3F2EE` | tło ekranu |
+| `--surface` | `#131C2B` | `#E9E7E0` | tło trafionej opcji |
+| `--text` | `#E7EAF2` | `#1B2233` | tekst docelowy i główny |
+| `--text-2` | `#8A94A9` | `#6A7080` | tłumaczenia, opisy |
+| `--text-3` | `#4C5670` | `#9A9FAC` | etykiety mono, opcje wygaszone |
+| `--border` | `#2C3852` | `#C9C5BB` | obrys opcji przed wyborem |
+| `--border-quiet` | `#1D2739` | `#E0DDD5` | linie, opcje po odpowiedzi |
+| `--accent` | `#8FA8F0` | `#4358C9` | luka, nowe słowo, trafienie, pudła na pasku |
+| `--tick-done` | `#5A6580` | `#9AA0AE` | karty zrobione |
+| `--tick-future` | `#222C40` | `#DCD9D1` | karty przed nami |
+| `--tick-current` | `#E7EAF2` | `#1B2233` | bieżąca karta |
+| `--wrong-border` | `#3A2A33` | `#D8C9C4` | obrys błędnie wybranej opcji |
+| `--wrong-text` | `#6E7788` | `#8A8078` | tekst błędnie wybranej opcji |
+
+**Czego w tej liście nie ma: czerwieni.** Pudło jest oznaczone znakiem `×`, wygaszeniem
+i ledwie ciepłym obrysem, a błędy na pasku postępu mają kolor akcentu. Zasada „dokładnie
+jeden kolor akcentu" jest w makiecie dotrzymana i preset jej nie łamie — **preset to inna
+rampa neutralna i inna barwa akcentu, nic więcej.**
+
+**Presety v1** (nazwy robocze, do zmiany bez konsekwencji technicznych): Atrament (z makiety,
+domyślny), Grafit, Mech, Piasek, Wysoki kontrast. Każdy w wariancie jasnym i ciemnym.
+Przełącznik `ciemny / jasny / systemowy` działa niezależnie od wyboru presetu, więc
+„systemowy" oznacza po prostu wybór wariantu przez `prefers-color-scheme`.
+
+**Bramka jakości.** Test w Vitest przechodzi po wszystkich presetach × oba warianty i liczy
+kontrast każdej pary tekst-na-tle. Preset łamiący AA (4.5:1 dla tekstu, 3:1 dla elementów
+nietekstowych) nie przechodzi CI. To jest tańsze i pewniejsze niż oglądanie kolorów okiem,
+a brief i tak wymaga AA na wszystkim, łącznie z tekstem pomocniczym.
+
+Poza CSS zmiana motywu aktualizuje jeszcze `<meta name="theme-color">` i właściwość
+`color-scheme`, żeby pasek stanu w zainstalowanym PWA i kontrolki systemowe nie zostały
+przy poprzednim motywie.
+
+## 9.2 Kroje pisma — waga jest tu wymaganiem, nie optymalizacją
+
+Makieta używa Spectral, Archivo, IBM Plex Mono, Noto Serif JP i Noto Serif KR, i wciąga je
+z `fonts.gstatic.com`. **Aplikacja ma działać w samolocie, więc `preconnect` do Google Fonts
+nie może przetrwać przeniesienia do kodu.** Kroje hostujemy u siebie i subsetujemy w buildzie
+(krok `07-fonts.ts`):
+
+| krój | subset | szacowana waga |
+|---|---|---|
+| Spectral, Archivo, IBM Plex Mono | latin + latin-ext (polskie znaki) | 30–60 kB każdy |
+| Noto Serif KR | sylaby hangul obecne w `data/ko/` + pełne jamo | 200–400 kB |
+| Noto Serif JP | kana + kanji obecne w `data/ja/` + interpunkcja | 200–500 kB |
+
+Subset liczymy z zawartości `data/{lang}/`, więc regeneruje się przy każdym przebiegu danych.
+Bez tego kroku samo Noto Serif JP waży kilka megabajtów i psuje precache — a bramka M0
+„otwiera się offline" przechodzi wtedy tylko pozornie, bo pierwsze uruchomienie bez sieci
+pokazuje tekst japoński krojem systemowym albo nie pokazuje go wcale.
 
 ---
 
@@ -554,6 +827,9 @@ odznak, pochwał („Świetnie!"), liczników serii, dużych kolorowych nagłów
 | `03-frequency` | FrequencyWords `{lang}_50k` | mapa lemat → ranga | lemat z tokenizera, fallback na formę powierzchniową |
 | `04-glosses` | glosy EN | glosy PL | LLM wsadowo, 50 na wywołanie, z walidacją liczby linii |
 | `05-assemble` | powyższe | `data/{lang}/*.json` | filtry jakości, sortowanie po `band` |
+| `06-distractors` | złożona talia | `distractors[]` + flaga `quiz` | osadzenia lokalnie, bez API (10.1b) |
+| `07-fonts` | zestaw znaków z `data/` | `public/fonts/*.woff2` | subset, patrz 9.2 |
+| `08-strokes` | KanjiVG | `data/ja/strokes.json` | tylko japoński, do `produce-draw` |
 
 ### 10.1a Tokenizery — trzy wtyczki, nie trzy pipeline'y
 
@@ -568,7 +844,52 @@ obniża trafność dopasowania do listy częstości, ale nie na tyle, żeby to b
 Podniesienie go do `morph` to osobne zadanie po v1, nie warunek wejścia.
 
 Wtyczka zwraca zawsze ten sam kształt: `{ s, r, b, pos, lemma }`. Dla języków łacińskich
-`r` jest `null`, a `pos` może być `null` — pipeline i UI muszą to znosić bez rozgałęzień.
+`r` jest `null` — pipeline i UI muszą to znosić bez rozgałęzień. `pos` przestaje być
+opcjonalne: dobór dystraktorów wymaga zgodności części mowy, więc wtyczka `space` też musi
+je podać. Dla klasy A wystarczy prosty tagger albo część mowy z listy częstości; przy braku
+danych wpisujemy `unk` i taka pozycja dobiera dystraktory wyłącznie po znaczeniu i paśmie.
+
+### 10.1b Dystraktory — `06-distractors`
+
+Quiz stoi na jakości błędnych opcji. Losowe słowa zamieniłyby kartę w test czytania, więc
+kandydaci muszą być z tego samego pasma częstości i pola znaczeniowego, a przy CJK dodatkowo
+podobni kształtem.
+
+**Zakres: wyłącznie słownictwo talii.** Kandydatów szukamy pośród lematów obecnych już
+w `core.json` i `sentences.json` danego języka. Te mają polską glosę z kroku `04`, więc
+dystraktory nie kosztują ani jednego dodatkowego wywołania modelu. Jest to też sensowniejsze
+dydaktycznie: błędna opcja jest słowem, którego użytkownik i tak się uczy.
+
+Dla każdego lematu mogącego być odpowiedzią:
+
+- **filtr**: ta sama część mowy, ranga w oknie 0,5–2× rangi celu, inna glosa PL
+  (odrzucamy synonimy — dwie poprawne odpowiedzi to zepsuta karta)
+- **wynik** = `w₁ · podobieństwo znaczeniowe + w₂ · podobieństwo kształtu + w₃ · bliskość pasma`
+- bierzemy 8 najlepszych → `distractors[]`; jeśli powyżej progu jest ich mniej niż
+  `adapter.quiz.minOptions − 1`, ustawiamy `quiz: false`
+
+**Podobieństwo znaczeniowe bez wywołań API.** Model osadzeń uruchamiany lokalnie w Node
+(`@xenova/transformers`, `paraphrase-multilingual-MiniLM`) po glosach polskich. Kilka tysięcy
+glos na język liczy się w sekundy, deterministycznie, offline, bez klucza. To ważne, bo krok
+`06` przebiega przy każdej zmianie talii — gdyby kosztował wywołania API, przestalibyśmy go
+uruchamiać.
+
+**Podobieństwo kształtu** to wtyczka wybierana przez `adapter.quiz.shape`, dokładnie tym samym
+wzorcem co tokenizery wyżej:
+
+| wtyczka | jak liczy | efekt |
+|---|---|---|
+| `edit` | odległość edycyjna na formie zapisanej, waga niska | dla es/pt/sv decyduje znaczenie: `agua` / `leche` / `pan` / `tiempo` |
+| `kanji-components` | Jaccard po rozkładzie na komponenty z KRADFILE, z mapą aliasów `水 ↔ 氵` | `水` / `氷` / `湯` |
+| `jamo` | odległość edycyjna po rozłożeniu sylab na jamo | `물` / `불` / `말` |
+
+Funkcja rozkładu hangulu jest ta sama, której używa klawiatura jamo z sekcji 7.2 — jedna
+implementacja, dwa zastosowania, w katalogu adaptera.
+
+**Bramka**: po pierwszym przebiegu na język przejrzyj ręcznie 20 losowych zestawów. Szukasz
+dwóch rzeczy — czy wśród dystraktorów nie ma drugiej poprawnej odpowiedzi i czy nie są
+tak odległe, że karta rozwiązuje się sama. Odsetek `quiz: false` zapisz do `build/report.json`;
+powyżej 15% oznacza za ostry próg albo za małą talię.
 
 ### 10.2 Filtry jakości w `05-assemble`
 
@@ -592,13 +913,25 @@ To zbyt ważne, żeby zostawić modelowi — te słowa użytkownik zobaczy setki
 
 `data/ATTRIBUTION.md` w repo, link ze stopki aplikacji:
 Tatoeba — CC BY 2.0 FR; FrequencyWords — CC BY-SA 3.0; JMdict/EDRDG — CC BY-SA;
-kuromoji — Apache 2.0. Dane pochodne od list częstości dziedziczą SA.
+KRADFILE/EDRDG — CC BY-SA; KanjiVG — CC BY-SA 3.0; kuromoji — Apache 2.0.
+Dane pochodne od list częstości, KRADFILE i KanjiVG dziedziczą SA — dotyczy to katalogu
+`data/`, nie kodu aplikacji.
+
+Kroje pisma mają własne licencje i też trafiają do pliku: Spectral, Archivo, Noto Serif JP,
+Noto Serif KR — SIL OFL 1.1; IBM Plex Mono — SIL OFL 1.1. Subsetowanie jest przez OFL
+dozwolone; nazwy plików pochodnych nie mogą sugerować, że to oryginalne kroje.
 
 ---
 
-## 11. Dźwięk — do sprawdzenia przed implementacją
+## 11. Dźwięk — do sprawdzenia w M0, nie przed M5
 
-**Zanim napiszesz warstwę audio, wykonaj ten test i zapisz wynik w `docs/ADR-001-audio.md`.**
+**Wykonaj ten test w M0 i zapisz wynik w `docs/ADR-001-audio.md`.**
+
+Pierwotnie ten test stał przed M5, bo dotyczy warstwy dźwięku. To był błąd w kolejności:
+plan B (audio generowane w buildzie) dokłada krok do pipeline'u i zmienia wagę talii,
+czyli wpływa na decyzje podejmowane w M1 — pakowanie `sentences.json`, budżet precache'a,
+rozmiar podawany na ekranie „talia niepobrana". Test trwa dziesięć minut, więc nie ma
+powodu trzymać go dłużej.
 
 Są świeże zgłoszenia, że w PWA dodanym do ekranu głównego na iOS 26.x odtwarzanie audio
 przestaje działać, mimo że w Safari działa poprawnie (`AudioContext` zostaje w stanie
@@ -622,27 +955,37 @@ nie dotykała komponentów.
 
 Każdy etap kończy się warunkiem. Nie przechodź dalej bez spełnienia.
 
-### M0 — szkielet (0,5 dnia)
-Vite + React + TS, Tailwind z tokenami, routing, PWA manifest, service worker,
-deploy na Pages przez GitHub Action.
-**Bramka:** aplikacja instaluje się na iPhonie i otwiera offline.
+### M0 — szkielet (1 dzień)
+Vite + React + TS, Tailwind mapowany na tokeny z sekcji 9.1, presety motywów z testem
+kontrastu, prymitywy UI z makiety, kroje hostowane lokalnie, routing, PWA manifest,
+service worker, deploy na Pages przez GitHub Action, reguła ESLint pilnująca adapterów,
+**oraz test audio z sekcji 11**.
 
-### M1 — pipeline i trzy języki klasy A (1 dzień)
+**Bramka:** aplikacja instaluje się na iPhonie i otwiera offline; trzy stany karty z makiety
+renderują się poprawnie w każdym presecie i obu wariantach; test kontrastu przechodzi;
+`docs/ADR-001-audio.md` ma wynik, nie pustą sekcję.
+
+### M1 — pipeline i trzy języki klasy A (1,5 dnia)
 Cały pipeline uruchomiony na hiszpańskim, portugalskim i szwedzkim — żadnej segmentacji,
-żadnych czytań, sam rdzeń mechaniki. `data/{es,pt,sv}/*.json` w repo.
+żadnych czytań, sam rdzeń mechaniki. `data/{es,pt,sv}/*.json` w repo, razem z dystraktorami
+z kroku `06` i zsubsetowanymi krojami z kroku `07`.
 
 Trzy języki naraz, a nie jeden, bo **trzeci kosztuje dziesięć minut i natychmiast ujawnia
 wszystko, co zostało zaszyte na sztywno** w pierwszym.
 
-**Bramka:** po 400 zdań na język, `report.json` przejrzany, odrzuty poniżej 30%,
+**Bramka:** po 400 zdań na język, `report.json` przejrzany, odrzuty poniżej 30%, `quiz: false`
+poniżej 15%, **20 losowych zestawów dystraktorów na język przejrzanych ręcznie** (sekcja 10.1b),
 `05-assemble` uruchamiany tą samą komendą z innym kodem języka.
 
-### M2 — silnik SRS + sesja (1,5 dnia)
-Czysty TS, testy jednostkowe na kroki nauki i przejścia interwałów. Dexie. Sesja z kartami
-`word` i `cloze`. Przełącznik języka. Bez logowania, bez dźwięku.
-**Bramka:** testy przechodzą; trzy dni realnego używania na dwóch językach naraz;
-interwały rosną; karty z „nie pamiętam" wracają w tej samej sesji; przełączenie języka
-nie miesza stanów.
+### M2 — silnik SRS + sesja quizowa (2 dni)
+Czysty TS, testy jednostkowe na kroki nauki, przejścia interwałów **oraz mapowanie wyniku
+quizu na ocenę wraz z ochroną przed strzałem** (sekcja 6.2). Dexie. Sesja z kartami
+`quiz-word` i `quiz-cloze`, `reveal` jako fallback. Przełącznik języka.
+Bez logowania, bez dźwięku, bez produkcji.
+
+**Bramka:** testy przechodzą; trzy dni realnego używania na dwóch językach naraz; interwały
+rosną; karty z pudłem wracają w tej samej sesji; przełączenie języka nie miesza stanów;
+poprawna odpowiedź nie stoi dwa razy z rzędu w tym samym miejscu; log zawiera `chosen`.
 
 ### M3 — koreański: etap 0 i obce pismo (0,5 dnia)
 Karty `script` (hangul), etapy i bramy, `hasScriptStage` w adapterze.
@@ -660,10 +1003,14 @@ dalej. Wszystko późniejsze stoi na tych danych.
 
 Druga bramka, równie ważna: **przejrzyj `src/` pod kątem `if (lang === 'ja')`.**
 Każde takie miejsce poza `src/langs/` przenieś do adaptera. To moment, w którym
-wielojęzyczność albo przetrwa, albo zacznie się osypywać.
+wielojęzyczność albo przetrwa, albo zacznie się osypywać. Od M0 pilnuje tego reguła ESLint,
+więc bramka jest przeglądem tego, co reguła przepuściła, a nie szukaniem od zera.
+
+Trzecia: dystraktory `kanji-components` na 20 losowych kartach. To jedyny język, w którym
+podobieństwo kształtu naprawdę decyduje o trudności karty.
 
 ### M5 — dźwięk (0,5 dnia)
-Wynik testu z sekcji 11, implementacja wybranej ścieżki, karta `listen`.
+Implementacja ścieżki wybranej w M0 (sekcja 11), karta `quiz-listen`.
 **Bramka:** japoński czyta się poprawnie w zainstalowanym PWA.
 
 ### M6 — konto i sync (1 dzień)
@@ -674,16 +1021,27 @@ samolotowym działa i synchronizuje się po powrocie sieci.
 
 ### M7 — poziomy i kalibracja (0,5 dnia)
 Wybór poziomu, kalibracja 25 pozycji, adaptacja pasma.
+Kalibracja jest bez quizu — pytanie „znasz to słowo?" z odpowiedzią tak/nie/niepewny.
+Tu chodzi o zasięg słownictwa, nie o test.
 **Bramka:** nowe konto z poziomem „radzę sobie" dostaje zdania i+1 od pierwszej sesji.
 
-### M8 — dopracowanie (1 dzień)
-Statystyki, ustawienia wyświetlania, wszystkie stany brzegowe, cofanie odpowiedzi,
-jasny motyw, dostępność.
+### M8 — produkcja (1,5 dnia)
+Karty `produce-*` z sekcji 7. Kolejno: `produce-type` dla klasy A (najtańsze, weryfikuje
+mapowanie ocen z 6.4), klawiatura jamo i `produce-jamo`, klawiatura kana i `produce-kana`,
+na końcu `08-strokes` i `produce-draw`.
+**Bramka:** karta z `interval >= 21` wchodzi w produkcję we wszystkich pięciu językach;
+japoński rysunek 水 oceniany poprawnie, w tym wykrycie złej kolejności kresek;
+klawiatura jamo składa 물 z ㅁ + ㅜ + ㄹ.
+
+### M9 — dopracowanie (1 dzień)
+Statystyki z mylonymi parami, pełne ustawienia, wybór presetu motywu, wszystkie stany
+brzegowe, cofanie odpowiedzi, obsługa klawiatury na desktopie, dostępność.
 
 ### Później
 Chiński (tokenizer `dict` + pinyin z CC-CEDICT), arabski (RTL, zależny od pewnej warstwy audio),
-kolejne języki klasy A na żądanie, karty `produce`, ocena odpowiedzi otwartych przez model,
-FSRS na zebranym logu, tryb słuchania w tle.
+kolejne języki klasy A na żądanie, ocena odpowiedzi otwartych przez model, wyjaśnienia różnic
+przy mylonych parach („氷 to woda zamarznięta — kreska u góry"), FSRS na zebranym logu,
+tryb słuchania w tle.
 
 ---
 
@@ -693,11 +1051,19 @@ FSRS na zebranym logu, tryb słuchania w tle.
 - **Pięć języków działa: hiszpański, portugalski, szwedzki, koreański, japoński**
 - Japoński od zera: kana → rdzeń → zdania z furiganą, bez ręcznej ingerencji
 - Przełączanie języka jednym dotknięciem, stany rozdzielone, budżet dzienny per język
-- `grep -r "=== 'ja'" src/ --exclude-dir=langs` nie zwraca nic. To samo dla pozostałych kodów
+- Reguła ESLint na literały językowe przechodzi; poza `src/langs/` nie ma rozgałęzień
 - Sesja 10-minutowa kończy się bez wyjątku w konsoli i bez utraty postępu przy przerwaniu
+- **Samoocena występuje wyłącznie na karcie `reveal`** — wszędzie indziej ocena jest wynikiem
+  quizu albo produkcji
+- Karta dojrzała wchodzi w produkcję: wpisanie (es/pt/sv), jamo (ko), kana i rysowanie (ja)
+- Wszystkie presety motywu przechodzą test kontrastu AA w CI
+- Aplikacja działa i jest obsługiwalna z klawiatury na desktopie 1280
 - Logowanie Google, synchronizacja między dwoma urządzeniami, eksport do pliku
 - Repo publiczne, README z instrukcją builda, `ATTRIBUTION.md`, reguły Firestore w repo
-- Zero kluczy API i sekretów w kodzie klienta
+- **Zero sekretów serwerowych w repo i w bundlu.** Konfiguracja webowa Firebase, w tym
+  `apiKey`, jest z założenia publiczna i musi być w kliencie — chronią jej reguły
+  bezpieczeństwa, a nie tajność. Dodatkowo App Check, żeby darmowy limit nie był otwarty
+  dla dowolnego skryptu
 
 ---
 
@@ -705,9 +1071,12 @@ FSRS na zebranym logu, tryb słuchania w tle.
 
 | Ryzyko | Prawdopodobieństwo | Reakcja |
 |---|---|---|
-| Audio nie działa w zainstalowanym PWA | średnie | plan B z sekcji 11 |
+| Audio nie działa w zainstalowanym PWA | średnie | plan B z sekcji 11, sprawdzony już w M0 |
 | Safari czyści IndexedDB | średnie | Firestore + ręczny eksport, oba w v1 |
-| kuromoji myli czytania w kontekście | niskie–średnie | bramka M3, ewentualnie MeCab z UniDic |
+| kuromoji myli czytania w kontekście | niskie–średnie | bramka M4, ewentualnie MeCab z UniDic |
+| Dystraktory za łatwe albo dwuznaczne | **wysokie** | ręczny przegląd 20 zestawów na język (10.1b); odrzucanie synonimów po glosie |
+| Quiz podbija interwały przez trafione strzały | średnie | reguły z 6.2, testy jednostkowe w M2, produkcja od `interval >= 21` |
+| Waga krojów psuje precache | średnie | subset z kroku `07-fonts`, bramka M0 |
 | Jakość glos PL z modelu | średnie | rdzeń ręcznie, reszta z walidacją i próbką kontrolną |
 | Talia rośnie ponad limit cache Safari | niskie | dziel `sentences.json` na paczki po 500, ładuj na żądanie |
 | Free tier Firestore | bardzo niskie | paczkowanie po 400 kart, 1–2 zapisy na sesję |
@@ -722,11 +1091,13 @@ Ma być na tyle mechaniczna, żeby dało się ją wykonać w godzinę dla język
 Opisz ją w `docs/ADDING-A-LANGUAGE.md` i utrzymuj aktualną — to jest test na to,
 czy architektura naprawdę jest wielojęzyczna.
 
-1. `src/langs/{code}.ts` — adapter wg kontraktu z sekcji 2.1
+1. `src/langs/{code}/index.ts` — adapter wg kontraktu z sekcji 2.1, razem z `quiz.shape`
+   i `production`
 2. Sprawdź dostępność źródeł: kod Tatoeba, lista częstości `{code}_50k`, głos TTS w systemie
 3. Przetłumacz ręcznie rdzeń słownictwa (~80 pozycji) → `build/core/{code}.tsv`
-4. `npm run build:data -- {code}` → `data/{code}/`
-5. Przejrzyj `build/report.json`: odrzuty, rozkład pasm, 20 losowych zdań
+4. `npm run build:data -- {code}` → `data/{code}/` (kroki 01–07)
+5. Przejrzyj `build/report.json`: odrzuty, rozkład pasm, 20 losowych zdań,
+   **20 losowych zestawów dystraktorów i odsetek `quiz: false`**
 6. Dopisz język do listy w `src/langs/index.ts` i do ekranu wyboru
 7. Jeśli pismo jest obce: `hasScriptStage: true` + `data/{code}/script.json`
 8. Test akceptacyjny: nowe konto, poziom „od zera", trzy sesje bez wyjątku
@@ -734,13 +1105,24 @@ czy architektura naprawdę jest wielojęzyczna.
 Punkt 3 jest jedynym, którego nie da się zautomatyzować i jedynym, którego nie wolno
 oddać modelowi. Rdzeń użytkownik zobaczy setki razy.
 
+Dla języka klasy A punkty 1–8 nie wymagają nowego kodu: `quiz.shape: 'edit'`
+i `production: ['type']` są obsłużone. Nowa wtyczka kształtu albo nowy tryb produkcji
+to osobne zadanie, nie część procedury dodania języka — i sygnał, że dokładany język
+nie jest klasy A.
+
 ---
 
 ## 16. Zasady dla implementacji
 
-- Logika SRS w czystym TypeScripcie, bez importów z React, pokryta testami.
+- Logika SRS w czystym TypeScripcie, bez importów z React, pokryta testami. Dotyczy to także
+  mapowania wyniku quizu na ocenę (6.2) — to jest logika, nie warstwa widoku.
 - Żadnych rozgałęzień `if (lang === 'ja')` w komponentach UI. Różnice językowe siedzą
-  w konfiguracji adaptera i w danych.
+  w konfiguracji adaptera i w danych. Pilnuje tego reguła ESLint od M0, nie `grep` w M4.
+- **Żadnych wartości heksowych w komponentach.** Kolor pochodzi z tokenu z sekcji 9.1 albo
+  nie istnieje. Nowy token to zmiana kontraktu — dopisz go do wszystkich presetów naraz,
+  inaczej test kontrastu tego nie wyłapie.
 - Każda operacja zapisu ma działać offline. Sieć jest opcjonalna wszędzie poza logowaniem.
 - Teksty interfejsu po polsku, w plikach lokalizacji od początku — nie wplecione w JSX.
 - Commituj `data/` jako osobne commity od kodu, z wersją w nazwie, żeby diff kodu był czytelny.
+- Makieta z sesji Claude Design leży w `docs/design/`. Jest referencją układu, typografii
+  i zachowania, a nie kodem do skopiowania — kolory z niej przechodzą do tokenów, nie do JSX.
