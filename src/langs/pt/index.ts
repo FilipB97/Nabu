@@ -1,0 +1,20 @@
+import type { LangAdapter } from '../types'
+
+/** Portugalski — klasa A. Ostrzegamy przy jednoczesnym uruchomieniu z hiszpańskim. */
+export const pt: LangAdapter = {
+  code: 'pt',
+  name: 'portugalski',
+  tatoeba: 'por',
+  freq: 'pt',
+  script: /^[\p{Script=Latin}\p{P}\p{Zs}\d]+$/u,
+  rtl: false,
+  hasScriptStage: false,
+  needsReading: false,
+  needsTranslit: false,
+  tokenizer: 'space',
+  display: { font: 'display', size: 30, lineHeight: 1.55 },
+  tts: { locale: 'pt-PT', rate: 0.6 },
+  sentence: { minTokens: 4, maxTokens: 18 },
+  quiz: { shape: 'edit', minOptions: 4 },
+  production: ['type'],
+}

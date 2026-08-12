@@ -1,0 +1,7 @@
+node_modules
+dist
+dev-dist
+build/cache
+*.local
+.DS_Store
+.vite

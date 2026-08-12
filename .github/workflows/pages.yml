@@ -1,0 +1,69 @@
+name: build i deploy na Pages
+
+on:
+  push:
+    branches: [main, 'claude/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Sprawdzenia anulują się nawzajem w obrębie tej samej gałęzi i zdarzenia — nowy push
+# unieważnia poprzedni. Deploy ma własną grupę i NIE jest anulowany: jedna grupa dla
+# obu zadań oznaczałaby, że przebieg z pull requesta ubija trwający deploy.
+concurrency:
+  group: check-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: lint, testy, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Reguła ESLint pilnuje dwóch rzeczy, które inaczej wychodzą na jaw dopiero
+      # po miesiącach: kodów języków poza adapterami i kolorów poza warstwą motywu.
+      - name: ESLint
+        run: npm run lint
+
+      # Bramka kontrastu z sekcji 9.1 planu — preset łamiący AA nie wchodzi do repo.
+      - name: Testy
+        run: npm test
+
+      - name: Build
+        run: npm run build
+        env:
+          NABU_BASE: /${{ github.event.repository.name }}/
+
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name == 'push'
+        with:
+          path: dist
+
+  deploy:
+    name: deploy
+    if: github.event_name == 'push'
+    needs: check
+    runs-on: ubuntu-latest
+    # Wymaga włączonego Pages ze źródłem „GitHub Actions" w ustawieniach repozytorium.
+    # Bez tego krok kończy się błędem 404 — to nie jest błąd w kodzie.
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
