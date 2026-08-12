@@ -32,14 +32,21 @@ export type Tokenizer = (text: string, adapter: LangAdapter) => Token[]
  * Apostrof wewnątrz wyrazu zostaje (`l'aigua`, `it's`), bo w językach romańskich
  * i germańskich bywa częścią formy, a nie separatorem.
  */
-const space: Tokenizer = (text) => {
-  const matches = text.matchAll(/\p{L}[\p{L}\p{M}'’-]*/gu)
-  return [...matches].map((m) => ({
-    s: m[0],
+const space: Tokenizer = (text, adapter) => {
+  const matches = [...text.matchAll(/\p{L}[\p{L}\p{M}'’-]*/gu)].map((m) => m[0])
+
+  // Hak adaptera: koreański rozdziela wyraz na rdzeń i partykułę, żeby luka nie wypadała
+  // na rzeczowniku zrośniętym z końcówką (sekcja 10.1a). Klasa A nie ma czego dzielić.
+  const parts = adapter.splitToken
+    ? matches.flatMap((w) => adapter.splitToken!(w))
+    : matches.map((s) => ({ s }) as { s: string; pos?: string })
+
+  return parts.map(({ s, pos }) => ({
+    s,
     r: null,
     b: null,
-    pos: null,
-    lemma: m[0].toLocaleLowerCase(),
+    pos: pos ?? null,
+    lemma: s.toLocaleLowerCase(),
   }))
 }
 

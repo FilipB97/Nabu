@@ -15,7 +15,8 @@ export const sv: LangAdapter = {
   tokenizer: 'space',
   display: { font: 'display', size: 30, lineHeight: 1.55 },
   tts: { locale: 'sv-SE', rate: 0.6 },
-  sentence: { minTokens: 4, maxTokens: 18 },
+  sentence: { minTokens: 4, maxTokens: 18, maxUnknown: 0, clozeSlack: 0 },
+  maxBand: 12000,
   quiz: { shape: 'edit', minOptions: 4 },
   production: ['type'],
 }

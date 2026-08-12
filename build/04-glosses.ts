@@ -102,7 +102,10 @@ export async function loadLexicon(langCode: string): Promise<Lexicon> {
   for await (const line of readLines(dump)) {
     // Filtr po surowym tekście przed parsowaniem JSON-a: parsowanie 1,3 mln obiektów
     // trwa minuty, a interesuje nas kilka procent z nich.
-    if (!line.includes(`"lang_code": "${langCode}"`) && !line.includes(`"lang_code":"${langCode}"`)) {
+    if (
+      !line.includes(`"lang_code": "${langCode}"`) &&
+      !line.includes(`"lang_code":"${langCode}"`)
+    ) {
       continue
     }
 
@@ -146,11 +149,7 @@ export async function loadLexicon(langCode: string): Promise<Lexicon> {
     }
   }
 
-  await writeFile(
-    cached,
-    JSON.stringify({ entries: [...entries], lemmas: [...lemmas] }),
-    'utf8',
-  )
+  await writeFile(cached, JSON.stringify({ entries: [...entries], lemmas: [...lemmas] }), 'utf8')
   console.log(`${entries.size} haseł, ${lemmas.size} form odmienionych`)
 
   return { entries, lemmas }
@@ -183,10 +182,24 @@ export function senseInContext(entry: Entry, polishSentence: string): string {
   return matches.length === 1 ? matches[0]! : entry.pl
 }
 
-export function lemmaOf(surface: string, lexicon: Lexicon): string {
+export function lemmaOf(
+  surface: string,
+  lexicon: Lexicon,
+  candidates?: (s: string) => string[],
+): string {
   const key = surface.toLocaleLowerCase()
   if (lexicon.entries.has(key)) return key
-  return lexicon.lemmas.get(key) ?? key
+
+  const known = lexicon.lemmas.get(key)
+  if (known) return known
+
+  // Hak adaptera: języki, w których forma powierzchniowa nie trafia w słownik,
+  // podają własnych kandydatów na postać hasłową (sekcja 2.1).
+  for (const candidate of candidates?.(surface) ?? []) {
+    const lower = candidate.toLocaleLowerCase()
+    if (lexicon.entries.has(lower)) return lower
+  }
+  return key
 }
 
 if (import.meta.filename === process.argv[1]) {

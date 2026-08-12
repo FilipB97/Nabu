@@ -13,9 +13,6 @@ import { readLines } from './lib/io.ts'
 
 export type FrequencyMap = Map<string, number>
 
-/** Powyżej tej rangi słowo uznajemy za zbyt rzadkie — sekcja 10.2. */
-export const MAX_BAND = 12_000
-
 export async function loadFrequency(path: string): Promise<FrequencyMap> {
   const ranks: FrequencyMap = new Map()
   let rank = 0

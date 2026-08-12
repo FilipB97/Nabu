@@ -20,7 +20,7 @@ import { adapterFor } from '../src/langs/index.ts'
 import type { LangAdapter } from '../src/langs/types.ts'
 import { fetchSources } from './01-fetch.ts'
 import { tokenize, type Token } from './02-tokenize.ts'
-import { loadFrequency, bandOf, MAX_BAND, type FrequencyMap } from './03-frequency.ts'
+import { loadFrequency, bandOf, type FrequencyMap } from './03-frequency.ts'
 import { loadLexicon, lemmaOf, senseInContext, type Lexicon } from './04-glosses.ts'
 import { assignDistractors, buildPool } from './06-distractors.ts'
 import { dataPath, ensureDir, readTsv, ROOT } from './lib/io.ts'
@@ -142,15 +142,21 @@ function looksLikeProperNoun(token: Token, index: number, lexicon: Lexicon): boo
   return !lexicon.entries.has(token.s.toLocaleLowerCase())
 }
 
-function annotate(tokens: Token[], ranks: FrequencyMap, lexicon: Lexicon): Token[] {
+function annotate(
+  tokens: Token[],
+  ranks: FrequencyMap,
+  lexicon: Lexicon,
+  adapter: LangAdapter,
+): Token[] {
   return tokens.map((token) => {
-    const lemma = lemmaOf(token.s, lexicon)
+    const lemma = lemmaOf(token.s, lexicon, adapter.lemmaCandidates)
     const entry = lexicon.entries.get(lemma)
     return {
       ...token,
       lemma,
       b: bandOf(token.s, ranks) ?? bandOf(lemma, ranks),
-      pos: entry?.pos ?? null,
+      // Część mowy nadana przez tokenizer (partykuły) ma pierwszeństwo przed słownikową.
+      pos: token.pos ?? entry?.pos ?? null,
     }
   })
 }
@@ -159,13 +165,19 @@ function annotate(tokens: Token[], ranks: FrequencyMap, lexicon: Lexicon): Token
  * Wybiera token do zasłonięcia. Preferujemy najrzadszy token, który ma glosę —
  * bez glosy nie da się pokazać opcji z tłumaczeniem, a to psuje kartę.
  */
-function pickCloze(tokens: Token[], lexicon: Lexicon, sentenceBand: number): number {
+function pickCloze(
+  tokens: Token[],
+  lexicon: Lexicon,
+  sentenceBand: number,
+  slack: number,
+  allowed: Set<string>,
+): number {
   if (sentenceBand < CLOZE_MIN_BAND) return -1
 
   let best = -1
   let bestBand = -1
   tokens.forEach((token, i) => {
-    if (!token.pos || !CLOZE_POS.has(token.pos)) return
+    if (!token.pos || !allowed.has(token.pos)) return
     const entry = lexicon.entries.get(token.lemma)
     if (!entry || NUMERAL_GLOSS.test(entry.pl)) return
     const band = token.b ?? 0
@@ -175,11 +187,13 @@ function pickCloze(tokens: Token[], lexicon: Lexicon, sentenceBand: number): num
     }
   })
 
-  // Luka musi być NAJRZADSZYM słowem zdania. To jest dokładnie zasada i+1 z sekcji 3.1:
-  // zdanie ma zawierać jedno nowe słowo, a nowe jest to najrzadsze. Gdyby luka wypadła
-  // na słowie łatwiejszym, użytkownik dostałby kartę, w której trudność jest gdzie indziej
-  // niż pytanie.
-  if (best < 0 || bestBand !== sentenceBand) return -1
+  if (best < 0) return -1
+
+  // Zasada i+1 z sekcji 3.1: zdanie ma zawierać jedno nowe słowo i to o nie pytamy.
+  // `clozeSlack` mówi, ilu tokenom wolno być rzadszymi od luki — dla klasy A zero,
+  // czyli luka jest najrzadszym słowem. Powód poluzowania przy koreańskim: adapter.
+  const rarer = tokens.filter((t) => (t.b ?? 0) > bestBand).length
+  if (rarer > slack) return -1
   return best
 }
 
@@ -201,6 +215,8 @@ export async function assemble(lang: string): Promise<{ items: Item[]; rejects: 
   const lexicon = await loadLexicon(adapter.code)
   const translations = await buildTranslations(sources)
   console.log(`  tłumaczeń polskich: ${translations.size}`)
+
+  const clozePos = new Set(adapter.quiz.clozePos ?? CLOZE_POS)
 
   const rejects: Rejects = {}
   const bump = (reason: string) => {
@@ -236,24 +252,32 @@ export async function assemble(lang: string): Promise<{ items: Item[]; rejects: 
       continue
     }
 
-    const tokens = annotate(raw, ranks, lexicon)
+    const tokens = annotate(raw, ranks, lexicon, adapter)
 
     if (tokens.some((t, i) => looksLikeProperNoun(t, i, lexicon))) {
       bump('nazwa własna')
       continue
     }
-    if (tokens.some((t) => t.b === null)) {
-      bump('token spoza listy częstości')
+    const unknown = tokens.filter((t) => t.b === null).length
+    if (unknown > adapter.sentence.maxUnknown) {
+      bump('za dużo tokenów spoza listy częstości')
       continue
     }
 
-    const band = Math.max(...tokens.map((t) => t.b ?? 0))
-    if (band > MAX_BAND) {
-      bump('pasmo powyżej 12000')
+    // Tokeny nieznane nie wchodzą do pasma: nie wiemy, czy są rzadkie, czy tylko
+    // odmienione. Nie mogą też być luką, bo ta wymaga i pasma, i glosy.
+    const known = tokens.map((t) => t.b).filter((b): b is number => b !== null)
+    if (known.length === 0) {
+      bump('za dużo tokenów spoza listy częstości')
+      continue
+    }
+    const band = Math.max(...known)
+    if (band > adapter.maxBand) {
+      bump('pasmo powyżej progu języka')
       continue
     }
 
-    const cloze = pickCloze(tokens, lexicon, band)
+    const cloze = pickCloze(tokens, lexicon, band, adapter.sentence.clozeSlack, clozePos)
     if (cloze < 0) {
       bump('brak tokenu nadającego się na lukę')
       continue
@@ -304,8 +328,8 @@ export async function writeReport(lang: string, items: Item[], rejects: Rejects)
     'znaki spoza zestawu języka',
     'nazwa własna',
     'wulgaryzm',
-    'pasmo powyżej 12000',
-    'token spoza listy częstości',
+    'pasmo powyżej progu języka',
+    'za dużo tokenów spoza listy częstości',
   ])
 
   const { 'brak tłumaczenia polskiego': outOfReach = 0, ...rest } = rejects

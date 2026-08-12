@@ -103,7 +103,12 @@ const JOBS: FontJob[] = [
     weight: 400,
     text: KANA + DEMO_CJK + LATIN + dataChars,
   },
-  { file: 'noto-serif-kr', family: 'Noto Serif KR', weight: 400, text: DEMO_CJK + LATIN + dataChars },
+  {
+    file: 'noto-serif-kr',
+    family: 'Noto Serif KR',
+    weight: 400,
+    text: DEMO_CJK + LATIN + dataChars,
+  },
 ]
 
 function cssUrl({ family, weight, text }: FontJob): string {
@@ -142,7 +147,9 @@ async function run(): Promise<void> {
     if (sources.length > 1) {
       // Z parametrem `text=` API zawsze zwraca jeden plik. Więcej oznacza, że subset
       // się nie zastosował, a wtedy Noto Serif JP wraca do pełnego rozmiaru.
-      throw new Error(`${job.family}: ${sources.length} plików zamiast jednego — subset nie zadziałał`)
+      throw new Error(
+        `${job.family}: ${sources.length} plików zamiast jednego — subset nie zadziałał`,
+      )
     }
 
     const binary = await fetch(sources[0]!, { headers: { 'User-Agent': WOFF2_UA } })

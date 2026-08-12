@@ -75,9 +75,56 @@ export type LangAdapter = {
     rate: number
   }
 
-  sentence: { minTokens: number; maxTokens: number }
+  sentence: {
+    minTokens: number
+    maxTokens: number
+    /**
+     * Ile tokenów może wypaść poza listę częstości, zanim odrzucimy zdanie.
+     *
+     * Dla języków o umiarkowanej fleksji zero jest właściwe — brak słowa na liście
+     * 50 tysięcy znaczy, że jest rzadkie. Przy aglutynacji to przestaje działać:
+     * koreański tworzy dziesiątki form od jednego rdzenia, więc 48% zdań ma co najmniej
+     * jeden token spoza listy, choć same słowa są pospolite. Tokeny nieznane nie liczą
+     * się do pasma zdania i nie mogą być luką — pytanie zawsze pada o słowo znane.
+     */
+    maxUnknown: number
+
+    /**
+     * Ile tokenów może być rzadszych od luki.
+     *
+     * Zero znaczy: luka MUSI być najrzadszym słowem zdania — to zasada i+1 z sekcji 3.1
+     * i dla języków klasy A jest właściwa. Dla koreańskiego przestaje działać, bo ranga
+     * tokenu kłamie: najrzadszym tokenem bywa pospolity czasownik w odmienionej formie,
+     * której nie ma ani w słowniku, ani sensownie na liście częstości. Upieranie się
+     * przy nim wycina 90% materiału i nie kupuje za to wierności zasadzie — bo pasmo,
+     * na którym ta zasada się opiera, jest tam zawyżone.
+     */
+    clozeSlack: number
+  }
+
+  /**
+   * Górna ranga częstości, powyżej której słowo uznajemy za zbyt rzadkie.
+   *
+   * Nie jest to stała, bo aglutynacja rozprasza częstość między formy: koreańskie
+   * `먹다` („jeść", forma słownikowa) ma w liście napisów rangę 28 331, podczas gdy
+   * jego forma grzecznościowa `먹어요` — 4 087. Próg 12 000 wycinałby formy podstawowe
+   * najpospolitszych czasowników.
+   *
+   * Konsekwencja, o której trzeba pamiętać: pasma NIE SĄ porównywalne między językami.
+   * Nigdy nie były — każdy język ma własną listę częstości — ale przy koreańskim
+   * rozjazd jest większy. Właściwym lekarstwem jest tokenizer `morph` (mecab-ko),
+   * który sprowadzi formy do rdzenia; do tego czasu podnosimy próg i mówimy o tym wprost.
+   */
+  maxBand: number
 
   quiz: {
+    /**
+     * Części mowy, które mogą być luką. Domyślnie rzeczownik, czasownik, przymiotnik
+     * i przysłówek. Koreański zawęża do form nieodmiennych: czasownik pojawiłby się
+     * w opcjach w formie odmienionej, a jego glosa opisuje formę słownikową — cztery
+     * opcje w różnych formach są wskazówką gramatyczną, nie testem znajomości słowa.
+     */
+    clozePos?: string[]
     shape: ShapeSimilarity
     /**
      * Poniżej tylu sensownych opcji pozycja dostaje `quiz: false` w buildzie
@@ -87,6 +134,19 @@ export type LangAdapter = {
   }
 
   production: ProductionMode[]
+
+  /**
+   * Rozbija wyraz na mniejsze jednostki — w koreańskim rdzeń i partykułę gramatyczną.
+   * Nieobecne oznacza, że wyraz jest jednostką sam w sobie, jak w klasie A.
+   */
+  splitToken?: (surface: string) => Array<{ s: string; pos?: string }>
+
+  /**
+   * Kandydaci na postać słownikową danej formy, od najbardziej prawdopodobnego.
+   * Wywołujący bierze pierwszego, który jest w słowniku. Nieobecny oznacza, że sama
+   * forma powierzchniowa wystarcza — tak jest dla klasy A.
+   */
+  lemmaCandidates?: (surface: string) => string[]
 }
 
 /** Etapy, przez które prowadzimy użytkownika, w kolejności. */

@@ -1,0 +1,231 @@
+{
+  "lang": "ko",
+  "zdań": 729,
+  "kandydatów": 2300,
+  "odrzuconychNaJakości": 323,
+  "odsetekOdrzutówJakościowych": 14,
+  "odsetekNieprzydatnychNaKartę": 54,
+  "pozaZasięgiem": 13573,
+  "powodyJakość": {
+    "pasmo powyżej progu języka": 203,
+    "za dużo tokenów spoza listy częstości": 107,
+    "znaki spoza zestawu języka": 9,
+    "wulgaryzm": 4
+  },
+  "powodyPrzydatność": {
+    "brak tokenu nadającego się na lukę": 655,
+    "za krótkie": 579,
+    "za długie": 14
+  },
+  "tłumaczenia": {
+    "bezpośrednie": 22,
+    "przezAngielski": 707
+  },
+  "pasma": {
+    "min": 85,
+    "mediana": 5120,
+    "p90": 23042,
+    "max": 29831
+  },
+  "quizNiedostępny": 21,
+  "próbka": [
+    {
+      "text": "오늘이 며칠이지?",
+      "pl": "Jaka jest dzisiejsza data?",
+      "luka": "오늘",
+      "band": 85,
+      "src": "pivot",
+      "dystraktory": [
+        "빨리",
+        "지금",
+        "이제"
+      ]
+    },
+    {
+      "text": "잘 못 들었어요.",
+      "pl": "Przepraszam?",
+      "luka": "못",
+      "band": 922,
+      "src": "pivot",
+      "dystraktory": [
+        "말",
+        "것",
+        "날",
+        "정말",
+        "해",
+        "게",
+        "엄마"
+      ]
+    },
+    {
+      "text": "할아버지는 아침 일찍 일어나셔요.",
+      "pl": "Mój dziadek wcześnie wstaje.",
+      "luka": "할아버지",
+      "band": 1534,
+      "src": "pivot",
+      "dystraktory": [
+        "고양이",
+        "남편",
+        "불",
+        "비행기",
+        "배",
+        "바람",
+        "질문",
+        "음악"
+      ]
+    },
+    {
+      "text": "난 학교에 가기 싫어.",
+      "pl": "Nie chcę iść do szkoły.",
+      "luka": "학교",
+      "band": 2009,
+      "src": "pivot",
+      "dystraktory": [
+        "딸",
+        "약",
+        "가족",
+        "사진",
+        "바보",
+        "달",
+        "사랑",
+        "얼굴"
+      ]
+    },
+    {
+      "text": "모든 일에는 끝이 있다.",
+      "pl": "Wszystko co dobre szybko się kończy.",
+      "luka": "끝",
+      "band": 3050,
+      "src": "pivot",
+      "dystraktory": [
+        "꽃",
+        "그림",
+        "은행",
+        "여름",
+        "무릎",
+        "방법",
+        "비",
+        "춤"
+      ]
+    },
+    {
+      "text": "아이티의 수도는 이름이 무엇입니까?",
+      "pl": "Co jest stolicą Haiti?",
+      "luka": "이름",
+      "band": 4511,
+      "src": "pivot",
+      "dystraktory": [
+        "입",
+        "약",
+        "사랑",
+        "기억",
+        "팀",
+        "영화",
+        "어머니",
+        "거짓말"
+      ]
+    },
+    {
+      "text": "너 공부 열심히 해야 해.",
+      "pl": "Musisz ciężej studiować.",
+      "luka": "공부",
+      "band": 6032,
+      "src": "pivot",
+      "dystraktory": [
+        "공기",
+        "공원",
+        "폭발",
+        "여동생",
+        "공항",
+        "공",
+        "평화",
+        "소년"
+      ]
+    },
+    {
+      "text": "바다가 보이는 자리 있나요?",
+      "pl": "Czy mają Państwo stolik z widokiem na ocean?",
+      "luka": "바다",
+      "band": 9070,
+      "src": "pivot",
+      "dystraktory": [
+        "불",
+        "바람",
+        "꿈",
+        "선물",
+        "나무",
+        "아내",
+        "하",
+        "담배"
+      ]
+    },
+    {
+      "text": "그녀는 힘든 삶을 살았다.",
+      "pl": "Miała ciężkie życie.",
+      "luka": "삶",
+      "band": 11958,
+      "src": "pivot",
+      "dystraktory": [
+        "섬",
+        "사과",
+        "사자",
+        "자살",
+        "사기",
+        "도망",
+        "소설",
+        "시계"
+      ]
+    },
+    {
+      "text": "그 비서는 예쁘기만 한 게 아니라 영어도 잘해.",
+      "pl": "Sekretarka nie dość, że zna angielski to jest piękna.",
+      "luka": "비서",
+      "band": 16410,
+      "src": "pivot",
+      "dystraktory": [
+        "테니스",
+        "입술",
+        "식물",
+        "봄",
+        "부활절",
+        "변화",
+        "자신감",
+        "침실"
+      ]
+    },
+    {
+      "text": "1939년에 전쟁이 일어났다.",
+      "pl": "Wojna wybuchła w roku 1939.",
+      "luka": "전쟁",
+      "band": 23448,
+      "src": "pivot",
+      "dystraktory": [
+        "점심",
+        "선물",
+        "담배",
+        "왼쪽",
+        "건물",
+        "은행",
+        "아내",
+        "냄새"
+      ]
+    },
+    {
+      "text": "돌고래는 호기심이 많다.",
+      "pl": "Delfiny są ciekawskie.",
+      "luka": "돌고래",
+      "band": 29831,
+      "src": "pivot",
+      "dystraktory": [
+        "손톱",
+        "초콜렛",
+        "거미",
+        "소고기",
+        "항구",
+        "발음",
+        "잠자리",
+        "고래"
+      ]
+    }
+  ]
+}

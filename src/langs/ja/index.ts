@@ -25,7 +25,10 @@ export const ja: LangAdapter = {
   tokenizer: 'morph',
   display: { font: 'ja', size: 34, lineHeight: 2 },
   tts: { locale: 'ja-JP', rate: 0.4 },
-  sentence: { minTokens: 4, maxTokens: 18 },
+  // Analizator morfologiczny rozbija na cząstki gramatyczne, więc to samo zdanie
+  // daje więcej tokenów niż podział po spacjach. Progi odpowiednio wyżej.
+  sentence: { minTokens: 5, maxTokens: 24, maxUnknown: 1, clozeSlack: 1 },
+  maxBand: 12000,
   quiz: { shape: 'kanji-components', minOptions: 4 },
   production: ['draw', 'kana'],
 }

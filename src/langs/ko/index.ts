@@ -1,4 +1,6 @@
 import type { LangAdapter } from '../types.ts'
+import { lemmaCandidates } from './lemma.ts'
+import { splitParticle } from './particles.ts'
 
 /**
  * Koreański — klasa B. Hangul jest w pełni fonetyczny i ma spacje, więc potrzebny
@@ -19,11 +21,16 @@ export const ko: LangAdapter = {
   hasScriptStage: true,
   needsReading: false,
   needsTranslit: true,
-  blocklist: /씨발|개새끼|좋리/iu,
+  blocklist: /씨발|시발|개새끼|병신|좆|지랄|썅/iu,
   tokenizer: 'space',
   display: { font: 'ko', size: 32, lineHeight: 1.75 },
   tts: { locale: 'ko-KR', rate: 0.5 },
-  sentence: { minTokens: 4, maxTokens: 18 },
-  quiz: { shape: 'jamo', minOptions: 4 },
+  // Koreański pakuje w jedno słowo tyle, co hiszpański w dwa: 43% zdań w korpusie
+  // ma dwa albo trzy tokeny. Próg 4 odrzucałby połowę materiału bez powodu.
+  sentence: { minTokens: 3, maxTokens: 16, maxUnknown: 1, clozeSlack: 3 },
+  maxBand: 30000,
+  quiz: { clozePos: ['noun', 'adv'], shape: 'jamo', minOptions: 4 },
   production: ['jamo'],
+  lemmaCandidates,
+  splitToken: splitParticle,
 }
