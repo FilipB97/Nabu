@@ -1,6 +1,6 @@
 {
   "lang": "es",
-  "zdań": 10949,
+  "zdań": 10909,
   "kandydatów": 43142,
   "odrzuconychNaJakości": 10667,
   "odsetekOdrzutówJakościowych": 25,
@@ -14,43 +14,43 @@
     "znaki spoza zestawu języka": 11
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 11700,
+    "brak tokenu nadającego się na lukę": 11740,
     "za krótkie": 9626,
     "za długie": 200
   },
   "tłumaczenia": {
-    "bezpośrednie": 3188,
-    "przezAngielski": 7761
+    "bezpośrednie": 3178,
+    "przezAngielski": 7731
   },
   "pasma": {
-    "min": 63,
-    "mediana": 2029,
-    "p90": 7429,
+    "min": 68,
+    "mediana": 2031,
+    "p90": 7444,
     "max": 11998
   },
   "quizNiedostępny": 0,
   "próbka": [
     {
-      "text": "¿Ser o no ser?",
-      "pl": "Być albo nie być?",
-      "luka": "Ser",
-      "band": 63,
+      "text": "Ya no sé qué hacer.",
+      "pl": "Już nie wiem, co robić.",
+      "luka": "hacer",
+      "band": 68,
       "src": "pivot",
       "dystraktory": [
-        "hacer",
-        "ver",
         "decir",
-        "ir",
+        "ver",
         "hecho",
+        "ir",
+        "estar",
         "hablar"
       ]
     },
     {
-      "text": "Necesito un coche nuevo.",
-      "pl": "Potrzebuję nowy samochód.",
+      "text": "Debes salir del coche.",
+      "pl": "Musisz wysiąść z samochodu.",
       "luka": "coche",
       "band": 408,
-      "src": "pivot",
+      "src": "direct",
       "dystraktory": [
         "clase",
         "doctor",
@@ -63,42 +63,42 @@
       ]
     },
     {
-      "text": "Esta película estuvo buena.",
-      "pl": "Ten film był dobry.",
-      "luka": "película",
-      "band": 641,
-      "src": "direct",
+      "text": "Sé que suena extraño, pero es verdad.",
+      "pl": "Wiem, że brzmi to dziwnie, ale to prawda.",
+      "luka": "extraño",
+      "band": 647,
+      "src": "pivot",
       "dystraktory": [
-        "llamada",
-        "presidente",
-        "resto",
-        "perro",
-        "ropa",
-        "cambio",
-        "puesto",
-        "cielo"
+        "raro",
+        "querido",
+        "general",
+        "cuarto",
+        "perfecto",
+        "duro",
+        "libre",
+        "derecho"
       ]
     },
     {
-      "text": "Ella me dio un buen consejo.",
-      "pl": "Dała mi dobrą radę.",
-      "luka": "consejo",
-      "band": 998,
-      "src": "direct",
+      "text": "En este momento está en la iglesia.",
+      "pl": "Teraz jest w kościele.",
+      "luka": "iglesia",
+      "band": 1000,
+      "src": "pivot",
       "dystraktory": [
         "intento",
-        "piso",
-        "honor",
-        "contacto",
         "infierno",
-        "abuelo",
-        "cocina",
-        "sorpresa"
+        "vieja",
+        "sorpresa",
+        "mayoría",
+        "busca",
+        "tía",
+        "piso"
       ]
     },
     {
-      "text": "Mañana no iré al cine.",
-      "pl": "Jutro nie idę do kina.",
+      "text": "Hoy me voy al cine.",
+      "pl": "Idę dzisiaj do kina.",
       "luka": "cine",
       "band": 1406,
       "src": "pivot",
@@ -114,11 +114,11 @@
       ]
     },
     {
-      "text": "¿Podría hablar más despacio?",
-      "pl": "Mógłbyś mówić wolniej?",
+      "text": "Todo lo que él hace, lo hace despacio.",
+      "pl": "On wszystko, co robi, robi powoli.",
       "luka": "despacio",
       "band": 1760,
-      "src": "pivot",
+      "src": "direct",
       "dystraktory": [
         "directamente",
         "últimamente",
@@ -131,45 +131,45 @@
       ]
     },
     {
-      "text": "El autobús está vacío.",
-      "pl": "Autobus jest pusty.",
-      "luka": "vacío",
-      "band": 2247,
-      "src": "pivot",
-      "dystraktory": [
-        "famoso",
-        "parecido",
-        "sucio",
-        "corto",
-        "efectivo",
-        "helado",
-        "precioso",
-        "quieto"
-      ]
-    },
-    {
-      "text": "Después, ella ha estado viviendo todo el tiempo en el exterior.",
-      "pl": "Potem mieszkała cały czas za granicą.",
-      "luka": "exterior",
-      "band": 2984,
+      "text": "Eres un buen estudiante.",
+      "pl": "Jesteś dobrym studentem.",
+      "luka": "estudiante",
+      "band": 2250,
       "src": "direct",
       "dystraktory": [
-        "experto",
-        "detenido",
-        "extranjero",
-        "emocionante",
-        "caro",
-        "feo",
-        "urgente",
-        "distinto"
+        "solución",
+        "esquina",
+        "estómago",
+        "entrevista",
+        "artista",
+        "inteligencia",
+        "plato",
+        "tarea"
       ]
     },
     {
-      "text": "Él toca la guitarra muy bien.",
-      "pl": "On gra bardzo dobrze na gitarze.",
+      "text": "No lo puedo demostrar, pero estoy seguro de que fue asesinado.",
+      "pl": "Nie mam dowodu, ale jestem pewny, że on został zamordowany.",
+      "luka": "demostrar",
+      "band": 2991,
+      "src": "pivot",
+      "dystraktory": [
+        "lograr",
+        "visitar",
+        "preparar",
+        "presentar",
+        "abandonar",
+        "preocuparse",
+        "enseñar",
+        "cocinar"
+      ]
+    },
+    {
+      "text": "Él toca bien la guitarra.",
+      "pl": "On dobrze gra na gitarze.",
       "luka": "guitarra",
       "band": 3832,
-      "src": "pivot",
+      "src": "direct",
       "dystraktory": [
         "tarta",
         "alianza",
@@ -182,8 +182,8 @@
       ]
     },
     {
-      "text": "Él quiere ser jugador de tenis.",
-      "pl": "On chce być tenisistą.",
+      "text": "Vamos a echar un partido de tenis.",
+      "pl": "Zagrajmy w tenisa.",
       "luka": "tenis",
       "band": 5300,
       "src": "pivot",
@@ -199,20 +199,20 @@
       ]
     },
     {
-      "text": "¡Ah, allí hay una mariposa!",
-      "pl": "Och, tam jest motyl!",
-      "luka": "mariposa",
-      "band": 7774,
+      "text": "Tom parece divertirse mucho tratando de provocar tantos problemas como él pueda.",
+      "pl": "Tom zdaje się mieć sporo zabawy usiłując spowodować jak najwięcej kłopotów.",
+      "luka": "provocar",
+      "band": 7775,
       "src": "pivot",
       "dystraktory": [
-        "madrugada",
-        "amabilidad",
-        "manga",
-        "paloma",
-        "ruinas",
-        "lava",
-        "milla",
-        "ferrocarril"
+        "prestar",
+        "cavar",
+        "llover",
+        "arrancar",
+        "ocupar",
+        "navegar",
+        "inventar",
+        "perseguir"
       ]
     },
     {

@@ -2,8 +2,8 @@
   "lang": "ja",
   "version": "2026-08-12",
   "license": "Tatoeba CC BY 2.0 FR; FrequencyWords CC BY-SA 3.0; Wikisłownik (plwiktionary) CC BY-SA 3.0",
-  "sentences": 16699,
-  "lexicon": 1323,
+  "sentences": 16599,
+  "lexicon": 1321,
   "packs": [
     {
       "file": "sentences-000.json",
@@ -26,188 +26,188 @@
     {
       "file": "sentences-003.json",
       "from": 258,
-      "to": 333,
+      "to": 334,
       "count": 500
     },
     {
       "file": "sentences-004.json",
-      "from": 333,
+      "from": 334,
       "to": 392,
       "count": 500
     },
     {
       "file": "sentences-005.json",
       "from": 392,
-      "to": 451,
+      "to": 455,
       "count": 500
     },
     {
       "file": "sentences-006.json",
-      "from": 451,
+      "from": 455,
       "to": 519,
       "count": 500
     },
     {
       "file": "sentences-007.json",
       "from": 519,
-      "to": 580,
+      "to": 587,
       "count": 500
     },
     {
       "file": "sentences-008.json",
-      "from": 580,
-      "to": 654,
+      "from": 587,
+      "to": 656,
       "count": 500
     },
     {
       "file": "sentences-009.json",
-      "from": 654,
-      "to": 718,
+      "from": 656,
+      "to": 721,
       "count": 500
     },
     {
       "file": "sentences-010.json",
-      "from": 718,
-      "to": 785,
+      "from": 721,
+      "to": 789,
       "count": 500
     },
     {
       "file": "sentences-011.json",
-      "from": 785,
-      "to": 871,
+      "from": 789,
+      "to": 881,
       "count": 500
     },
     {
       "file": "sentences-012.json",
-      "from": 871,
-      "to": 961,
+      "from": 881,
+      "to": 968,
       "count": 500
     },
     {
       "file": "sentences-013.json",
-      "from": 961,
-      "to": 1057,
+      "from": 969,
+      "to": 1069,
       "count": 500
     },
     {
       "file": "sentences-014.json",
-      "from": 1058,
-      "to": 1179,
+      "from": 1069,
+      "to": 1190,
       "count": 500
     },
     {
       "file": "sentences-015.json",
-      "from": 1179,
-      "to": 1289,
+      "from": 1190,
+      "to": 1304,
       "count": 500
     },
     {
       "file": "sentences-016.json",
-      "from": 1290,
-      "to": 1424,
+      "from": 1304,
+      "to": 1431,
       "count": 500
     },
     {
       "file": "sentences-017.json",
-      "from": 1424,
-      "to": 1551,
+      "from": 1431,
+      "to": 1567,
       "count": 500
     },
     {
       "file": "sentences-018.json",
-      "from": 1551,
-      "to": 1722,
+      "from": 1567,
+      "to": 1738,
       "count": 500
     },
     {
       "file": "sentences-019.json",
-      "from": 1722,
-      "to": 1899,
+      "from": 1738,
+      "to": 1926,
       "count": 500
     },
     {
       "file": "sentences-020.json",
-      "from": 1899,
-      "to": 2115,
+      "from": 1927,
+      "to": 2155,
       "count": 500
     },
     {
       "file": "sentences-021.json",
-      "from": 2118,
-      "to": 2379,
+      "from": 2155,
+      "to": 2419,
       "count": 500
     },
     {
       "file": "sentences-022.json",
-      "from": 2380,
-      "to": 2674,
+      "from": 2421,
+      "to": 2719,
       "count": 500
     },
     {
       "file": "sentences-023.json",
-      "from": 2674,
-      "to": 3000,
+      "from": 2719,
+      "to": 3063,
       "count": 500
     },
     {
       "file": "sentences-024.json",
-      "from": 3000,
-      "to": 3398,
+      "from": 3063,
+      "to": 3466,
       "count": 500
     },
     {
       "file": "sentences-025.json",
-      "from": 3398,
-      "to": 3848,
+      "from": 3466,
+      "to": 3933,
       "count": 500
     },
     {
       "file": "sentences-026.json",
-      "from": 3848,
-      "to": 4379,
+      "from": 3933,
+      "to": 4509,
       "count": 500
     },
     {
       "file": "sentences-027.json",
-      "from": 4379,
-      "to": 4962,
+      "from": 4509,
+      "to": 5092,
       "count": 500
     },
     {
       "file": "sentences-028.json",
-      "from": 4962,
-      "to": 5850,
+      "from": 5095,
+      "to": 6077,
       "count": 500
     },
     {
       "file": "sentences-029.json",
-      "from": 5850,
-      "to": 7079,
+      "from": 6089,
+      "to": 7355,
       "count": 500
     },
     {
       "file": "sentences-030.json",
-      "from": 7079,
-      "to": 8716,
+      "from": 7363,
+      "to": 9229,
       "count": 500
     },
     {
       "file": "sentences-031.json",
-      "from": 8717,
-      "to": 11350,
+      "from": 9230,
+      "to": 11913,
       "count": 500
     },
     {
       "file": "sentences-032.json",
-      "from": 11353,
-      "to": 16287,
+      "from": 11915,
+      "to": 17647,
       "count": 500
     },
     {
       "file": "sentences-033.json",
-      "from": 16300,
+      "from": 17653,
       "to": 19998,
-      "count": 199
+      "count": 99
     }
   ]
 }

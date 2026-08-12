@@ -1,6 +1,6 @@
 {
   "lang": "ko",
-  "zdań": 761,
+  "zdań": 759,
   "kandydatów": 2300,
   "odrzuconychNaJakości": 360,
   "odsetekOdrzutówJakościowych": 16,
@@ -13,13 +13,13 @@
     "wulgaryzm": 4
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 586,
+    "brak tokenu nadającego się na lukę": 588,
     "za krótkie": 579,
     "za długie": 14
   },
   "tłumaczenia": {
     "bezpośrednie": 20,
-    "przezAngielski": 741
+    "przezAngielski": 739
   },
   "pasma": {
     "min": 85,
@@ -27,7 +27,7 @@
     "p90": 23076,
     "max": 29831
   },
-  "quizNiedostępny": 30,
+  "quizNiedostępny": 29,
   "próbka": [
     {
       "text": "오늘이 며칠이지?",
@@ -42,8 +42,8 @@
       ]
     },
     {
-      "text": "개가 있어요?",
-      "pl": "Czy ma pan psa?",
+      "text": "개가 짖네.",
+      "pl": "Psy szczekają.",
       "luka": "개",
       "band": 726,
       "src": "pivot",
@@ -189,7 +189,7 @@
       ]
     },
     {
-      "text": "호주에 가본 적이 있어?",
+      "text": "호주에 가본 적이 있나요?",
       "pl": "Byłeś w Australii?",
       "luka": "적",
       "band": 23488,

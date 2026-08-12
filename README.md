@@ -6,19 +6,20 @@ czytaniami i wymową, działa offline i mieści się w dziesięciu minutach dzie
 Pełna specyfikacja — model danych, silnik powtórek, pipeline i kolejność prac z bramkami —
 jest w [`plan.md`](plan.md). Ten plik opisuje tylko, jak uruchomić repo.
 
-## Stan: M1
+## Stan: M2
 
-Szkielet aplikacji z warstwą motywów, karta z makiety na żywych tokenach oraz **komplet
-danych dla trzech języków klasy A**. Nie ma jeszcze silnika powtórek ani logowania.
+Działająca sesja: dodajesz język, odpowiadasz na karty, postęp zapisuje się lokalnie
+po każdej odpowiedzi. Nie ma jeszcze logowania ani synchronizacji.
 
 | jest | nie ma |
 |---|---|
-| Vite + React + TypeScript, PWA z precache | silnika SRS i kolejki sesji |
-| 13 tokenów motywu, 5 presetów × jasny/ciemny/systemowy | Firebase, kont, synchronizacji |
-| bramka kontrastu AA w CI | kart produkcji i rysowania |
-| karta quizu w trzech systemach pisma, obsługa klawiatury | etapów i bram dla obcego pisma (M3) |
-| adaptery pięciu języków wg kontraktu z sekcji 2.1 | podpięcia danych pod sesję (M2) |
+| Vite + React + TypeScript, PWA z precache | logowania i synchronizacji (M6) |
+| silnik SM-2 z krokami nauki i ochroną przed strzałem | kart produkcji i rysowania (M8) |
+| kolejka sesji, karty wracają w tej samej sesji | kalibracji i poziomów wejściowych (M7) |
+| Dexie jako źródło prawdy, zapis po każdej odpowiedzi | etapów i bram dla obcego pisma (M3) |
+| talie ładowane paczkami na żądanie, nie w precache | statystyk i ustawień (M9) |
 | pipeline 01–07, pięć języków z dystraktorami | renderowania ruby w sesji (M4) |
+| 13 tokenów motywu, 5 presetów, bramka kontrastu w CI | |
 | kroje zsubsetowane do znaków z talii, razem 1,25 MB | chińskiego |
 
 ### Dane

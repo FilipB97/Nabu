@@ -1,6 +1,6 @@
 {
   "lang": "pt",
-  "zdań": 8423,
+  "zdań": 8398,
   "kandydatów": 32186,
   "odrzuconychNaJakości": 7672,
   "odsetekOdrzutówJakościowych": 24,
@@ -14,13 +14,13 @@
     "znaki spoza zestawu języka": 9
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 9021,
+    "brak tokenu nadającego się na lukę": 9046,
     "za krótkie": 6927,
     "za długie": 143
   },
   "tłumaczenia": {
-    "bezpośrednie": 393,
-    "przezAngielski": 8030
+    "bezpośrednie": 392,
+    "przezAngielski": 8006
   },
   "pasma": {
     "min": 57,
@@ -48,8 +48,8 @@
       ]
     },
     {
-      "text": "O meu pai vai me matar.",
-      "pl": "Tata mnie zabije.",
+      "text": "Quem quer te matar?",
+      "pl": "Kto chce cię zabić?",
       "luka": "matar",
       "band": 340,
       "src": "pivot",
@@ -65,8 +65,8 @@
       ]
     },
     {
-      "text": "Foi um bom rei.",
-      "pl": "Był dobrym królem.",
+      "text": "O dinheiro é rei.",
+      "pl": "Pieniądze mają siłę przekonywania.",
       "luka": "rei",
       "band": 595,
       "src": "pivot",
@@ -116,25 +116,25 @@
       ]
     },
     {
-      "text": "Quanto tempo leva para chegar na estação?",
-      "pl": "Jak długo zajmuje dojście do stacji?",
-      "luka": "estação",
-      "band": 1368,
+      "text": "Tenho confiança em ti.",
+      "pl": "Ufam ci.",
+      "luka": "confiança",
+      "band": 1366,
       "src": "pivot",
       "dystraktory": [
-        "restaurante",
-        "espírito",
+        "calças",
         "justiça",
-        "verão",
-        "vídeo",
-        "saco",
-        "braço",
-        "inimigo"
+        "inimigo",
+        "cheia",
+        "restaurante",
+        "mala",
+        "estação",
+        "ama"
       ]
     },
     {
-      "text": "É uma solução excelente.",
-      "pl": "To jest doskonałe rozwiązanie.",
+      "text": "Você tem certeza de que não há solução?",
+      "pl": "Jesteś pewien, że nie ma rozwiązania?",
       "luka": "solução",
       "band": 1827,
       "src": "pivot",
@@ -150,8 +150,8 @@
       ]
     },
     {
-      "text": "Você poderia me ensinar inglês?",
-      "pl": "Czy mogłabyś nauczyć mnie angielskiego.",
+      "text": "Posso te ensinar a cantar.",
+      "pl": "Mogę nauczyć cię śpiewać.",
       "luka": "ensinar",
       "band": 2379,
       "src": "pivot",
@@ -167,42 +167,42 @@
       ]
     },
     {
-      "text": "Ele estava ansioso para ver a filha.",
-      "pl": "Bardzo chciał zobaczyć córkę.",
-      "luka": "ansioso",
-      "band": 3380,
+      "text": "Você sabe a origem?",
+      "pl": "Czy znasz pochodzenie?",
+      "luka": "origem",
+      "band": 3379,
       "src": "pivot",
       "dystraktory": [
-        "satisfeito",
-        "vizinho",
-        "curioso",
-        "romântico",
-        "internacional",
-        "corajoso",
-        "sincero",
-        "feio"
+        "primavera",
+        "compromisso",
+        "ombro",
+        "judeu",
+        "costume",
+        "mamãe",
+        "destruição",
+        "expressão"
       ]
     },
     {
-      "text": "Qual é a profissão do Tom?",
-      "pl": "Jaki zawód ma Tom?",
-      "luka": "profissão",
-      "band": 4600,
+      "text": "O festival começa amanhã.",
+      "pl": "Festiwal rozpocznie się już jutro.",
+      "luka": "festival",
+      "band": 4601,
       "src": "pivot",
       "dystraktory": [
-        "caixão",
-        "emoção",
-        "maio",
-        "conclusão",
-        "festival",
-        "projeto",
         "mochila",
-        "recepção"
+        "tortura",
+        "solteira",
+        "química",
+        "prática",
+        "habilidade",
+        "lógica",
+        "meio-dia"
       ]
     },
     {
-      "text": "Cuidado! O chão está molhado.",
-      "pl": "Uważaj! Podłoga jest mokra.",
+      "text": "O chão ainda está molhado.",
+      "pl": "Ziemia nadal jest mokra.",
       "luka": "molhado",
       "band": 6924,
       "src": "pivot",

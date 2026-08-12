@@ -1101,6 +1101,16 @@ Bez logowania, bez dźwięku, bez produkcji.
 rosną; karty z pudłem wracają w tej samej sesji; przełączenie języka nie miesza stanów;
 poprawna odpowiedź nie stoi dwa razy z rzędu w tym samym miejscu; log zawiera `chosen`.
 
+**Wynik (12.08.2026):** 48 testów jednostkowych na silnik i kolejkę, przepływ sprawdzony
+w przeglądarce od pierwszego uruchomienia do zapisu w IndexedDB. Karty z pudłem wracają
+(sesja 8 kart rozrosła się do 14), log zapisuje `chosen` przy każdej odpowiedzi.
+Zostaje do sprawdzenia jedyna rzecz, której nie da się zasymulować: trzy dni realnego
+używania na dwóch językach naraz.
+
+Przy okazji wyszła wada danych niewidoczna w samych danych: zdanie „Lo hecho, hecho está"
+z luką na pierwszym `hecho` zostawiało drugie widoczne obok — odpowiedź stała w pytaniu.
+Krok `05` odrzuca teraz zdania, w których lemat luki nie jest jedyny.
+
 ### M3 — koreański: etap 0 i obce pismo (0,5 dnia)
 Karty `script` (hangul), etapy i bramy, `hasScriptStage` w adapterze.
 Koreański jest tu celowo przed japońskim: wprowadza obcy alfabet, ale bez segmentacji

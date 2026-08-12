@@ -215,6 +215,12 @@ function pickCloze(
 
   if (best < 0) return -1
 
+  // Lemat luki musi być w zdaniu JEDYNY. „Lo hecho, hecho está" z luką na pierwszym
+  // `hecho` zostawia drugie widoczne obok — odpowiedź stoi w pytaniu. Wyszło dopiero
+  // na gotowej karcie, bo w danych nic tego nie zdradza.
+  const targetLemma = tokens[best]!.lemma
+  if (tokens.filter((t) => t.lemma === targetLemma).length > 1) return -1
+
   // Zasada i+1 z sekcji 3.1: zdanie ma zawierać jedno nowe słowo i to o nie pytamy.
   // `clozeSlack` mówi, ilu tokenom wolno być rzadszymi od luki — dla klasy A zero,
   // czyli luka jest najrzadszym słowem. Powód poluzowania przy koreańskim: adapter.

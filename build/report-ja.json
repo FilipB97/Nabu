@@ -1,6 +1,6 @@
 {
   "lang": "ja",
-  "zdań": 16699,
+  "zdań": 16599,
   "kandydatów": 49453,
   "odrzuconychNaJakości": 4005,
   "odsetekOdrzutówJakościowych": 8,
@@ -12,21 +12,21 @@
     "wulgaryzm": 15
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 24623,
+    "brak tokenu nadającego się na lukę": 24723,
     "za krótkie": 3954,
     "za długie": 172
   },
   "tłumaczenia": {
-    "bezpośrednie": 7982,
-    "przezAngielski": 8717
+    "bezpośrednie": 7929,
+    "przezAngielski": 8670
   },
   "pasma": {
     "min": 57,
     "mediana": 1377,
-    "p90": 7166,
+    "p90": 7182,
     "max": 19998
   },
-  "quizNiedostępny": 59,
+  "quizNiedostępny": 57,
   "próbka": [
     {
       "text": "私は時間がない。",
@@ -46,11 +46,11 @@
       ]
     },
     {
-      "text": "あなたの言う通りかもね。",
-      "pl": "Może masz rację.",
+      "text": "私の家はその通りから少し入ったところだ。",
+      "pl": "Mój dom jest niedaleko ulicy.",
       "luka": "通り",
       "band": 260,
-      "src": "direct",
+      "src": "pivot",
       "dystraktory": [
         "運転",
         "道",
@@ -63,11 +63,11 @@
       ]
     },
     {
-      "text": "あなたの辞書を私に貸してくれませんか。",
-      "pl": "Czy mógłbym pożyczyć pana słownik?",
+      "text": "あなたの辞書を使ってもいいですか。",
+      "pl": "Czy mogę używać twojego słownika?",
       "luka": "辞書",
       "band": 455,
-      "src": "direct",
+      "src": "pivot",
       "dystraktory": [
         "新聞",
         "簡単",
@@ -80,45 +80,45 @@
       ]
     },
     {
-      "text": "自分の名前消すの忘れたでしょ。",
-      "pl": "Zapomniałeś wymazać swoje imię.",
-      "luka": "名前",
-      "band": 658,
-      "src": "pivot",
+      "text": "私には子どもが十人いる。",
+      "pl": "Mam dziesięcioro dzieci.",
+      "luka": "子ども",
+      "band": 657,
+      "src": "direct",
       "dystraktory": [
-        "事故",
-        "結婚",
-        "計画",
-        "一番",
-        "成功",
-        "一緒",
-        "アメリカ",
-        "映画"
+        "男の子",
+        "帽子",
+        "科学",
+        "数学",
+        "フランス",
+        "道路",
+        "カメラ",
+        "銀行"
       ]
     },
     {
-      "text": "成功するつもりならもっと頑張れ。",
-      "pl": "Pracuj ciężej jeśli planujesz odnieść sukces.",
-      "luka": "成功",
-      "band": 885,
-      "src": "pivot",
+      "text": "彼も彼の妹もパーティーに招待されている。",
+      "pl": "Na imprezę zaproszony jest zarówno on, jak i jego siostra.",
+      "luka": "妹",
+      "band": 884,
+      "src": "direct",
       "dystraktory": [
-        "男",
-        "名前",
-        "アメリカ",
-        "映画",
-        "事故",
-        "言葉",
-        "結婚",
-        "旅行"
+        "味",
+        "妻",
+        "弟",
+        "価値",
+        "下",
+        "元気",
+        "女",
+        "自由"
       ]
     },
     {
-      "text": "どうして君は出る時に地図を持ってこなかったのだ。",
-      "pl": "Dlaczego nie wziąłeś mapy, jak wychodziłeś?",
+      "text": "必要なら彼女に地図を書いてあげるとトムは言った。",
+      "pl": "Tom powiedział, że w razie potrzeby narysuje jej mapę.",
       "luka": "地図",
       "band": 1200,
-      "src": "direct",
+      "src": "pivot",
       "dystraktory": [
         "田舎",
         "早起き",
@@ -131,88 +131,88 @@
       ]
     },
     {
-      "text": "何でトムとメアリーが離婚するつもりだって思うわけ？",
-      "pl": "Czemu myślisz, że Tom i Maria planują się rozwieźć?",
-      "luka": "離婚",
-      "band": 1575,
-      "src": "pivot",
+      "text": "彼らの両方がその会合に出席したわけではなかった。",
+      "pl": "Obaj nie byli na zebraniu.",
+      "luka": "両方",
+      "band": 1576,
+      "src": "direct",
       "dystraktory": [
-        "結婚式",
-        "景色",
-        "明かり",
-        "桜",
         "便",
         "不安",
-        "土曜日",
-        "不幸"
+        "否定",
+        "階段",
+        "不幸",
+        "富士山",
+        "世紀",
+        "綺麗"
       ]
     },
     {
-      "text": "この橋は2年前に建設された。",
-      "pl": "Ten most został wybudowany dwa lata temu.",
-      "luka": "橋",
-      "band": 2179,
+      "text": "私は草の上に寝た。",
+      "pl": "Położyłem się na trawie.",
+      "luka": "草",
+      "band": 2181,
+      "src": "direct",
+      "dystraktory": [
+        "煙草",
+        "韓国",
+        "油",
+        "鏡",
+        "惑星",
+        "真",
+        "競技",
+        "歯医者"
+      ]
+    },
+    {
+      "text": "砂は好きじゃないのよ。",
+      "pl": "Nie lubię piasku.",
+      "luka": "砂",
+      "band": 3113,
       "src": "pivot",
       "dystraktory": [
-        "歴史",
-        "機械",
-        "品",
+        "砂漠",
+        "風景",
+        "活用",
+        "不可欠",
+        "唇",
+        "少数",
+        "毛布",
+        "小切手"
+      ]
+    },
+    {
+      "text": "彼女は思い切ってあの森に入って行くだろうか。",
+      "pl": "Czy ona odważy się wejść do lasu?",
+      "luka": "森",
+      "band": 4587,
+      "src": "direct",
+      "dystraktory": [
         "味",
-        "森",
-        "湖",
-        "中国",
-        "客"
+        "村",
+        "橋",
+        "機会",
+        "機械",
+        "ラジオ",
+        "カナダ",
+        "コート"
       ]
     },
     {
-      "text": "何としても戦争は防がねばならない。",
-      "pl": "Za wszelką cenę musimy zapobiec wojnie.",
-      "luka": "戦争",
-      "band": 3108,
-      "src": "direct",
-      "dystraktory": [
-        "価値",
-        "歌",
-        "政治",
-        "色",
-        "日曜日",
-        "会議",
-        "妻",
-        "海"
-      ]
-    },
-    {
-      "text": "彼は私にこの辞書を推薦してくれた。",
-      "pl": "Polecił mi ten słownik.",
-      "luka": "辞書",
-      "band": 4581,
-      "src": "direct",
-      "dystraktory": [
-        "新聞",
-        "簡単",
-        "嘘",
-        "午後",
-        "船",
-        "足",
-        "クラス",
-        "箱"
-      ]
-    },
-    {
-      "text": "残念ですが、私には先約があります。",
-      "pl": "Przykro mi, ale już mam umówione spotkanie.",
-      "luka": "残念",
-      "band": 7595,
+      "text": "我々は全員ひざまずいて祈りを捧げた。",
+      "pl": "Uklękliśmy wszyscy do modlitwy.",
+      "luka": "祈り",
+      "band": 7614,
       "src": "pivot",
       "dystraktory": [
-        "春",
-        "満足",
-        "現在",
-        "夫",
-        "政府",
-        "腹",
-        "経済",
-        "死"
+        "人質",
+        "神聖",
+        "ファスナー",
+        "アスピリン",
+        "復讐",
+        "マリ",
+        "狂気",
+        "南極"
       ]
     },
     {

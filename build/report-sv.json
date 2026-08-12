@@ -1,6 +1,6 @@
 {
   "lang": "sv",
-  "zdań": 2323,
+  "zdań": 2315,
   "kandydatów": 8080,
   "odrzuconychNaJakości": 1212,
   "odsetekOdrzutówJakościowych": 15,
@@ -15,17 +15,17 @@
   },
   "powodyPrzydatność": {
     "za krótkie": 2375,
-    "brak tokenu nadającego się na lukę": 2155,
+    "brak tokenu nadającego się na lukę": 2163,
     "za długie": 15
   },
   "tłumaczenia": {
-    "bezpośrednie": 693,
-    "przezAngielski": 1630
+    "bezpośrednie": 690,
+    "przezAngielski": 1625
   },
   "pasma": {
     "min": 50,
-    "mediana": 1243,
-    "p90": 6126,
+    "mediana": 1248,
+    "p90": 6121,
     "max": 11973
   },
   "quizNiedostępny": 1,
@@ -45,11 +45,11 @@
       ]
     },
     {
-      "text": "Han är min vän.",
-      "pl": "Jest moim przyjacielem.",
+      "text": "Jag var aldrig din vän.",
+      "pl": "Nigdy nie byłam twoją przyjaciółką.",
       "luka": "vän",
       "band": 227,
-      "src": "pivot",
+      "src": "direct",
       "dystraktory": [
         "väg",
         "hand",
@@ -62,25 +62,25 @@
       ]
     },
     {
-      "text": "Du bor här, eller hur?",
-      "pl": "Mieszkasz tu, czyż nie?",
-      "luka": "bor",
-      "band": 417,
+      "text": "Det var trevligt att göra ingenting.",
+      "pl": "Fajnie było nic nie robić.",
+      "luka": "trevligt",
+      "band": 428,
       "src": "direct",
       "dystraktory": [
-        "bror",
-        "dotter",
-        "fort",
-        "rör",
-        "ord",
-        "bil",
-        "hus",
-        "bad"
+        "gott",
+        "heller",
+        "ibland",
+        "alls",
+        "svårt",
+        "tillsammans",
+        "förut",
+        "inne"
       ]
     },
     {
-      "text": "Tom är min man.",
-      "pl": "Tom jest moim mężem.",
+      "text": "Få bort Tom härifrån.",
+      "pl": "Zabierz stąd Toma.",
       "luka": "Tom",
       "band": 659,
       "src": "pivot",
@@ -113,8 +113,8 @@
       ]
     },
     {
-      "text": "Jag kan inte dansa heller.",
-      "pl": "Ja też nie umiem tańczyć.",
+      "text": "Jag tycker om att dansa.",
+      "pl": "Lubię tańczyć.",
       "luka": "dansa",
       "band": 1032,
       "src": "pivot",
@@ -130,20 +130,20 @@
       ]
     },
     {
-      "text": "Mina föräldrar förstår mig inte — bara mormor förstår mig.",
-      "pl": "Moi rodzice mnie nie rozumieją - tylko babcia (od strony mamy) mnie rozumie.",
-      "luka": "mormor",
-      "band": 1435,
+      "text": "Hon hörde honom sjunga.",
+      "pl": "Słyszała, jak on śpiewa.",
+      "luka": "sjunga",
+      "band": 1436,
       "src": "direct",
       "dystraktory": [
-        "pris",
-        "form",
-        "papper",
-        "hot",
-        "sekund",
-        "självmord",
-        "exempel",
-        "lärare"
+        "stänga",
+        "springa",
+        "ljuga",
+        "fungera",
+        "laga",
+        "backa",
+        "minnas",
+        "gömma"
       ]
     },
     {
