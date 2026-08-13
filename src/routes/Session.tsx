@@ -50,6 +50,7 @@ export function Session() {
     settings,
     answer,
     answerProduction,
+    learned,
     next,
     restartClock,
     undoLast,
@@ -102,6 +103,14 @@ export function Session() {
         return
       }
 
+      if (current?.intro) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          learned()
+        }
+        return
+      }
+
       if (current?.production) return
       const options = current?.options?.options.length ?? 0
       const digit = Number.parseInt(event.key, 10)
@@ -120,7 +129,7 @@ export function Session() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [answer, undoLast, next, navigate, current, reveal, say])
+  }, [answer, undoLast, next, learned, navigate, current, reveal, say])
 
   // Automatyczne przejście wyłącznie po trafieniu — pudło zawsze czeka na dotknięcie,
   // bo to przy pudle jest najwięcej do przeczytania.
@@ -207,6 +216,19 @@ export function Session() {
   const stageOfCard = entry.card.stage
   const jednoelementowa = stageOfCard === 'script' || stageOfCard === 'core'
 
+  // Zdanie o znaku pochodzi z adaptera — to wiedza o piśmie, więc mieszka tam, gdzie
+  // reszta wiedzy o języku (sekcja 2.1). Rdzeń nie wie, czym różni się kana od hangulu.
+  //
+  // Szukamy PRAWDZIWEJ pozycji w inwentarzu, zamiast składać ją z tokenu karty: to
+  // `group` odróżnia hiraganę od katakany i spółgłoskę od samogłoski, a token go nie niesie.
+  const note =
+    current.intro && stageOfCard === 'script' && target
+      ? (() => {
+          const known = adapter.scriptItems?.().find((each) => each.s === target.s)
+          return known ? (adapter.scriptNote?.(known) ?? null) : null
+        })()
+      : null
+
   const stateOf = (index: number): OptionState => {
     if (!reveal) return 'idle'
     if (index === reveal.correct) return 'correct'
@@ -257,7 +279,65 @@ export function Session() {
         className="nabu-card flex flex-col justify-center gap-6 rounded-[22px]
           px-[clamp(22px,4vw,40px)] py-[clamp(26px,4vw,38px)] min-h-[210px] md:min-h-[248px]"
       >
-        {current.production && !reveal ? (
+        {current.intro ? (
+          /**
+           * Wprowadzenie — pozycja pokazuje się, zanim o nią zapytamy.
+           *
+           * Bez tego kroku pierwsze spotkanie ze znakiem jest wyborem jednej z czterech
+           * rzeczy, których żadnej użytkownik nie widział. Trafienie jest wtedy przypadkiem,
+           * pudło karą za cudzy błąd, a nauczyć się z tego nie da niczego.
+           */
+          <div className="flex flex-col items-center gap-4 text-center">
+            <Mono tone="accent">nowe · {STAGE_LABEL[stageOfCard]}</Mono>
+
+            <p
+              className={`${fontClass} leading-[1.2] text-text`}
+              style={{ fontSize: jednoelementowa ? 'clamp(72px,16vw,104px)' : 'clamp(34px,7vw,48px)' }}
+            >
+              {jednoelementowa ? entry.item.text : (target?.s ?? '')}
+            </p>
+
+            {/* Czytanie i znaczenie. Na etapie pisma glosa JEST czytaniem, więc drugi
+                wiersz byłby tym samym napisem dwa razy. */}
+            <div className="flex flex-wrap items-baseline justify-center gap-x-3 gap-y-1">
+              {target?.r && target.r !== target.gloss && (
+                <span className="font-mono text-[15px] text-accent">{target.r}</span>
+              )}
+              <span className="font-ui text-[19px] text-text">{target?.gloss}</span>
+              <button
+                type="button"
+                onClick={() => void speak(target?.s ?? '', {
+                  locale: adapter.tts.locale,
+                  rate: settings.rate,
+                })}
+                aria-label="Posłuchaj"
+                className="nabu-press -m-2 rounded-full p-2 text-[17px] text-text-3"
+              >
+                ♪
+              </button>
+            </div>
+
+            {note && (
+              <p className="font-ui max-w-[440px] text-[13.5px] leading-[1.6] text-text-2">
+                {note}
+              </p>
+            )}
+
+            {/* Przy zdaniu pokazujemy od razu, jak słowo pracuje w kontekście — po to
+                właśnie jest zdanie, a nie sama para słowo–glosa. */}
+            {!jednoelementowa && (
+              <div className="flex flex-col gap-2 border-t border-border-quiet pt-4">
+                <p
+                  className={`${fontClass} text-text-2`}
+                  style={{ fontSize: `${Math.round(adapter.display.size * 0.62)}px` }}
+                >
+                  {entry.item.text}
+                </p>
+                <p className="font-ui text-[13.5px] leading-[1.5] text-text-3">{entry.item.pl}</p>
+              </div>
+            )}
+          </div>
+        ) : current.production && !reveal ? (
           <ProduceCard
             production={current.production}
             adapter={adapter}
@@ -370,7 +450,12 @@ export function Session() {
 
       {/* Opcje siadają na dole ekranu — tam sięga kciuk (sekcja 8.4). */}
       <div className="mt-auto flex flex-col gap-[10px] pt-2">
-        {current.production ? (
+        {current.intro ? (
+          <Button variant="primary" full onClick={learned}>
+            Rozumiem, pytaj
+            <span className="font-mono ms-3 hidden text-[11px] opacity-60 md:inline">enter</span>
+          </Button>
+        ) : current.production ? (
           reveal && (
             <Button variant="primary" full onClick={next}>
               Dalej

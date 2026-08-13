@@ -69,6 +69,13 @@ export type SessionCard = {
   /** Zadanie produkcji albo `null`, gdy karta jest quizem. */
   production: Production | null
   mode: CardType
+  /**
+   * Pierwsze spotkanie z pozycją: pokazujemy znak, czytanie i znaczenie, ZANIM o nie
+   * zapytamy. Quiz bez tego kroku każe wybrać jedną z czterech rzeczy, których żadnej
+   * użytkownik nie widział — to jest losowanie, nie nauka, a błąd w nim niesie karę
+   * w harmonogramie za coś, czego nikt nie pokazał.
+   */
+  intro: boolean
 }
 
 /**
@@ -203,6 +210,14 @@ export function useSession(lang: string) {
   })
   /** Jeden poziom cofnięcia — sekcja 8.4. */
   const undo = useRef<{ before: CardState; entry: QueueEntry } | null>(null)
+  /** Pozycje, które w tej sesji przeszły już przez wprowadzenie. */
+  const introduced = useRef(new Set<string>())
+  /**
+   * Pozycje, które użytkownik kiedykolwiek widział — z bazy i z tej sesji. Steruje
+   * doborem dystraktorów: na starcie etapu 0 opcje mają być z poznanych znaków,
+   * a nie z całego inwentarza.
+   */
+  const met = useRef(new Set<string>())
   /** Czy system ma głos dla tego języka. Bez niego karta ze słuchu jest pustym ekranem. */
   const canListen = useRef(false)
   /** Odpowiedź zapisana, karta jeszcze na ekranie — czeka na „Dalej". */
@@ -212,6 +227,20 @@ export function useSession(lang: string) {
 
   const prepare = useCallback(
     (entry: QueueEntry, config: LangSettings): SessionCard => {
+      // Pozycja widziana pierwszy raz idzie przez wprowadzenie. Opcji wtedy nie budujemy:
+      // zestaw dystraktorów ma powstać dla PYTANIA, które padnie za chwilę, a nie dla
+      // ekranu, na którym nie ma czego wybierać.
+      if (entry.fresh && !introduced.current.has(entry.card.id)) {
+        shownAt.current = Date.now()
+        return {
+          entry,
+          options: null,
+          production: null,
+          mode: modeFor(entry.card, canListen.current),
+          intro: true,
+        }
+      }
+
       // Produkcja ma pierwszeństwo przed quizem: karta dojrzała sprawdza wiedzę czynną,
       // a rozpoznanie jednej z czterech opcji da się wyćwiczyć, nie znając słowa (6.4).
       const production = productionFor(
@@ -223,7 +252,7 @@ export function useSession(lang: string) {
       if (production) {
         shownAt.current = Date.now()
         const mode = `produce-${production.mode}` as CardType
-        return { entry, options: null, production, mode }
+        return { entry, options: null, production, mode, intro: false }
       }
 
       const built = buildOptions(
@@ -232,6 +261,8 @@ export function useSession(lang: string) {
         config.quizOptions,
         lastShown.current.get(entry.card.id) ?? null,
         confusions.current,
+        Math.random,
+        met.current,
       )
       if (built) {
         lastShown.current.set(entry.card.id, {
@@ -245,10 +276,27 @@ export function useSession(lang: string) {
         options: built,
         production: null,
         mode: built ? modeFor(entry.card, canListen.current) : 'reveal',
+        intro: false,
       }
     },
     [lang],
   )
+
+  /**
+   * Zamyka wprowadzenie i zadaje pytanie o tę samą pozycję.
+   *
+   * Pytanie pada od razu, a nie za pięć kart: pierwsze przypomnienie tuż po pokazaniu
+   * jest najtańsze i najskuteczniejsze, a karta i tak wróci w tej sesji przez kroki
+   * nauki. Nic tu nie zapisujemy — wprowadzenie nie jest odpowiedzią i nie ma prawa
+   * ruszyć harmonogramu.
+   */
+  const learned = useCallback(() => {
+    const card = current
+    if (!card || !settings) return
+    introduced.current.add(card.entry.card.id)
+    met.current.add(card.entry.card.id)
+    setCurrent(prepare(card.entry, settings))
+  }, [current, prepare, settings])
 
   // ---- budowa sesji ----------------------------------------------------------
   useEffect(() => {
@@ -322,6 +370,8 @@ export function useSession(lang: string) {
 
       queue.current = new SessionQueue(entries)
       stats.current = { answered: 0, firstTry: 0, missed: 0, fresh: 0, startedAt: now }
+      introduced.current = new Set()
+      met.current = new Set(seen)
       undo.current = null
       pending.current = null
       setReveal(null)
@@ -541,6 +591,7 @@ export function useSession(lang: string) {
     settings,
     answer,
     answerProduction,
+    learned,
     next,
     restartClock,
     undoLast,

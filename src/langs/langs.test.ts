@@ -19,6 +19,23 @@ describe('kontrakt adapterów', () => {
     ).toBe(adapter.hasScriptStage)
   })
 
+  it.each(LANG_CODES)('%s: etap 0 tłumaczy pismo, a nie tylko o nie pyta', (code) => {
+    const adapter = adapterFor(code)
+    if (!adapter.hasScriptStage) return
+
+    // Bez tych dwóch pól pierwsze spotkanie ze znakiem jest wyborem jednej z czterech
+    // rzeczy, których żadnej użytkownik nie widział — czyli losowaniem. Adapter z etapem
+    // 0 musi umieć powiedzieć, jak działa jego pismo i skąd bierze się czytanie znaku.
+    expect(adapter.scriptAbout?.trim().length ?? 0, `${code}: brak opisu pisma`).toBeGreaterThan(80)
+    expect(adapter.scriptNote, `${code}: brak wyjaśnienia pojedynczego znaku`).toBeDefined()
+
+    for (const item of adapter.scriptItems?.() ?? []) {
+      const note = adapter.scriptNote?.(item) ?? ''
+      expect(note.length, `${code}: znak ${item.s} bez wyjaśnienia`).toBeGreaterThan(40)
+      expect(note, `${code}: wyjaśnienie znaku ${item.s} nie mówi o jego czytaniu`).toContain(item.r)
+    }
+  })
+
   it.each(LANG_CODES)('%s: inwentarz pisma ma unikalne znaki i niepuste czytania', (code) => {
     const items = adapterFor(code).scriptItems?.() ?? []
     if (items.length === 0) return

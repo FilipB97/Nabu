@@ -82,3 +82,32 @@ export function kanaItems(): ScriptItem[] {
   }
   return items
 }
+
+/**
+ * Wyjaśnienie pojedynczego znaku przy pierwszym spotkaniu — sekcja 2a.
+ *
+ * Kana jest systemem, nie zbiorem obrazków: wiersz `k` to te same pięć samogłosek
+ * z jedną spółgłoską z przodu, a każdy znak niesie całą sylabę. Powiedzenie tego przy
+ * pierwszym `か` jest warte więcej niż dziesięć powtórek, w których użytkownik zgaduje
+ * między `ka`, `ki` i `ku` — bo po tym zdaniu wie, czego szukać w kształcie.
+ */
+export function kanaNote(item: ScriptItem): string {
+  const katakana = item.group.startsWith('katakana')
+  const system = katakana
+    ? 'Katakana: te same sylaby co w hiraganie, inny zapis. Pisze się nią słowa obce, nazwy i dźwięki.'
+    : 'Hiragana: podstawowe pismo sylabiczne. Jeden znak to cała sylaba, zawsze czytana tak samo.'
+
+  if (item.r === 'n') {
+    return `${system} To jedyny znak bez samogłoski — samo „n" na końcu sylaby.`
+  }
+  if (item.r.length === 1) {
+    return `${system} Czysta samogłoska „${item.r}" — od niej zaczyna się cały jej rząd.`
+  }
+
+  const vowel = item.r.slice(-1)
+  const consonant = item.r.slice(0, -1)
+  return (
+    `${system} Sylaba „${item.r}" to ${consonant} + ${vowel}; ` +
+    `wszystkie znaki tego rzędu kończą się na „${vowel}".`
+  )
+}

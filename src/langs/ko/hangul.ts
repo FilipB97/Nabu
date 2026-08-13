@@ -116,3 +116,32 @@ const LETTERS: ReadonlyArray<[litera: string, czytanie: string, klasa: string]> 
 export function jamoItems(): ScriptItem[] {
   return LETTERS.map(([s, r, group]) => ({ s, r, group }))
 }
+
+/**
+ * Wyjaśnienie pojedynczej litery przy pierwszym spotkaniu — sekcja 2a.
+ *
+ * Hangul jest alfabetem, w którym kształt litery odpowiada układowi ust, a litery
+ * składa się w bloki sylabowe. Użytkownik, który tego nie usłyszy, uczy się czterdziestu
+ * kresek bez klucza — a z kluczem czyta dowolną sylabę po dwudziestu minutach.
+ */
+export function jamoNote(item: ScriptItem): string {
+  if (item.group === 'samogłoska') {
+    return (
+      `Samogłoska „${item.r}". Kreska pionowa albo pozioma z kropką decyduje o brzmieniu; ` +
+      'samogłoski stoją w bloku po prawej albo pod spółgłoską.'
+    )
+  }
+  if (item.group === 'dwugłoska') {
+    return `Dwugłoska „${item.r}" — złożenie dwóch samogłosek zapisane jako jeden znak.`
+  }
+  if (item.group === 'spółgłoska napięta') {
+    return (
+      `Spółgłoska napięta „${item.r}": ta sama litera podwojona, wymawiana mocniej ` +
+      'i bez przydechu. Podwojenie zawsze znaczy napięcie.'
+    )
+  }
+  return (
+    `Spółgłoska „${item.r}". Sylaba zaczyna się od spółgłoski, więc ta litera stanie ` +
+    'w bloku jako pierwsza.'
+  )
+}

@@ -190,6 +190,22 @@ export type LangAdapter = {
   scriptItems?: () => ScriptItem[]
 
   /**
+   * Jak działa to pismo — dwa, trzy zdania na ekranie głównym przez cały etap 0.
+   *
+   * Quiz uczy rozpoznawania, ale nie powie, że kana jest sylabiczna, a hangul składa
+   * się w bloki. Bez tej wiedzy użytkownik zapamiętuje 92 obrazki zamiast systemu,
+   * którego 92 znaki są tylko spisem.
+   */
+  scriptAbout?: string
+
+  /**
+   * Zdanie o konkretnym znaku, pokazywane przy PIERWSZYM spotkaniu, zanim padnie
+   * pytanie. Ma powiedzieć, do czego znak należy i z czego się bierze jego czytanie —
+   * inaczej wybór spośród czterech nieznanych sylab jest losowaniem, a nie nauką.
+   */
+  scriptNote?: (item: ScriptItem) => string
+
+  /**
    * Czy nad tym tokenem warto pokazać czytanie. Domyślnie: gdy różni się od zapisu.
    *
    * Japoński potrzebuje własnej reguły: czytanie `ねこ` nad `猫` niesie informację,
