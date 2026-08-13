@@ -1,58 +1,23 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react'
-import { useNavigate } from 'react-router'
-import { LANG_CODES, adapterFor, interferesWith } from '@/langs'
-import { currentStage, gatedStages, stageProgress, type GatedStage } from '@/session/stages'
-import { LEVELS, levelById, type Level } from '@/session/calibration'
-import { loadMeta, type DeckMeta } from '@/store/decks'
-import {
-  BACKLOG_LIMIT,
-  INTENSITY,
-  addedLanguages,
-  backlogCount,
-  db,
-  dueCount,
-  settingsFor,
-  updateSettings,
-  type LangSettings,
-} from '@/store/db'
-import { hasVoice, onVoicesChanged, primeSpeech } from '@/audio/speak'
-import { Mark } from '@/ui/Ticks'
-import { Mono } from '@/ui/Mono'
-import { Group, Row } from '@/ui/List'
-import { Choice } from '@/ui/Choice'
+import { Link, useNavigate } from 'react-router'
+import { adapterFor } from '@/langs'
+import { useLangs } from '@/app/lang'
+import { useWide } from '@/app/AppShell'
+import { primeSpeech } from '@/audio/speak'
+import { BACKLOG_LIMIT, INTENSITY, updateSettings, type LangSettings } from '@/store/db'
 import { Button } from '@/ui/Button'
+import { Choice } from '@/ui/Choice'
+import { Mono } from '@/ui/Mono'
+import { StageBar } from '@/ui/StageBar'
 
 /**
- * Ekran startu sesji — sekcja 8.3 planu.
+ * Ekran główny — sekcja 8.3 planu, po redesignie.
  *
- * Ma odpowiadać na trzy pytania w jednym spojrzeniu: ile jest do zrobienia, ile to
- * potrwa, co się dzieje dalej. Przełącznik języka jest na wierzchu, nie w ustawieniach,
- * a języki aktywne są oddzielone od utrzymywanych (sekcja 2.4).
+ * Odpowiada na trzy pytania w jednym spojrzeniu: ile jest do zrobienia, ile to potrwa,
+ * co dalej. Wszystko poza tym zeszło do ustawień — ekran, na który wchodzi się codziennie,
+ * nie może być listą pokręteł.
  *
- * Liczba do powtórki jest największym elementem na ekranie i stoi na karcie razem
- * z przyciskiem startu — to jest jedyna rzecz, po którą użytkownik tu przychodzi.
+ * Jedyne mocne miejsce to liczba kart i przycisk startu. Reszta jest cicha.
  */
-
-type LangRow = {
-  settings: LangSettings
-  due: number
-  backlog: number
-  stage: GatedStage
-  progress: { solid: number; needed: number }
-  meta: DeckMeta
-}
-
-const STAGE_LABEL: Record<GatedStage, string> = {
-  script: 'pismo',
-  core: 'rdzeń',
-  sentences: 'zdania',
-}
-
-const STAGE_HINT: Record<GatedStage, string> = {
-  script: 'Najpierw znaki. Bez nich zdanie jest obrazkiem.',
-  core: 'Sto najczęstszych słów. Potem zdania mają się o co oprzeć.',
-  sentences: 'Zdania z korpusu, po jednym nowym słowie na raz.',
-}
 
 const INTENSITY_LABEL: Record<LangSettings['intensity'], string> = {
   short: 'krótka',
@@ -60,422 +25,174 @@ const INTENSITY_LABEL: Record<LangSettings['intensity'], string> = {
   long: 'długa',
 }
 
-/** Wiersz ustawienia: etykieta i pod nią przełącznik. Segment na wąskim ekranie nie mieści
- *  się obok etykiety, a ściśnięty do połowy szerokości przestaje być czytelny. */
-function SettingRow({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="flex flex-col gap-2 py-4">
-      <span className="font-ui text-[15px] text-text">{label}</span>
-      {children}
-    </div>
-  )
-}
+const STAGE_LABEL = { script: 'pismo', core: 'rdzeń', sentences: 'zdania' } as const
+
+const STAGE_HINT = {
+  script: 'Najpierw znaki. Bez nich zdanie jest obrazkiem.',
+  core: 'Sto najczęstszych słów. Potem zdania mają się o co oprzeć.',
+  sentences: 'Zdania z korpusu, po jednym nowym słowie na raz.',
+} as const
 
 export function Start() {
   const navigate = useNavigate()
-  const [rows, setRows] = useState<LangRow[] | null>(null)
-  const [selected, setSelected] = useState<string | null>(null)
-  /**
-   * Głosy systemowe pojawiają się asynchronicznie, a na iOS także po pobraniu przez
-   * użytkownika w trakcie działania aplikacji — stąd nasłuch, a nie jednorazowy odczyt.
-   * To jest domknięcie ryzyka „brak głosu TTS" z sekcji 14 (ADR-001).
-   */
-  const [voiceTick, setVoiceTick] = useState(0)
-  /** Język wybrany do dodania, czekający na poziom wejściowy (sekcja 3.1). */
-  const [pending, setPending] = useState<string | null>(null)
-
-  useEffect(() => onVoicesChanged(() => setVoiceTick((n) => n + 1)), [])
-
-  const refresh = useCallback(async () => {
-    const now = Date.now()
-    const langs = await addedLanguages()
-    const loaded = await Promise.all(
-      langs.map(async (settings) => {
-        const meta = await loadMeta(settings.lang)
-        const cards = await db.cards.where('lang').equals(settings.lang).toArray()
-        const stage = currentStage(adapterFor(settings.lang), cards, meta, settings.stageOverride)
-        return {
-          settings,
-          meta,
-          stage,
-          progress: stageProgress(cards, meta, stage),
-          due: await dueCount(settings.lang, now),
-          backlog: await backlogCount(settings.lang),
-        }
-      }),
-    )
-    setRows(loaded)
-    setSelected(
-      (current) => current ?? loaded.find((r) => r.settings.active)?.settings.lang ?? null,
-    )
-  }, [])
-
-  useEffect(() => {
-    void refresh()
-  }, [refresh])
-
-  const change = useCallback(
-    async (patch: Partial<Omit<LangSettings, 'lang'>>) => {
-      if (!selected) return
-      await updateSettings(selected, patch)
-      await refresh()
-    },
-    [refresh, selected],
-  )
-
-  /** Krok pierwszy: pytamy o interferencję, potem o poziom wejściowy. */
-  const beginAdd = useCallback(
-    (code: string) => {
-      const clash = interferesWith(code).find((other) =>
-        rows?.some((r) => r.settings.lang === other),
-      )
-      if (clash) {
-        // Sekcja 2.4: mówimy o interferencji raz, nie blokujemy.
-        const other = adapterFor(clash).name
-        const ok = window.confirm(
-          `Uczysz się już ${other}. Te dwa języki mieszają się łatwiej niż inne — ` +
-            'możesz dodać teraz albo odłożyć, aż tamten będzie w utrzymaniu. Dodać mimo to?',
-        )
-        if (!ok) return
-      }
-      setPending(code)
-    },
-    [rows],
-  )
-
-  /**
-   * Krok drugi: poziom ustawia pasmo doboru i to, czy zaczynamy od pisma. Kalibracja
-   * rusza od razu — jej sens jest w tym, żeby PIERWSZA sesja miała właściwy materiał,
-   * więc odłożenie jej na później czyni ją bezużyteczną.
-   */
-  const addLanguage = useCallback(
-    async (code: string, level: Level) => {
-      const spec = levelById(level)
-      await settingsFor(code)
-      await updateSettings(code, {
-        addedAt: Date.now(),
-        level,
-        bandFrom: spec.bandFrom,
-        bandTo: spec.bandTo,
-        ...(spec.skipScript ? { stageOverride: 'core' as const } : {}),
-        calibrated: !spec.calibrate,
-      })
-      setPending(null)
-      setSelected(code)
-      if (spec.calibrate) navigate(`/kalibracja/${code}`)
-      else await refresh()
-    },
-    [navigate, refresh],
-  )
+  const wide = useWide()
+  const { rows, current, selected, select, refresh } = useLangs()
 
   if (!rows) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-bg">
+      <div className="flex flex-1 items-center justify-center">
         <Mono tone="normal">wczytuję…</Mono>
       </div>
     )
   }
 
-  const active = rows.filter((r) => r.settings.active)
-  const maintained = rows.filter((r) => !r.settings.active)
-  const chosen = rows.find((r) => r.settings.lang === selected) ?? null
-  const missing = LANG_CODES.filter((code) => !rows.some((r) => r.settings.lang === code))
-  // `voiceTick` jest tu po to, żeby odczyt powtórzył się po dosłaniu głosów.
-  const voiceMissing =
-    chosen !== null && voiceTick >= 0 && !hasVoice(adapterFor(chosen.settings.lang).tts.locale)
-  const fresh = chosen && chosen.backlog >= BACKLOG_LIMIT
-    ? 0
-    : chosen
-      ? INTENSITY[chosen.settings.intensity].fresh
-      : 0
+  if (rows.length === 0 || !current) {
+    return (
+      <div className="flex flex-1 flex-col justify-center gap-6 py-10">
+        <h1 className="font-display text-[clamp(30px,7vw,44px)] leading-[1.15] text-text">
+          Czego chcesz się uczyć?
+        </h1>
+        <p className="font-ui max-w-[520px] text-[15.5px] leading-[1.6] text-text-2">
+          Możesz dodać kolejny język później. Dwa aktywne naraz to rozsądny sufit — pięć
+          języków to sto kart dziennie i porzucenie aplikacji w drugim tygodniu.
+        </p>
+        <Link to="/dodaj" className="nabu-press nabu-accent-fill font-ui flex min-h-[58px]
+          max-w-[280px] items-center justify-center text-[16px]">
+          Wybierz język
+        </Link>
+      </div>
+    )
+  }
+
+  const adapter = adapterFor(current.settings.lang)
+  const fresh =
+    current.backlog >= BACKLOG_LIMIT ? 0 : INTENSITY[current.settings.intensity].fresh
+  const canStart = current.due > 0 || fresh > 0
 
   return (
-    <div
-      className="mx-auto flex min-h-screen w-full max-w-[460px] flex-col gap-8 bg-bg px-6
-        pt-[calc(env(safe-area-inset-top)+32px)] pb-[calc(env(safe-area-inset-bottom)+32px)]"
-    >
-      <Mark height={18} />
-
-      {rows.length === 0 ? (
-        <div className="flex flex-col gap-4">
-          <h1 className="font-display text-[30px] leading-[1.25] text-text">
-            Czego chcesz się uczyć?
-          </h1>
-          <p className="font-ui text-[14px] leading-[1.6] text-text-2">
-            Możesz dodać kolejny język później. Dwa aktywne naraz to rozsądny sufit.
-          </p>
+    <div className="flex flex-col gap-[22px]">
+      {/* Przełącznik języka wraca na górę tylko na telefonie — na desktopie jest w szynie. */}
+      {!wide && rows.length > 1 && (
+        <div className="flex flex-wrap gap-2">
+          {rows.map((row) => (
+            <button
+              key={row.settings.lang}
+              type="button"
+              onClick={() => select(row.settings.lang)}
+              aria-pressed={row.settings.lang === selected}
+              className={`nabu-press font-ui flex min-h-[40px] items-center gap-2 rounded-full
+                px-4 text-[14px] ${
+                  row.settings.lang === selected
+                    ? 'nabu-accent-fill'
+                    : 'border border-border-quiet text-text-2'
+                }`}
+            >
+              {adapterFor(row.settings.lang).name}
+              {row.due > 0 && <span className="font-mono text-[12px] opacity-80">{row.due}</span>}
+            </button>
+          ))}
         </div>
-      ) : (
-        <>
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-wrap gap-2">
-              {active.map((row) => {
-                const isSelected = selected === row.settings.lang
-                return (
-                  <button
-                    key={row.settings.lang}
-                    type="button"
-                    onClick={() => setSelected(row.settings.lang)}
-                    aria-pressed={isSelected}
-                    className={`nabu-press font-ui flex min-h-[44px] items-center gap-2 rounded-full
-                      px-5 text-[15px] ${
-                        isSelected
-                          ? 'nabu-accent-fill'
-                          : 'nabu-card text-text-2'
-                      }`}
-                  >
-                    {adapterFor(row.settings.lang).name}
-                    {row.due > 0 && (
-                      <span className="font-mono text-[12px] opacity-80">{row.due}</span>
-                    )}
-                  </button>
-                )
-              })}
-            </div>
+      )}
 
-            {maintained.length > 0 && (
-              <div className="flex flex-wrap items-center gap-3">
-                <Mono>utrzymywane</Mono>
-                {maintained.map((row) => (
-                  <button
-                    key={row.settings.lang}
-                    type="button"
-                    onClick={() => setSelected(row.settings.lang)}
-                    aria-pressed={selected === row.settings.lang}
-                    className="nabu-press font-ui rounded-full text-[13px] text-text-3"
-                  >
-                    {adapterFor(row.settings.lang).name} {row.due}
-                  </button>
-                ))}
-              </div>
-            )}
+      <div className="flex items-baseline justify-between gap-4">
+        <h1 className="font-display text-[clamp(30px,5vw,40px)] leading-none text-text">
+          {adapter.name}
+        </h1>
+        <Mono tone="accent">etap · {STAGE_LABEL[current.stage]}</Mono>
+      </div>
+
+      <section className="nabu-card flex flex-col gap-[26px] px-[clamp(20px,5vw,32px)] py-[clamp(22px,5vw,30px)]">
+        <div className="flex flex-wrap items-baseline justify-between gap-4">
+          <div className="flex items-baseline gap-3">
+            <span className="font-display text-[clamp(54px,9vw,68px)] leading-none text-text">
+              {current.due}
+            </span>
+            <span className="font-ui text-[15px] text-text-2">do powtórki</span>
           </div>
-
-          {chosen && (
-            <div className="flex flex-col gap-6">
-              <div className="nabu-card flex flex-col gap-5 px-6 py-7">
-                <div className="flex items-end justify-between gap-4">
-                  <div className="flex items-baseline gap-3">
-                    <span className="font-display text-[56px] leading-none text-text">
-                      {chosen.due}
-                    </span>
-                    <span className="font-ui text-[14px] text-text-2">do powtórki</span>
-                  </div>
-                  {fresh > 0 && (
-                    <div className="flex items-baseline gap-2">
-                      <span className="font-display text-[22px] leading-none text-accent">
-                        +{fresh}
-                      </span>
-                      <span className="font-ui text-[13px] text-text-2">nowych</span>
-                    </div>
-                  )}
-                </div>
-
-                {chosen.backlog >= BACKLOG_LIMIT && (
-                  <p className="font-ui text-[13px] leading-[1.6] text-text-2">
-                    Czeka {chosen.backlog} rozpoczętych pozycji. Nie dokładamy kolejnych, dopóki
-                    nie zejdziesz poniżej {BACKLOG_LIMIT} — inaczej zaległość rośnie szybciej,
-                    niż da się ją nadrobić.
-                  </p>
-                )}
-
-                <div className="flex flex-col gap-2 border-t border-border-quiet pt-5">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <Mono tone="accent">etap · {STAGE_LABEL[chosen.stage]}</Mono>
-                    {chosen.stage !== 'sentences' && (
-                      <Mono tone="normal">
-                        {chosen.progress.solid} / {chosen.progress.needed}
-                      </Mono>
-                    )}
-                  </div>
-                  <p className="font-ui text-[13px] leading-[1.5] text-text-2">
-                    {STAGE_HINT[chosen.stage]}
-                  </p>
-                  {voiceMissing && (
-                    <p className="font-ui text-[12.5px] leading-[1.5] text-text-3">
-                      System nie ma głosu dla tego języka, więc karty ze słuchu są pomijane.
-                      Na iPhonie: Ustawienia → Dostępność → Zawartość mówiona → Głosy.
-                    </p>
-                  )}
-                </div>
-
-                <Button
-                  variant="primary"
-                  full
-                  disabled={chosen.due === 0 && fresh === 0}
-                  onClick={() => {
-                    // Pierwsze `speak()` musi wyjść z gestu użytkownika, inaczej iOS
-                    // zignoruje wszystkie kolejne — po cichu (ADR-001).
-                    primeSpeech()
-                    navigate(`/sesja/${chosen.settings.lang}`)
-                  }}
-                >
-                  Zacznij
-                </Button>
-              </div>
-
-              <Group label="sesja" hint="Ile kart do powtórki bierzemy na jedno podejście.">
-                <SettingRow label="Długość">
-                  <Choice
-                    value={chosen.settings.intensity}
-                    options={(['short', 'normal', 'long'] as const).map((level) => ({
-                      value: level,
-                      label: `${INTENSITY_LABEL[level]} · ${INTENSITY[level].due}`,
-                    }))}
-                    onChange={(intensity) => void change({ intensity })}
-                  />
-                </SettingRow>
-              </Group>
-
-              {/* Pełny ekran ustawień jest w M9. Tutaj są trzy rzeczy, które zmienia się
-                  w trakcie nauki, a nie raz na zawsze — reszta może poczekać. */}
-              <Group
-                label="ustawienia języka"
-                hint="Dotyczą tylko wybranego języka. Motyw i wygląd są w ustawieniach ogólnych."
-              >
-                <SettingRow label="Opcji w quizie">
-                  <Choice
-                    value={chosen.settings.quizOptions}
-                    options={[
-                      { value: 3, label: '3' },
-                      { value: 4, label: '4' },
-                      { value: 6, label: '6' },
-                    ]}
-                    onChange={(quizOptions) => void change({ quizOptions })}
-                  />
-                </SettingRow>
-
-                <SettingRow label="Po trafieniu">
-                  <Choice
-                    value={chosen.settings.autoAdvance}
-                    options={[
-                      { value: false, label: 'czekaj' },
-                      { value: true, label: 'dalej sam' },
-                    ]}
-                    onChange={(autoAdvance) => void change({ autoAdvance })}
-                  />
-                </SettingRow>
-
-                <SettingRow label="Tempo mowy">
-                  <Choice
-                    value={chosen.settings.rate}
-                    options={[
-                      { value: 0.45, label: 'wolno' },
-                      { value: 0.6, label: 'normalnie' },
-                      { value: 0.85, label: 'szybko' },
-                    ]}
-                    onChange={(rate) => void change({ rate })}
-                  />
-                </SettingRow>
-
-                <SettingRow label="Produkcja">
-                  <Choice
-                    value={chosen.settings.production}
-                    options={[
-                      { value: 'off' as const, label: 'wyłączona' },
-                      { value: 'mature' as const, label: 'od dojrzałych' },
-                      { value: 'always' as const, label: 'zawsze' },
-                    ]}
-                    onChange={(production) => void change({ production })}
-                  />
-                </SettingRow>
-
-                <SettingRow label="Etap">
-                  <Choice
-                    value={chosen.settings.stageOverride ?? 'auto'}
-                    options={[
-                      { value: 'auto' as const, label: 'po kolei' },
-                      ...gatedStages(adapterFor(chosen.settings.lang)).map((stage) => ({
-                        value: stage,
-                        label: STAGE_LABEL[stage],
-                      })),
-                    ]}
-                    onChange={(value) =>
-                      void change({ stageOverride: value === 'auto' ? null : value })
-                    }
-                  />
-                </SettingRow>
-
-                <SettingRow label="Tryb">
-                  <Choice
-                    value={chosen.settings.active}
-                    options={[
-                      { value: true, label: 'aktywny' },
-                      { value: false, label: 'utrzymywany' },
-                    ]}
-                    onChange={(active) => void change({ active })}
-                  />
-                </SettingRow>
-              </Group>
+          {fresh > 0 && (
+            <div className="flex items-baseline gap-2">
+              <span className="font-display text-[24px] leading-none text-accent">+{fresh}</span>
+              <span className="font-ui text-[13.5px] text-text-2">nowych</span>
             </div>
           )}
-        </>
-      )}
-
-      {pending && (
-        <div className="nabu-card flex flex-col gap-5 px-6 py-6">
-          <div className="flex flex-col gap-1">
-            <Mono tone="accent">{adapterFor(pending).name}</Mono>
-            <p className="font-ui text-[14px] leading-[1.6] text-text-2">
-              Od czego zaczynamy? Wybór ustawia pasmo częstości, a przy trzech ostatnich
-              opcjach zapytamy jeszcze o dwadzieścia pięć słów, żeby trafić z materiałem
-              od pierwszej sesji.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            {LEVELS.map((level) => (
-              <button
-                key={level.id}
-                type="button"
-                onClick={() => void addLanguage(pending, level.id)}
-                className="nabu-press nabu-card flex flex-col gap-1 px-5 py-4 text-start"
-              >
-                <span className="font-ui text-[15px] text-text">{level.label}</span>
-                <span className="font-ui text-[12.5px] leading-[1.5] text-text-2">
-                  {level.description}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          <Button variant="ghost" full onClick={() => setPending(null)}>
-            anuluj
-          </Button>
         </div>
-      )}
 
-      {missing.length > 0 && (
-        <div className="flex flex-col gap-3 pt-2">
-          <Mono>dodaj język</Mono>
-          <div className="flex flex-wrap gap-2">
-            {missing.map((code) => (
-              <button
-                key={code}
-                type="button"
-                onClick={() => beginAdd(code)}
-                className="nabu-press nabu-card font-ui min-h-[44px] rounded-full px-5 text-[13px]
-                  text-text-2"
-              >
-                {adapterFor(code).name}
-              </button>
-            ))}
+        <StageBar
+          solid={current.progress.solid}
+          needed={current.progress.needed}
+          hint={STAGE_HINT[current.stage]}
+          done={current.stage === 'sentences'}
+        />
+
+        {current.backlog >= BACKLOG_LIMIT && (
+          <p className="font-ui text-[13px] leading-[1.6] text-text-2">
+            Czeka {current.backlog} rozpoczętych pozycji. Nie dokładamy kolejnych, dopóki nie
+            zejdziesz poniżej {BACKLOG_LIMIT} — inaczej zaległość rośnie szybciej, niż da się
+            ją nadrobić.
+          </p>
+        )}
+
+        <div className="flex flex-wrap items-end gap-5">
+          <div className="min-w-[230px] flex-1">
+            <Button
+              variant="primary"
+              full
+              disabled={!canStart}
+              className="min-h-[58px]"
+              onClick={() => {
+                // Pierwsze `speak()` musi wyjść z gestu użytkownika (ADR-001).
+                primeSpeech()
+                navigate(`/sesja/${current.settings.lang}`)
+              }}
+            >
+              {canStart ? 'Zacznij naukę' : 'Na dziś gotowe'}
+            </Button>
+          </div>
+          <div className="flex min-w-[220px] flex-1 flex-col gap-2">
+            <Mono>długość sesji</Mono>
+            <Choice
+              value={current.settings.intensity}
+              options={(['short', 'normal', 'long'] as const).map((level) => ({
+                value: level,
+                label: INTENSITY_LABEL[level],
+              }))}
+              onChange={(intensity) =>
+                void updateSettings(current.settings.lang, { intensity }).then(refresh)
+              }
+            />
           </div>
         </div>
-      )}
+      </section>
 
-      {/* Stopka jako lista, nie rząd linków: to są przejścia do innych ekranów,
-          więc mają wyglądać i zachowywać się jak wszystkie inne przejścia. */}
-      <div className="mt-auto flex flex-col gap-7 pt-4">
-        <Group>
-          {chosen && <Row label="Postęp" to={`/postep/${chosen.settings.lang}`} />}
-          <Row label="Ustawienia" to="/ustawienia" />
-        </Group>
+      <div className="grid gap-[14px] md:grid-cols-2">
+        <Link
+          to={`/postep/${current.settings.lang}`}
+          className="nabu-press nabu-card flex flex-col gap-4 px-6 py-6"
+        >
+          <Mono>postęp</Mono>
+          <div className="flex items-baseline gap-3">
+            <span className="font-display text-[38px] leading-none text-text">
+              {current.progress.solid}
+            </span>
+            <span className="font-ui text-[13.5px] text-text-2">słów utrwalonych</span>
+          </div>
+          <p className="font-ui text-[12.5px] leading-[1.5] text-text-3">
+            Mylone pary, prognoza powtórek i to, ile z talii jest już za Tobą.
+          </p>
+        </Link>
 
-        <Group label="narzędzia" hint="Test dźwięku wykonuje się na urządzeniu, nie na desktopie.">
-          <Row label="Demo karty" to="/demo" />
-          <Row label="Test dźwięku" to="/audio" />
-        </Group>
+        <div className="nabu-card flex flex-col gap-4 px-6 py-6">
+          <Mono>talia</Mono>
+          <div className="flex items-baseline gap-3">
+            <span className="font-display text-[38px] leading-none text-text">
+              {current.meta.sentences.toLocaleString('pl-PL')}
+            </span>
+            <span className="font-ui text-[13.5px] text-text-2">zdań w zapasie</span>
+          </div>
+          <p className="font-ui text-[12.5px] leading-[1.5] text-text-3">
+            Materiał pochodzi z Tatoeby, glosy z Wikisłownika. Nic nie jest napisane maszynowo.
+          </p>
+        </div>
       </div>
     </div>
   )

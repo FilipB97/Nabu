@@ -7,7 +7,6 @@ import { loadLexicon, loadStage, type Lexicon } from '@/store/decks'
 import { db } from '@/store/db'
 import { Bars } from '@/ui/Ticks'
 import { Group, Row } from '@/ui/List'
-import { NavBar } from '@/ui/NavBar'
 import { Mono } from '@/ui/Mono'
 
 /**
@@ -26,6 +25,24 @@ import { Mono } from '@/ui/Mono'
  */
 
 const FORECAST_DAYS = 14
+
+/**
+ * Nazwy dni pod słupkami. Z `Intl`, nie z wpisanej tablicy: skróty dni to sprawa
+ * lokalizacji, a nie treści aplikacji — i to samo wywołanie zadziała, gdy interfejs
+ * kiedykolwiek przestanie być wyłącznie polski.
+ *
+ * Dwie litery, bo słupek na telefonie ma około dwudziestu pikseli szerokości.
+ */
+const WEEKDAY = new Intl.DateTimeFormat('pl-PL', { weekday: 'short' })
+
+function forecastLabels(from = new Date()): string[] {
+  return Array.from({ length: FORECAST_DAYS }, (_, i) => {
+    if (i === 0) return 'dziś'
+    const day = new Date(from)
+    day.setDate(from.getDate() + i)
+    return WEEKDAY.format(day).replace('.', '').slice(0, 2)
+  })
+}
 
 /** Ile par pokazujemy. Więcej niż pięć to lista do przeglądania, a nie wniosek. */
 const TOP_PAIRS = 5
@@ -109,7 +126,7 @@ export function Stats() {
 
   if (!summary) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-bg">
+      <div className="flex flex-1 items-center justify-center">
         <Mono tone="normal">liczę…</Mono>
       </div>
     )
@@ -120,21 +137,29 @@ export function Stats() {
   ]
 
   return (
-    <div
-      className="mx-auto flex min-h-screen w-full max-w-[460px] flex-col gap-7 bg-bg px-5
-        pt-[calc(env(safe-area-inset-top)+14px)] pb-[calc(env(safe-area-inset-bottom)+32px)]"
-    >
-      <NavBar title={`${adapter.name} · postęp`} back="/start" backLabel="Start" />
-
-      <div className="flex items-baseline gap-3 px-1">
-        <span className="font-display text-[64px] leading-none text-text">{summary.mature}</span>
-        <span className="font-ui text-[15px] text-text-2">słów utrwalonych</span>
+    <div className="flex flex-col gap-[22px] pb-4">
+      <div className="flex items-baseline justify-between gap-4">
+        <h1 className="font-display text-[clamp(28px,5vw,38px)] leading-none text-text">Postęp</h1>
+        <Mono tone="accent">{adapter.name}</Mono>
       </div>
 
-      <Group>
-        <Row label="Wprowadzone" value={<span className="font-display text-[17px] text-text">{summary.cards}</span>} />
-        <Row label="W trakcie nauki" value={<span className="font-display text-[17px] text-text">{summary.learning}</span>} />
-      </Group>
+      {/* Trzy liczby obok siebie, nie lista: użytkownik porównuje je ze sobą („ile już
+          umiem wobec tego, ile jest w robocie"), a lista każe je czytać po kolei. */}
+      <div className="grid grid-cols-2 gap-[14px] md:grid-cols-3">
+        {[
+          { label: 'utrwalone', value: summary.mature, hint: 'interwał od trzech tygodni' },
+          { label: 'w nauce', value: summary.learning, hint: 'rozpoczęte, jeszcze nie stabilne' },
+          { label: 'wprowadzone', value: summary.cards, hint: 'wszystkie karty tego języka' },
+        ].map((stat) => (
+          <div key={stat.label} className="nabu-card flex flex-col gap-2 px-5 py-5">
+            <Mono>{stat.label}</Mono>
+            <span className="font-display text-[clamp(30px,6vw,38px)] leading-none text-text">
+              {stat.value}
+            </span>
+            <span className="font-ui text-[12.5px] leading-[1.45] text-text-3">{stat.hint}</span>
+          </div>
+        ))}
+      </div>
 
       <Group
         label="powtórki przez dwa tygodnie"
@@ -142,7 +167,11 @@ export function Stats() {
           wypada dużo powtórek — nie trzeba nic z tym robić."
       >
         <div className="py-5">
-          <Bars values={summary.forecast} label="prognoza powtórek na czternaście dni" />
+          <Bars
+            values={summary.forecast}
+            labels={forecastLabels()}
+            label="prognoza powtórek na czternaście dni"
+          />
         </div>
       </Group>
 

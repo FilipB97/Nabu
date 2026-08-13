@@ -185,7 +185,7 @@ function Section({
 
 export function Demo() {
   return (
-    <div className="flex min-h-screen flex-col gap-14 bg-bg px-8 py-14 text-text lg:px-16">
+    <div className="flex flex-col gap-14 py-4 text-text">
       <BrandMark />
       <ThemePicker />
 

@@ -17,13 +17,10 @@ export function Done() {
   const minutes = summary ? Math.max(1, Math.round((Date.now() - summary.startedAt) / 60000)) : 0
 
   return (
-    <div
-      className="mx-auto flex min-h-screen w-full max-w-[460px] flex-col justify-center gap-8 bg-bg
-        px-6 py-10"
-    >
+    <div className="mx-auto flex w-full max-w-[520px] flex-1 flex-col justify-center gap-7 py-6">
       <Mono tone="accent">{adapter.name} · sesja zakończona</Mono>
 
-      <div className="nabu-card flex flex-col gap-6 px-6 py-7">
+      <div className="nabu-card flex flex-col gap-6 px-[clamp(20px,4vw,28px)] py-7">
         <div className="flex items-baseline gap-3">
           <span className="font-display text-[56px] leading-none text-text">
             {summary?.answered ?? 0}
@@ -31,7 +28,7 @@ export function Done() {
           <span className="font-ui text-[15px] text-text-2">kart · {minutes} min</span>
         </div>
 
-        <dl className="flex flex-col gap-3">
+        <dl className="flex flex-col gap-3 border-t border-border-quiet pt-5">
           {[
             ['Trafione za pierwszym razem', summary?.firstTry ?? 0],
             ['Pudła', summary?.missed ?? 0],
@@ -45,9 +42,16 @@ export function Done() {
         </dl>
       </div>
 
-      <Button variant="primary" full onClick={() => navigate('/start')}>
-        Wróć
-      </Button>
+      <div className="flex flex-col gap-[10px] sm:flex-row">
+        <Button variant="primary" full onClick={() => navigate('/start')}>
+          Wróć do startu
+        </Button>
+        {/* Druga sesja tego samego dnia jest normalną rzeczą, a nie nagrodą za pierwszą —
+            więc jest zwykłym przyciskiem obok, nie zachętą po środku ekranu. */}
+        <Button full onClick={() => navigate(`/sesja/${lang}`, { replace: true })}>
+          Jeszcze jedna sesja
+        </Button>
+      </div>
 
       <Mono>zapisano lokalnie</Mono>
     </div>

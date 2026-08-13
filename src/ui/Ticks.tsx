@@ -100,6 +100,8 @@ export function Progress({ total, done, lapses = [], className, label }: Progres
 type BarsProps = {
   /** Wartości słupków. Pierwszy jest wyróżniony akcentem — to „dziś". */
   values: readonly number[]
+  /** Podpisy pod słupkami, po jednym na wartość. Bez nich oś nie mówi, o które dni chodzi. */
+  labels?: readonly string[]
   /** Wysokość najwyższego słupka w px. */
   height?: number
   className?: string
@@ -107,23 +109,29 @@ type BarsProps = {
 }
 
 /** Prognoza powtórek — ten sam motyw, inna skala. */
-export function Bars({ values, height = 56, className, label }: BarsProps) {
+export function Bars({ values, labels, height = 64, className, label }: BarsProps) {
   const max = Math.max(...values, 1)
 
   return (
     <div
-      className={`flex w-full items-end gap-[3px] ${className ?? ''}`}
+      className={`flex w-full items-end gap-[6px] ${className ?? ''}`}
       role="img"
       aria-label={label ?? 'prognoza powtórek'}
     >
       {values.map((value, i) => (
-        <div
-          key={i}
-          className={`min-w-0 flex-1 rounded-[1px] ${i === 0 ? 'bg-accent' : 'bg-tick-done'}`}
-          style={{
-            height: `${Math.max(2, Math.round((height * value) / max))}px`,
-          }}
-        />
+        <div key={i} className="flex min-w-0 flex-1 flex-col items-center gap-2">
+          {/* Słupek rośnie od dołu, więc kolumna musi mieć stałą wysokość — inaczej dni
+              bez powtórek podnosiłyby podpisy wyżej niż dni z powtórkami. */}
+          <div className="flex w-full items-end" style={{ height: `${height}px` }}>
+            <div
+              className={`w-full rounded-[3px] ${i === 0 ? 'bg-accent' : 'bg-tick-future'}`}
+              style={{ height: `${Math.max(2, Math.round((height * value) / max))}px` }}
+            />
+          </div>
+          {labels?.[i] && (
+            <span className="font-mono text-[10px] leading-none text-text-3">{labels[i]}</span>
+          )}
+        </div>
       ))}
     </div>
   )

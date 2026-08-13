@@ -90,7 +90,7 @@ export function AudioTest() {
   ]
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-[640px] flex-col gap-8 bg-bg px-6 py-12 text-text">
+    <div className="mx-auto flex w-full max-w-[640px] flex-col gap-8 py-4 text-text">
       <div className="flex flex-col gap-3">
         <Mono tone="accent">test dźwięku · sekcja 11 planu</Mono>
         <h1 className="font-display text-[26px] leading-[1.3]">
