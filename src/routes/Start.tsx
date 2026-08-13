@@ -71,8 +71,13 @@ export function Start() {
 
   return (
     <div className="flex flex-col gap-[22px]">
-      {/* Przełącznik języka wraca na górę tylko na telefonie — na desktopie jest w szynie. */}
-      {!wide && rows.length > 1 && (
+      {/*
+        Przełącznik języka wraca na górę tylko na telefonie — na desktopie jest w szynie.
+        Rysujemy go także przy JEDNYM języku, bo mieszka w nim jedyne na telefonie wejście
+        do dodawania kolejnego. Bez tego użytkownik z jednym językiem nie miał stąd żadnego
+        wyjścia poza naukę tego, co już ma.
+      */}
+      {!wide && (
         <div className="flex flex-wrap gap-2">
           {rows.map((row) => (
             <button
@@ -91,6 +96,14 @@ export function Start() {
               {row.due > 0 && <span className="font-mono text-[12px] opacity-80">{row.due}</span>}
             </button>
           ))}
+          <Link
+            to="/dodaj"
+            aria-label="Dodaj język"
+            className="nabu-press font-ui flex min-h-[40px] items-center rounded-full border
+              border-dashed border-border-quiet px-4 text-[14px] text-text-3"
+          >
+            + język
+          </Link>
         </div>
       )}
 
