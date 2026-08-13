@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router'
 import { adapterFor } from '@/langs'
 import { useLangs } from '@/app/lang'
-import { gatedStages } from '@/session/stages'
+import { gatedStages, stageLabel } from '@/session/stages'
 import { MODES, PRESETS, PRESETS_IDS, useTheme } from '@/theme/ThemeProvider'
 import { paletteOf, type Mode } from '@/theme/presets'
 import { clearLanguage, downloadBackup } from '@/store/backup'
@@ -33,8 +33,6 @@ const MODE_LABEL: Record<Mode, string> = {
   light: 'jasny',
   system: 'systemowy',
 }
-
-const STAGE_LABEL = { script: 'pismo', core: 'rdzeń', sentences: 'zdania' } as const
 
 /**
  * Wiersz z kontrolką. Na szerokim ekranie kontrolka stoi po prawej, jak w liście iOS;
@@ -257,7 +255,7 @@ export function Settings() {
                   { value: 'auto' as const, label: 'po kolei' },
                   ...gatedStages(adapter).map((stage) => ({
                     value: stage,
-                    label: STAGE_LABEL[stage],
+                    label: stageLabel(adapter, stage),
                   })),
                 ]}
                 onChange={(value) => change({ stageOverride: value === 'auto' ? null : value })}

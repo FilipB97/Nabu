@@ -1,8 +1,9 @@
 import { useCallback, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { adapterFor, type Stage } from '@/langs'
+import { adapterFor } from '@/langs'
 import { AGAIN, GOOD } from '@/srs/types'
 import { useSession } from '@/session/useSession'
+import { stageLabel } from '@/session/stages'
 import { layoutAroundCloze, type Piece } from '@/session/cloze'
 import { speak, stopSpeaking } from '@/audio/speak'
 import { ProduceCard } from '@/session/ProduceCard'
@@ -29,14 +30,6 @@ import { Progress } from '@/ui/Ticks'
 
 /** Ile trwa automatyczne przejście po trafieniu, gdy jest włączone. */
 const AUTO_ADVANCE_MS = 1400
-
-/** Nazwa etapu w nagłówku — użytkownik ma wiedzieć, czego uczy go ta karta. */
-const STAGE_LABEL: Record<Stage, string> = {
-  script: 'pismo',
-  core: 'rdzeń',
-  sentences: 'zdania',
-  production: 'produkcja',
-}
 
 export function Session() {
   const { lang = '' } = useParams()
@@ -256,7 +249,7 @@ export function Session() {
               nad zdaniem z kanji — czyli kłamać dokładnie tam, gdzie użytkownik szuka
               wyjaśnienia, dlaczego karta wygląda inaczej niż poprzednia. */}
           <Mono tone="normal" className="truncate">
-            {adapter.name} · {STAGE_LABEL[stageOfCard]}
+            {adapter.name} · {stageLabel(adapter, stageOfCard)}
           </Mono>
 
           <Mono tone="normal">
@@ -314,7 +307,7 @@ export function Session() {
            * pudło karą za cudzy błąd, a nauczyć się z tego nie da niczego.
            */
           <div className="flex flex-col items-center gap-4 text-center">
-            <Mono tone="accent">nowe · {STAGE_LABEL[stageOfCard]}</Mono>
+            <Mono tone="accent">nowe · {stageLabel(adapter, stageOfCard)}</Mono>
 
             <p
               dir={dirOf(adapter)}
@@ -495,7 +488,7 @@ export function Session() {
       <div className="mt-auto flex flex-col gap-[10px] pt-2">
         {current.intro ? (
           <Button variant="primary" full onClick={learned}>
-            {current.batch ? 'Poznaj te znaki' : 'Rozumiem, pytaj'}
+            {current.batch ? 'Poznaj tę porcję' : 'Rozumiem, pytaj'}
             <span className="font-mono ms-3 hidden text-[11px] opacity-60 md:inline">enter</span>
           </Button>
         ) : current.production ? (

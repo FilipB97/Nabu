@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router'
 import { adapterFor } from '@/langs'
 import { useLangs } from '@/app/lang'
 import { useWide } from '@/app/AppShell'
+import { stageHint, stageLabel } from '@/session/stages'
 import { primeSpeech } from '@/audio/speak'
 import { BACKLOG_LIMIT, INTENSITY, updateSettings, type LangSettings } from '@/store/db'
 import { Button } from '@/ui/Button'
@@ -24,14 +25,6 @@ const INTENSITY_LABEL: Record<LangSettings['intensity'], string> = {
   normal: 'normalna',
   long: 'długa',
 }
-
-const STAGE_LABEL = { script: 'pismo', core: 'rdzeń', sentences: 'zdania' } as const
-
-const STAGE_HINT = {
-  script: 'Najpierw znaki. Bez nich zdanie jest obrazkiem.',
-  core: 'Sto najczęstszych słów. Potem zdania mają się o co oprzeć.',
-  sentences: 'Zdania z korpusu, po jednym nowym słowie na raz.',
-} as const
 
 export function Start() {
   const navigate = useNavigate()
@@ -111,7 +104,7 @@ export function Start() {
         <h1 className="font-display text-[clamp(30px,5vw,40px)] leading-none text-text">
           {adapter.name}
         </h1>
-        <Mono tone="accent">etap · {STAGE_LABEL[current.stage]}</Mono>
+        <Mono tone="accent">etap · {stageLabel(adapter, current.stage)}</Mono>
       </div>
 
       <section className="nabu-card flex flex-col gap-[26px] px-[clamp(20px,5vw,32px)] py-[clamp(22px,5vw,30px)]">
@@ -133,16 +126,17 @@ export function Start() {
         <StageBar
           solid={current.progress.solid}
           needed={current.progress.needed}
-          hint={STAGE_HINT[current.stage]}
+          hint={stageHint(adapter, current.stage)}
           done={current.stage === 'sentences'}
         />
 
-        {/* Jak działa to pismo — przez cały etap 0, w jednym miejscu i bez powtarzania
-            na każdej karcie. Quiz uczy rozpoznawania znaku; tego, że kana jest tabelą
-            pięciu samogłosek, a hangul składa się w bloki, nie nauczy nigdy. */}
+        {/* Jak działa ten system — przez cały etap 0, w jednym miejscu i bez powtarzania
+            na każdej karcie. Quiz uczy rozpoznawania pojedynczej pozycji; tego, że kana
+            jest tabelą pięciu samogłosek, hangul składa się w bloki, a chiński ton zmienia
+            znaczenie słowa, nie nauczy nigdy. */}
         {current.stage === 'script' && adapter.scriptAbout && (
           <div className="flex flex-col gap-2 rounded-[14px] border border-border-quiet bg-surface-2 px-5 py-4">
-            <Mono>jak działa to pismo</Mono>
+            <Mono>jak działa {stageLabel(adapter, 'script')}</Mono>
             <p className="font-ui text-[13.5px] leading-[1.65] text-text-2">
               {adapter.scriptAbout}
             </p>

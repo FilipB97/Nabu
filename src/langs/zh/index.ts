@@ -1,4 +1,5 @@
 import type { LangAdapter } from '../types.ts'
+import { pinyinBatches, pinyinItems, pinyinMnemonic, pinyinNote } from './pinyin.ts'
 
 /**
  * Chiński standardowy — klasa C. Brak spacji wymusza segmentację, ale w odróżnieniu
@@ -21,9 +22,12 @@ export const zh: LangAdapter = {
   freqSource: 'list',
   script: /^[\p{Script=Han}\p{P}\p{Zs}\d、。「」]+$/u,
   rtl: false,
-  // Znaki nie są osobnym alfabetem do opanowania przed słowami — one SĄ słowami.
-  // Uczymy ich razem ze słownictwem, więc etap 0 nie ma tu czego obsługiwać.
-  hasScriptStage: false,
+  // Etap 0 nie jest tu pismem, tylko PINYINEM. Znaki rzeczywiście nie są alfabetem
+  // i uczymy ich razem ze słownictwem — ale skończony inwentarz do opanowania przed
+  // słowami istnieje: cztery tony, dwadzieścia jeden inicjałów i dwadzieścia finałów.
+  // Bez nich czytanie `dì fāng` pod każdą kartą jest szumem, a ton — który jest częścią
+  // słowa — w ogóle nie zostaje wprowadzony.
+  hasScriptStage: true,
   needsReading: true,
   needsTranslit: true,
   tokenizer: 'dict',
@@ -40,6 +44,17 @@ export const zh: LangAdapter = {
     minOptions: 4,
   },
   production: ['draw'],
+  scriptItems: pinyinItems,
+  scriptLabel: 'wymowa',
+  scriptAbout:
+    'Chiński nie ma alfabetu — znaki poznaje się razem ze słowami. Ma za to pinyin: ' +
+    'zapis wymowy literami łacińskimi, w którym te litery znaczą co innego niż po polsku ' +
+    '(q to „ć", x to „ś", c to „c"). Do tego cztery tony: ta sama sylaba wypowiedziana ' +
+    'inaczej jest innym słowem, więc ton nie jest ozdobą, tylko częścią wyrazu. ' +
+    'Czterdzieści sześć pozycji tego etapu domyka całą wymowę.',
+  scriptNote: pinyinNote,
+  scriptMnemonic: pinyinMnemonic,
+  scriptBatches: pinyinBatches,
   // Pinyin nad każdym słowem: z samego znaku nie da się odczytać wymowy, a ton jest
   // częścią słowa. To jest dokładnie odwrotny przypadek niż japońska furigana, która
   // nad kaną byłaby powtórzeniem.
