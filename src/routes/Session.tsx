@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { adapterFor } from '@/langs'
+import { adapterFor, type Stage } from '@/langs'
 import { AGAIN, GOOD } from '@/srs/types'
 import { useSession } from '@/session/useSession'
 import { layoutAroundCloze, type Piece } from '@/session/cloze'
@@ -29,11 +29,12 @@ import { Progress } from '@/ui/Ticks'
 /** Ile trwa automatyczne przejście po trafieniu, gdy jest włączone. */
 const AUTO_ADVANCE_MS = 1400
 
-/** Nazwa etapu w nagłówku — użytkownik ma wiedzieć, czego się w tej sesji uczy. */
-const STAGE_LABEL: Record<'script' | 'core' | 'sentences', string> = {
+/** Nazwa etapu w nagłówku — użytkownik ma wiedzieć, czego uczy go ta karta. */
+const STAGE_LABEL: Record<Stage, string> = {
   script: 'pismo',
   core: 'rdzeń',
   sentences: 'zdania',
+  production: 'produkcja',
 }
 
 export function Session() {
@@ -43,13 +44,13 @@ export function Session() {
   const {
     phase,
     current,
-    stage,
     reveal,
     progress,
     summary,
     settings,
     answer,
     answerProduction,
+    learned,
     next,
     restartClock,
     undoLast,
@@ -102,6 +103,14 @@ export function Session() {
         return
       }
 
+      if (current?.intro) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          learned()
+        }
+        return
+      }
+
       if (current?.production) return
       const options = current?.options?.options.length ?? 0
       const digit = Number.parseInt(event.key, 10)
@@ -120,7 +129,7 @@ export function Session() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [answer, undoLast, next, navigate, current, reveal, say])
+  }, [answer, undoLast, next, learned, navigate, current, reveal, say])
 
   // Automatyczne przejście wyłącznie po trafieniu — pudło zawsze czeka na dotknięcie,
   // bo to przy pudle jest najwięcej do przeczytania.
@@ -207,6 +216,18 @@ export function Session() {
   const stageOfCard = entry.card.stage
   const jednoelementowa = stageOfCard === 'script' || stageOfCard === 'core'
 
+  // Zdanie o znaku pochodzi z adaptera — to wiedza o piśmie, więc mieszka tam, gdzie
+  // reszta wiedzy o języku (sekcja 2.1). Rdzeń nie wie, czym różni się kana od hangulu.
+  //
+  // Szukamy PRAWDZIWEJ pozycji w inwentarzu, zamiast składać ją z tokenu karty: to
+  // `group` odróżnia hiraganę od katakany i spółgłoskę od samogłoski, a token go nie niesie.
+  const scriptItem =
+    current.intro && stageOfCard === 'script' && target
+      ? (adapter.scriptItems?.().find((each) => each.s === target.s) ?? null)
+      : null
+  const note = scriptItem ? (adapter.scriptNote?.(scriptItem) ?? null) : null
+  const mnemonic = scriptItem ? (adapter.scriptMnemonic?.(scriptItem) ?? null) : null
+
   const stateOf = (index: number): OptionState => {
     if (!reveal) return 'idle'
     if (index === reveal.correct) return 'correct'
@@ -231,8 +252,12 @@ export function Session() {
             <span className="hidden text-text-3 md:inline">· esc</span>
           </button>
 
+          {/* Etap BIEŻĄCEJ KARTY, nie sesji. Powtórki przychodzą ze wszystkich etapów
+              naraz (sekcja 2a), więc podpis wzięty z sesji potrafił zapowiadać „pismo"
+              nad zdaniem z kanji — czyli kłamać dokładnie tam, gdzie użytkownik szuka
+              wyjaśnienia, dlaczego karta wygląda inaczej niż poprzednia. */}
           <Mono tone="normal" className="truncate">
-            {adapter.name} · {STAGE_LABEL[stage]}
+            {adapter.name} · {STAGE_LABEL[stageOfCard]}
           </Mono>
 
           <Mono tone="normal">
@@ -249,11 +274,107 @@ export function Session() {
 
       {/* Karta rośnie do treści, a nie do wysokości ekranu: rozciągnięta na cały telefon
           zostawiała pod odpowiedzią pół ekranu pustki i odsuwała opcje poza zasięg kciuka. */}
-      <main
+      <section
         className="nabu-card flex flex-col justify-center gap-6 rounded-[22px]
           px-[clamp(22px,4vw,40px)] py-[clamp(26px,4vw,38px)] min-h-[210px] md:min-h-[248px]"
       >
-        {current.production && !reveal ? (
+        {current.batch ? (
+          /**
+           * Porcja pisma — cały rząd naraz, zanim padnie pytanie o pierwszy znak.
+           *
+           * `か き く け こ` pokazane razem uczą TABELI: jedna spółgłoska i te same pięć
+           * samogłosek. Rozdzielone na pięć sesji uczą pięciu niepowiązanych obrazków,
+           * a przy 92 znakach to jest różnica między systemem a wkuwaniem inwentarza.
+           */
+          <div className="flex flex-col items-center gap-5 text-center">
+            <Mono tone="accent">nowa porcja · {current.batch.label}</Mono>
+
+            <div className="flex flex-wrap items-end justify-center gap-x-6 gap-y-4">
+              {current.batch.items.map((item) => (
+                <span key={item.s} className="flex flex-col items-center gap-2">
+                  <span
+                    className={`${fontClass} text-[clamp(40px,9vw,56px)] leading-none text-text`}
+                  >
+                    {item.s}
+                  </span>
+                  <span className="font-mono text-[13px] text-text-2">{item.r}</span>
+                </span>
+              ))}
+            </div>
+
+            <p className="font-ui max-w-[460px] text-[13.5px] leading-[1.65] text-text-2">
+              {current.batch.note}
+            </p>
+          </div>
+        ) : current.intro ? (
+          /**
+           * Wprowadzenie — pozycja pokazuje się, zanim o nią zapytamy.
+           *
+           * Bez tego kroku pierwsze spotkanie ze znakiem jest wyborem jednej z czterech
+           * rzeczy, których żadnej użytkownik nie widział. Trafienie jest wtedy przypadkiem,
+           * pudło karą za cudzy błąd, a nauczyć się z tego nie da niczego.
+           */
+          <div className="flex flex-col items-center gap-4 text-center">
+            <Mono tone="accent">nowe · {STAGE_LABEL[stageOfCard]}</Mono>
+
+            <p
+              className={`${fontClass} leading-[1.2] text-text`}
+              style={{ fontSize: jednoelementowa ? 'clamp(72px,16vw,104px)' : 'clamp(34px,7vw,48px)' }}
+            >
+              {jednoelementowa ? entry.item.text : (target?.s ?? '')}
+            </p>
+
+            {/* Czytanie i znaczenie. Na etapie pisma glosa JEST czytaniem, więc drugi
+                wiersz byłby tym samym napisem dwa razy. */}
+            <div className="flex flex-wrap items-baseline justify-center gap-x-3 gap-y-1">
+              {target?.r && target.r !== target.gloss && (
+                <span className="font-mono text-[15px] text-accent">{target.r}</span>
+              )}
+              <span className="font-ui text-[19px] text-text">{target?.gloss}</span>
+              <button
+                type="button"
+                onClick={() => void speak(target?.s ?? '', {
+                  locale: adapter.tts.locale,
+                  rate: settings.rate,
+                })}
+                aria-label="Posłuchaj"
+                className="nabu-press -m-2 rounded-full p-2 text-[17px] text-text-3"
+              >
+                ♪
+              </button>
+            </div>
+
+            {note && (
+              <p className="font-ui max-w-[440px] text-[13.5px] leading-[1.6] text-text-2">
+                {note}
+              </p>
+            )}
+
+            {/* Zaczep pamięciowy stoi osobno i niżej: nota mówi, JAK DZIAŁA pismo,
+                a zaczep — co ten kształt przypomina. To dwie różne rzeczy i mieszanie
+                ich w jeden akapit gubi obie. */}
+            {mnemonic && (
+              <p className="nabu-accent-tint font-ui max-w-[440px] rounded-[12px] px-4 py-3
+                text-[13.5px] leading-[1.6] text-text">
+                {mnemonic}
+              </p>
+            )}
+
+            {/* Przy zdaniu pokazujemy od razu, jak słowo pracuje w kontekście — po to
+                właśnie jest zdanie, a nie sama para słowo–glosa. */}
+            {!jednoelementowa && (
+              <div className="flex flex-col gap-2 border-t border-border-quiet pt-4">
+                <p
+                  className={`${fontClass} text-text-2`}
+                  style={{ fontSize: `${Math.round(adapter.display.size * 0.62)}px` }}
+                >
+                  {entry.item.text}
+                </p>
+                <p className="font-ui text-[13.5px] leading-[1.5] text-text-3">{entry.item.pl}</p>
+              </div>
+            )}
+          </div>
+        ) : current.production && !reveal ? (
           <ProduceCard
             production={current.production}
             adapter={adapter}
@@ -362,11 +483,16 @@ export function Session() {
             <span className="font-ui text-[14.5px] text-text-2">{reveal.answer.gloss}</span>
           </div>
         )}
-      </main>
+      </section>
 
       {/* Opcje siadają na dole ekranu — tam sięga kciuk (sekcja 8.4). */}
       <div className="mt-auto flex flex-col gap-[10px] pt-2">
-        {current.production ? (
+        {current.intro ? (
+          <Button variant="primary" full onClick={learned}>
+            {current.batch ? 'Poznaj te znaki' : 'Rozumiem, pytaj'}
+            <span className="font-mono ms-3 hidden text-[11px] opacity-60 md:inline">enter</span>
+          </Button>
+        ) : current.production ? (
           reveal && (
             <Button variant="primary" full onClick={next}>
               Dalej

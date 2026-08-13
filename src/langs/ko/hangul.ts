@@ -17,7 +17,7 @@ const MEDIAL_COUNT = 21
 const FINAL_COUNT = 28
 
 /** 초성 — 19 spółgłosek nagłosowych, w kolejności unikodowej. */
-import type { ScriptItem } from '../types.ts'
+import type { ScriptBatch, ScriptItem } from '../types.ts'
 
 export const INITIALS = [...'ᄀᄁᄂᄃᄄᄅᄆᄇᄈᄉᄊᄋᄌᄍᄎᄏᄐᄑᄒ']
 
@@ -115,4 +115,166 @@ const LETTERS: ReadonlyArray<[litera: string, czytanie: string, klasa: string]> 
 
 export function jamoItems(): ScriptItem[] {
   return LETTERS.map(([s, r, group]) => ({ s, r, group }))
+}
+
+/**
+ * Wyjaśnienie pojedynczej litery przy pierwszym spotkaniu — sekcja 2a.
+ *
+ * Hangul jest alfabetem, w którym kształt litery odpowiada układowi ust, a litery
+ * składa się w bloki sylabowe. Użytkownik, który tego nie usłyszy, uczy się czterdziestu
+ * kresek bez klucza — a z kluczem czyta dowolną sylabę po dwudziestu minutach.
+ */
+export function jamoNote(item: ScriptItem): string {
+  if (item.group === 'samogłoska') {
+    return (
+      `Samogłoska „${item.r}". Kreska pionowa albo pozioma z kropką decyduje o brzmieniu; ` +
+      'samogłoski stoją w bloku po prawej albo pod spółgłoską.'
+    )
+  }
+  if (item.group === 'dwugłoska') {
+    return `Dwugłoska „${item.r}" — złożenie dwóch samogłosek zapisane jako jeden znak.`
+  }
+  if (item.group === 'spółgłoska napięta') {
+    return (
+      `Spółgłoska napięta „${item.r}": ta sama litera podwojona, wymawiana mocniej ` +
+      'i bez przydechu. Podwojenie zawsze znaczy napięcie.'
+    )
+  }
+  return (
+    `Spółgłoska „${item.r}". Sylaba zaczyna się od spółgłoski, więc ta litera stanie ` +
+    'w bloku jako pierwsza.'
+  )
+}
+
+/**
+ * Zaczepy pamięciowe dla hangulu.
+ *
+ * W odróżnieniu od kany nie są umowne: kształty podstawowych spółgłosek RYSUJĄ układ
+ * narządów mowy (ㄱ to podniesiony tył języka, ㅁ to zamknięte usta), a każda kreska
+ * dołożona do kształtu podstawowego dokłada przydech. Hangul został tak zaprojektowany
+ * w 1443 roku i powiedzenie tego wprost zamienia czterdzieści kresek w pięć kształtów
+ * plus dwie reguły.
+ */
+const HINTS: Record<string, string> = {
+  ㄱ: 'Tył języka podniesiony do podniebienia — dokładnie ten kształt.',
+  ㄴ: 'Czubek języka oparty o wałek za zębami.',
+  ㄷ: 'To ㄴ z dachem: ten sam język, mocniejsze zwarcie.',
+  ㄹ: 'Zygzak — język podwija się i wraca; stąd dźwięk między r a l.',
+  ㅁ: 'Zamknięte usta widziane z przodu — kwadrat.',
+  ㅂ: 'Usta z ㅁ, które otwierają się do góry.',
+  ㅅ: 'Powietrze przeciskane przez szczelinę — strzałka w dół.',
+  ㅇ: 'Otwarte gardło. Na początku sylaby nieme, na końcu „ng".',
+  ㅈ: 'To ㅅ z daszkiem — szczelina zaczyna się od zwarcia.',
+  ㅊ: 'To ㅈ z dodatkową kreską: kreska zawsze znaczy przydech.',
+  ㅋ: 'To ㄱ z dodatkową kreską — przydechowe k.',
+  ㅌ: 'To ㄷ z dodatkową kreską — przydechowe t.',
+  ㅍ: 'To ㅂ położone i uproszczone — przydechowe p.',
+  ㅎ: 'Kapelusz nad otwartym gardłem — samo tchnienie.',
+
+  ㄲ: 'Podwojone ㄱ. Podwojenie zawsze znaczy napięcie, nigdy przydech.',
+  ㄸ: 'Podwojone ㄷ — mocniej i krócej, bez wydmuchu powietrza.',
+  ㅃ: 'Podwojone ㅂ — mocniej i krócej, bez wydmuchu powietrza.',
+  ㅆ: 'Podwojone ㅅ — syczące i napięte.',
+  ㅉ: 'Podwojone ㅈ — mocniej i krócej, bez wydmuchu powietrza.',
+
+  ㅏ: 'Pionowa kreska z kreseczką po prawej — usta otwarte szeroko.',
+  ㅑ: 'To ㅏ z drugą kreseczką: druga kreska zawsze dokłada „j" z przodu.',
+  ㅓ: 'Kreseczka po lewej zamiast po prawej — dźwięk cofnięty, jak „o" w słowie „sok".',
+  ㅕ: 'To ㅓ z drugą kreseczką, czyli „jo" cofnięte.',
+  ㅗ: 'Kreseczka nad poziomą kreską — usta zaokrąglone do „o".',
+  ㅛ: 'To ㅗ z drugą kreseczką — „jo".',
+  ㅜ: 'Kreseczka pod poziomą kreską — usta ściągnięte do „u".',
+  ㅠ: 'To ㅜ z drugą kreseczką — „ju".',
+  ㅡ: 'Sama pozioma kreska — usta rozciągnięte, dźwięk między y a u.',
+  ㅣ: 'Sama pionowa kreska — proste „i".',
+
+  ㅐ: 'Złożenie ㅏ i ㅣ — jedno „e", szersze niż ㅔ.',
+  ㅒ: 'Złożenie ㅑ i ㅣ — „je".',
+  ㅔ: 'Złożenie ㅓ i ㅣ — „e" węższe niż ㅐ; dziś różnica prawie zanikła.',
+  ㅖ: 'Złożenie ㅕ i ㅣ — „je".',
+  ㅘ: 'Złożenie ㅗ i ㅏ — „ła".',
+  ㅙ: 'Złożenie ㅗ i ㅐ — „łe".',
+  ㅚ: 'Złożenie ㅗ i ㅣ — dziś czytane jak „łe".',
+  ㅝ: 'Złożenie ㅜ i ㅓ — „ło".',
+  ㅞ: 'Złożenie ㅜ i ㅔ — „łe".',
+  ㅟ: 'Złożenie ㅜ i ㅣ — „łi".',
+  ㅢ: 'Złożenie ㅡ i ㅣ — wymawiane jednym ruchem, „yi".',
+}
+
+export function jamoMnemonic(item: ScriptItem): string | undefined {
+  return HINTS[item.s]
+}
+
+/**
+ * Porcje wprowadzania. Kolejność jest identyczna z `jamoItems()` — identyfikatory
+ * pozycji w talii są indeksami tamtej listy, więc przestawienie porcji przestawiłoby
+ * znaczenie kart, które użytkownik ma już w bazie.
+ */
+const BATCHES: ReadonlyArray<{ id: string; label: string; note: string; from: number; to: number }> = [
+  {
+    id: 'podstawowe-1',
+    label: 'spółgłoski podstawowe',
+    note: 'Pięć kształtów, z których zbudowany jest cały hangul. Każdy rysuje układ języka i ust przy wymowie.',
+    from: 0,
+    to: 5,
+  },
+  {
+    id: 'podstawowe-2',
+    label: 'spółgłoski dźwięczne',
+    note: 'Cztery kolejne kształty. ㅇ jest wyjątkiem: na początku sylaby nie znaczy nic, na końcu czyta się „ng".',
+    from: 5,
+    to: 9,
+  },
+  {
+    id: 'przydechowe',
+    label: 'spółgłoski z przydechem',
+    note: 'Wszystkie powstały przez dołożenie kreski do kształtu podstawowego. Kreska = wydmuch powietrza.',
+    from: 9,
+    to: 14,
+  },
+  {
+    id: 'napiete',
+    label: 'spółgłoski napięte',
+    note: 'Litera podwojona: mocniej, krócej i BEZ wydmuchu. To jedyna reguła, jakiej trzeba do całej piątki.',
+    from: 14,
+    to: 19,
+  },
+  {
+    id: 'samogloski-pionowe',
+    label: 'samogłoski pionowe',
+    note: 'Kreska pionowa z kreseczką po prawej albo po lewej. Druga kreseczka zawsze dokłada „j" z przodu.',
+    from: 19,
+    to: 23,
+  },
+  {
+    id: 'samogloski-poziome',
+    label: 'samogłoski poziome',
+    note: 'Kreska pozioma z kreseczką nad albo pod. Ta sama reguła: druga kreseczka to „j".',
+    from: 23,
+    to: 29,
+  },
+  {
+    id: 'dwugloski-1',
+    label: 'dwugłoski',
+    note: 'Od tej porcji nie ma nowych kształtów — są wyłącznie złożenia tego, co już znasz.',
+    from: 29,
+    to: 35,
+  },
+  {
+    id: 'dwugloski-2',
+    label: 'dwugłoski z ㅜ',
+    note: 'Złożenia zaczynające się od ㅗ i ㅜ brzmią z „ł" na początku.',
+    from: 35,
+    to: 40,
+  },
+]
+
+export function jamoBatches(): ScriptBatch[] {
+  const items = jamoItems()
+  return BATCHES.map((batch) => ({
+    id: batch.id,
+    label: batch.label,
+    note: batch.note,
+    items: items.slice(batch.from, batch.to),
+  }))
 }

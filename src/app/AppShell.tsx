@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router'
 import { adapterFor } from '@/langs'
 import { useLangs } from './lang'
@@ -77,6 +77,59 @@ function sectionOf(pathname: string): Section {
 /** Ekrany prowadzone krok po kroku: bez zakładek, z jednym wyjściem. */
 function isFocused(pathname: string): boolean {
   return pathname.startsWith('/sesja/') || pathname.startsWith('/kalibracja/')
+}
+
+/**
+ * Ekrany, na których wracamy tam, gdzie użytkownik był, a nie na górę.
+ *
+ * Wejście w ustawienia z połowy listy i powrót na sam początek ekranu kasuje kontekst,
+ * którego szukało się przez chwilę — a przy liście talii czy prognozy ten kontekst jest
+ * całą treścią. Sesji i kalibracji tu nie ma: one zawsze zaczynają od pierwszej karty.
+ */
+const REMEMBERED = ['/start', '/postep', '/ustawienia', '/dodaj']
+
+/**
+ * Pamięć pozycji przewijania per ekran.
+ *
+ * Trzymana w pamięci, nie w `sessionStorage`: chodzi o powrót w obrębie jednej sesji
+ * pracy, a nie o odtwarzanie stanu po przeładowaniu — tam użytkownik i tak spodziewa
+ * się początku. Zapis idzie przy każdym przewinięciu, więc nie zależy od tego, którą
+ * drogą ekran został opuszczony (chevron, zakładka, przycisk wstecz przeglądarki).
+ */
+function useScrollMemory(pathname: string) {
+  const positions = useRef(new Map<string, number>())
+  const at = useRef(pathname)
+
+  useEffect(() => {
+    const save = () => positions.current.set(at.current, window.scrollY)
+    window.addEventListener('scroll', save, { passive: true })
+    return () => window.removeEventListener('scroll', save)
+  }, [])
+
+  useLayoutEffect(() => {
+    at.current = pathname
+    const remembered = REMEMBERED.some((prefix) => pathname.startsWith(prefix))
+    const target = remembered ? (positions.current.get(pathname) ?? 0) : 0
+
+    if (target === 0) {
+      window.scrollTo(0, 0)
+      return
+    }
+
+    // Treść bywa doładowywana po pierwszym renderze (talia, statystyki), a do pozycji
+    // 800 px nie da się przewinąć strony, która ma na razie 400. Stąd kilka prób przez
+    // kolejne klatki zamiast jednego skoku — z twardym limitem, żeby nie kręcić się
+    // w nieskończoność na ekranie, który po prostu jest krótszy niż był.
+    let frames = 0
+    let raf = 0
+    const settle = () => {
+      window.scrollTo(0, target)
+      if (Math.abs(window.scrollY - target) < 2 || frames++ > 20) return
+      raf = requestAnimationFrame(settle)
+    }
+    settle()
+    return () => cancelAnimationFrame(raf)
+  }, [pathname])
 }
 
 /**
@@ -201,6 +254,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { selected } = useLangs()
   const section = sectionOf(pathname)
   const focused = isFocused(pathname)
+  useScrollMemory(pathname)
 
   if (wide) {
     return (

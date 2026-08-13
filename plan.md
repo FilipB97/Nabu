@@ -190,6 +190,34 @@ języka. Szczegóły w sekcjach 6.4 i 7.
 Etap 0 istnieje tylko tam, gdzie adapter ma `hasScriptStage: true` — czyli dla japońskiego
 (kana) i koreańskiego (hangul). Języki łacińskie startują od `core`.
 
+### 2a.1 Najpierw pokaż, potem pytaj
+
+Quiz nie może być pierwszym kontaktem z pozycją. Wybór jednej z czterech rzeczy, których
+żadnej użytkownik nie widział, jest losowaniem: trafienie niczego nie dowodzi, a pudło
+karze harmonogramem za materiał, którego nikt nie pokazał. Dlatego każda nowa pozycja
+przechodzi przez **wprowadzenie**, a na etapie 0 przez dwa kroki:
+
+1. **Porcja** — cały rząd naraz (`か き く け こ`) z czytaniami i regułą, która go spina.
+   Pismo poznaje się grupami: rząd pokazany w całości uczy tabeli, rozdzielony na pięć
+   sesji uczy pięciu niepowiązanych obrazków.
+2. **Znak** — pojedyncza pozycja z czytaniem, dźwiękiem, zdaniem o tym, skąd to czytanie
+   się bierze, i zaczepem pamięciowym (metoda słowa-klucza).
+
+Dopiero potem pada pytanie — od razu, bo pierwsze przypomnienie tuż po pokazaniu jest
+najtańsze, a karta i tak wróci w tej samej sesji przez kroki nauki. Wprowadzenie nie jest
+odpowiedzią i nie zapisuje niczego w harmonogramie.
+
+Konsekwencja dla kontraktu adaptera (sekcja 2.1): język z etapem 0 musi dostarczyć
+`scriptAbout` (jak działa to pismo), `scriptNote` (skąd bierze się czytanie znaku),
+`scriptMnemonic` (co przypomina kształt) i `scriptBatches` (porcje wprowadzania).
+Wymusza to test kontraktu — pismo bez wyjaśnienia nie wchodzi do repo.
+
+Do tego czwarta reguła doboru opcji (sekcja 6.3): **dystraktory mają pierwszeństwo
+z pozycji już poznanych**. Wybór między czterema znakami, z których trzy widzi się
+pierwszy raz, sprawdza pamięć sprzed dziesięciu sekund; wybór między czterema znanymi
+sprawdza, czy się je rozróżnia. Po kilku sesjach cały inwentarz jest poznany i reguła
+przestaje cokolwiek zmieniać.
+
 ---
 
 ## 3. Poziom trudności

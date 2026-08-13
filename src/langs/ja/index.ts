@@ -1,5 +1,5 @@
 import type { LangAdapter } from '../types.ts'
-import { kanaItems, needsFurigana } from './kana.ts'
+import { kanaBatches, kanaItems, kanaMnemonic, kanaNote, needsFurigana } from './kana.ts'
 import { KANA_ROWS, composeKana } from './keyboard.ts'
 
 /**
@@ -42,6 +42,14 @@ export const ja: LangAdapter = {
   },
   production: ['draw', 'kana'],
   scriptItems: kanaItems,
+  scriptAbout:
+    'Japoński zapisuje się trzema pismami naraz. Kana — hiragana i katakana — jest ' +
+    'sylabiczna: jeden znak to jedna sylaba, czytana zawsze tak samo. Kanji przychodzą ' +
+    'później i nad nimi i tak stoi kana, więc od niej trzeba zacząć. Znaków jest 2 × 46 ' +
+    'i układają się w tabelę pięciu samogłosek na dziewięć spółgłosek.',
+  scriptNote: kanaNote,
+  scriptMnemonic: kanaMnemonic,
+  scriptBatches: kanaBatches,
   showReading: needsFurigana,
   keyboard: { rows: KANA_ROWS, compose: composeKana },
 }

@@ -124,6 +124,18 @@ export function Start() {
           done={current.stage === 'sentences'}
         />
 
+        {/* Jak działa to pismo — przez cały etap 0, w jednym miejscu i bez powtarzania
+            na każdej karcie. Quiz uczy rozpoznawania znaku; tego, że kana jest tabelą
+            pięciu samogłosek, a hangul składa się w bloki, nie nauczy nigdy. */}
+        {current.stage === 'script' && adapter.scriptAbout && (
+          <div className="flex flex-col gap-2 rounded-[14px] border border-border-quiet bg-surface-2 px-5 py-4">
+            <Mono>jak działa to pismo</Mono>
+            <p className="font-ui text-[13.5px] leading-[1.65] text-text-2">
+              {adapter.scriptAbout}
+            </p>
+          </div>
+        )}
+
         {current.backlog >= BACKLOG_LIMIT && (
           <p className="font-ui text-[13px] leading-[1.6] text-text-2">
             Czeka {current.backlog} rozpoczętych pozycji. Nie dokładamy kolejnych, dopóki nie

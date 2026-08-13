@@ -41,5 +41,5 @@ export function interferesWith(code: string): string[] {
 // bez wpisywania kodu języka jako literału (patrz reguła ESLint).
 export { es, pt, sv, ko, ja, zh }
 
-export type { LangAdapter, ProductionMode, ScriptItem, Stage } from './types.ts'
+export type { LangAdapter, ProductionMode, ScriptBatch, ScriptItem, Stage } from './types.ts'
 export { stagesFor } from './types.ts'

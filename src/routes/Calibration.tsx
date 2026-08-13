@@ -127,7 +127,7 @@ export function Calibration() {
         <Progress total={probes.length} done={at} label={`słowo ${at + 1} z ${probes.length}`} />
       </header>
 
-      <main
+      <section
         className="nabu-card flex flex-col items-center justify-center gap-5 rounded-[22px]
           px-6 py-10 min-h-[240px] md:min-h-[280px]"
       >
@@ -140,7 +140,7 @@ export function Calibration() {
         <p className="font-ui max-w-[440px] text-center text-[14px] leading-[1.6] text-text-2">
           Znasz to słowo? Nie sprawdzamy Cię — szukamy tylko miejsca, od którego zacząć.
         </p>
-      </main>
+      </section>
 
       <div className="mt-auto flex flex-col gap-[10px] pt-2">
         <div className="flex gap-[10px]">

@@ -57,6 +57,16 @@ export function buildOptions(
   last: LastShown | null,
   confusions: Confusions,
   random: () => number = Math.random,
+  /**
+   * Pozycje, które użytkownik już poznał. Mają pierwszeństwo wśród dystraktorów —
+   * to jest reguła 4 i widać ją wyłącznie na początku nauki.
+   *
+   * Wybór między czterema znakami, z których trzy widzi się pierwszy raz, jest testem
+   * jednej rzeczy: czy zapamiętałem TEN znak sprzed dziesięciu sekund. Wybór między
+   * czterema znanymi jest testem tego, czy je rozróżniam — a o to właśnie chodzi.
+   * Po kilku sesjach cały inwentarz jest poznany i reguła przestaje cokolwiek zmieniać.
+   */
+  met: ReadonlySet<string> = new Set(),
 ): OptionSet | null {
   const target = item.tokens[item.cloze]
   if (!item.quiz || !target?.gloss) return null
@@ -67,9 +77,13 @@ export function buildOptions(
   const available = item.distractors.filter((id) => id !== correctId && lexicon[id])
   if (available.length < needed) return null
 
-  // Reguła 3: pary, na których użytkownik już się nabrał, mają pierwszeństwo.
+  // Reguła 4 przed regułą 3: najpierw to, co użytkownik w ogóle widział, dopiero potem
+  // to, na czym się nabrał. Nabrać się można wyłącznie na coś, co się już zna.
   const missed = confusions.get(correctId)
   const weighted = [...available].sort((a, b) => {
+    const ma = met.has(a) ? 1 : 0
+    const mb = met.has(b) ? 1 : 0
+    if (ma !== mb) return mb - ma
     const wa = missed?.get(a) ?? 0
     const wb = missed?.get(b) ?? 0
     if (wa !== wb) return wb - wa
