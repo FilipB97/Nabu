@@ -221,13 +221,12 @@ export function Session() {
   //
   // Szukamy PRAWDZIWEJ pozycji w inwentarzu, zamiast składać ją z tokenu karty: to
   // `group` odróżnia hiraganę od katakany i spółgłoskę od samogłoski, a token go nie niesie.
-  const note =
+  const scriptItem =
     current.intro && stageOfCard === 'script' && target
-      ? (() => {
-          const known = adapter.scriptItems?.().find((each) => each.s === target.s)
-          return known ? (adapter.scriptNote?.(known) ?? null) : null
-        })()
+      ? (adapter.scriptItems?.().find((each) => each.s === target.s) ?? null)
       : null
+  const note = scriptItem ? (adapter.scriptNote?.(scriptItem) ?? null) : null
+  const mnemonic = scriptItem ? (adapter.scriptMnemonic?.(scriptItem) ?? null) : null
 
   const stateOf = (index: number): OptionState => {
     if (!reveal) return 'idle'
@@ -279,7 +278,35 @@ export function Session() {
         className="nabu-card flex flex-col justify-center gap-6 rounded-[22px]
           px-[clamp(22px,4vw,40px)] py-[clamp(26px,4vw,38px)] min-h-[210px] md:min-h-[248px]"
       >
-        {current.intro ? (
+        {current.batch ? (
+          /**
+           * Porcja pisma — cały rząd naraz, zanim padnie pytanie o pierwszy znak.
+           *
+           * `か き く け こ` pokazane razem uczą TABELI: jedna spółgłoska i te same pięć
+           * samogłosek. Rozdzielone na pięć sesji uczą pięciu niepowiązanych obrazków,
+           * a przy 92 znakach to jest różnica między systemem a wkuwaniem inwentarza.
+           */
+          <div className="flex flex-col items-center gap-5 text-center">
+            <Mono tone="accent">nowa porcja · {current.batch.label}</Mono>
+
+            <div className="flex flex-wrap items-end justify-center gap-x-6 gap-y-4">
+              {current.batch.items.map((item) => (
+                <span key={item.s} className="flex flex-col items-center gap-2">
+                  <span
+                    className={`${fontClass} text-[clamp(40px,9vw,56px)] leading-none text-text`}
+                  >
+                    {item.s}
+                  </span>
+                  <span className="font-mono text-[13px] text-text-2">{item.r}</span>
+                </span>
+              ))}
+            </div>
+
+            <p className="font-ui max-w-[460px] text-[13.5px] leading-[1.65] text-text-2">
+              {current.batch.note}
+            </p>
+          </div>
+        ) : current.intro ? (
           /**
            * Wprowadzenie — pozycja pokazuje się, zanim o nią zapytamy.
            *
@@ -320,6 +347,16 @@ export function Session() {
             {note && (
               <p className="font-ui max-w-[440px] text-[13.5px] leading-[1.6] text-text-2">
                 {note}
+              </p>
+            )}
+
+            {/* Zaczep pamięciowy stoi osobno i niżej: nota mówi, JAK DZIAŁA pismo,
+                a zaczep — co ten kształt przypomina. To dwie różne rzeczy i mieszanie
+                ich w jeden akapit gubi obie. */}
+            {mnemonic && (
+              <p className="nabu-accent-tint font-ui max-w-[440px] rounded-[12px] px-4 py-3
+                text-[13.5px] leading-[1.6] text-text">
+                {mnemonic}
               </p>
             )}
 
@@ -452,7 +489,7 @@ export function Session() {
       <div className="mt-auto flex flex-col gap-[10px] pt-2">
         {current.intro ? (
           <Button variant="primary" full onClick={learned}>
-            Rozumiem, pytaj
+            {current.batch ? 'Poznaj te znaki' : 'Rozumiem, pytaj'}
             <span className="font-mono ms-3 hidden text-[11px] opacity-60 md:inline">enter</span>
           </Button>
         ) : current.production ? (

@@ -52,6 +52,24 @@ export type ScriptItem = {
   group: string
 }
 
+/**
+ * Porcja etapu 0 — tyle znaków, ile wprowadzamy naraz.
+ *
+ * Pismo poznaje się grupami, nie pojedynczo: `か き く け こ` to jedna spółgłoska
+ * i pięć samogłosek, więc pokazane razem uczą TABELI, a rozdzielone na pięć sesji
+ * uczą pięciu niepowiązanych obrazków. To jest różnica między zapamiętaniem systemu
+ * a wkuwaniem inwentarza.
+ */
+export type ScriptBatch = {
+  /** Identyfikator porcji — po nim wiemy, że była już pokazana. */
+  id: string
+  /** Nazwa, np. „hiragana · rząd K". */
+  label: string
+  /** Co łączy znaki w tej porcji i czego można się z niej domyślić. */
+  note: string
+  items: ScriptItem[]
+}
+
 export type LangAdapter = {
   /** Kod ISO 639-1, ten sam co katalog w `data/`. */
   code: string
@@ -204,6 +222,19 @@ export type LangAdapter = {
    * inaczej wybór spośród czterech nieznanych sylab jest losowaniem, a nie nauką.
    */
   scriptNote?: (item: ScriptItem) => string
+
+  /**
+   * Zaczep pamięciowy: co ten kształt przypomina. Metoda słowa-klucza jest najlepiej
+   * udokumentowanym sposobem na obce pismo — kształt bez skojarzenia jest kreską,
+   * ze skojarzeniem staje się obrazkiem, który da się przywołać.
+   */
+  scriptMnemonic?: (item: ScriptItem) => string | undefined
+
+  /**
+   * Inwentarz pisma podzielony na porcje do wprowadzania, w kolejności. Suma porcji
+   * musi być równa `scriptItems()` co do kolejności — pilnuje tego test kontraktu.
+   */
+  scriptBatches?: () => ScriptBatch[]
 
   /**
    * Czy nad tym tokenem warto pokazać czytanie. Domyślnie: gdy różni się od zapisu.

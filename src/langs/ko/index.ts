@@ -1,7 +1,7 @@
 import type { LangAdapter } from '../types.ts'
 import { lemmaCandidates } from './lemma.ts'
 import { splitParticle } from './particles.ts'
-import { jamoItems, jamoNote } from './hangul.ts'
+import { jamoBatches, jamoItems, jamoMnemonic, jamoNote } from './hangul.ts'
 import { JAMO_ROWS, composeJamo } from './keyboard.ts'
 
 /**
@@ -43,5 +43,7 @@ export const ko: LangAdapter = {
     'spółgłoska na końcu — i taki blok czyta się jak jedną sylabę. Po opanowaniu liter ' +
     'przeczytasz dowolne koreańskie słowo, nawet nie wiedząc, co znaczy.',
   scriptNote: jamoNote,
+  scriptMnemonic: jamoMnemonic,
+  scriptBatches: jamoBatches,
   keyboard: { rows: JAMO_ROWS, compose: composeJamo },
 }

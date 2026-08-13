@@ -1,5 +1,5 @@
 import type { LangAdapter } from '../types.ts'
-import { kanaItems, kanaNote, needsFurigana } from './kana.ts'
+import { kanaBatches, kanaItems, kanaMnemonic, kanaNote, needsFurigana } from './kana.ts'
 import { KANA_ROWS, composeKana } from './keyboard.ts'
 
 /**
@@ -48,6 +48,8 @@ export const ja: LangAdapter = {
     'później i nad nimi i tak stoi kana, więc od niej trzeba zacząć. Znaków jest 2 × 46 ' +
     'i układają się w tabelę pięciu samogłosek na dziewięć spółgłosek.',
   scriptNote: kanaNote,
+  scriptMnemonic: kanaMnemonic,
+  scriptBatches: kanaBatches,
   showReading: needsFurigana,
   keyboard: { rows: KANA_ROWS, compose: composeKana },
 }

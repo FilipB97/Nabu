@@ -36,6 +36,43 @@ describe('kontrakt adapterów', () => {
     }
   })
 
+  it.each(LANG_CODES)('%s: każdy znak ma zaczep pamięciowy', (code) => {
+    const adapter = adapterFor(code)
+    if (!adapter.hasScriptStage) return
+
+    expect(adapter.scriptMnemonic, `${code}: brak zaczepów pamięciowych`).toBeDefined()
+    for (const item of adapter.scriptItems?.() ?? []) {
+      const hint = adapter.scriptMnemonic?.(item) ?? ''
+      expect(hint.length, `${code}: znak ${item.s} bez zaczepu`).toBeGreaterThan(15)
+    }
+  })
+
+  it.each(LANG_CODES)('%s: porcje pokrywają inwentarz w tej samej kolejności', (code) => {
+    const adapter = adapterFor(code)
+    if (!adapter.hasScriptStage) return
+
+    const items = adapter.scriptItems?.() ?? []
+    const batches = adapter.scriptBatches?.() ?? []
+    expect(batches.length, `${code}: brak porcji wprowadzania`).toBeGreaterThan(0)
+
+    // Kolejność musi się zgadzać co do znaku: identyfikatory pozycji w talii są indeksami
+    // `scriptItems()`, więc porcja przestawiająca znaki przestawiłaby znaczenie kart,
+    // które użytkownik ma już w bazie.
+    expect(batches.flatMap((batch) => batch.items.map((item) => item.s))).toEqual(
+      items.map((item) => item.s),
+    )
+
+    for (const batch of batches) {
+      expect(batch.items.length, `${code}: pusta porcja ${batch.id}`).toBeGreaterThan(0)
+      expect(batch.items.length, `${code}: porcja ${batch.id} za duża na jedno posiedzenie`)
+        .toBeLessThanOrEqual(6)
+      expect(batch.label.trim().length, `${code}: porcja ${batch.id} bez nazwy`).toBeGreaterThan(0)
+      expect(batch.note.length, `${code}: porcja ${batch.id} bez wyjaśnienia`).toBeGreaterThan(40)
+    }
+
+    expect(new Set(batches.map((batch) => batch.id)).size).toBe(batches.length)
+  })
+
   it.each(LANG_CODES)('%s: inwentarz pisma ma unikalne znaki i niepuste czytania', (code) => {
     const items = adapterFor(code).scriptItems?.() ?? []
     if (items.length === 0) return
