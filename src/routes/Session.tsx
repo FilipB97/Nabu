@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router'
-import { adapterFor } from '@/langs'
+import { adapterFor, type Stage } from '@/langs'
 import { AGAIN, GOOD } from '@/srs/types'
 import { useSession } from '@/session/useSession'
 import { layoutAroundCloze, type Piece } from '@/session/cloze'
@@ -29,11 +29,12 @@ import { Progress } from '@/ui/Ticks'
 /** Ile trwa automatyczne przejście po trafieniu, gdy jest włączone. */
 const AUTO_ADVANCE_MS = 1400
 
-/** Nazwa etapu w nagłówku — użytkownik ma wiedzieć, czego się w tej sesji uczy. */
-const STAGE_LABEL: Record<'script' | 'core' | 'sentences', string> = {
+/** Nazwa etapu w nagłówku — użytkownik ma wiedzieć, czego uczy go ta karta. */
+const STAGE_LABEL: Record<Stage, string> = {
   script: 'pismo',
   core: 'rdzeń',
   sentences: 'zdania',
+  production: 'produkcja',
 }
 
 export function Session() {
@@ -43,7 +44,6 @@ export function Session() {
   const {
     phase,
     current,
-    stage,
     reveal,
     progress,
     summary,
@@ -231,8 +231,12 @@ export function Session() {
             <span className="hidden text-text-3 md:inline">· esc</span>
           </button>
 
+          {/* Etap BIEŻĄCEJ KARTY, nie sesji. Powtórki przychodzą ze wszystkich etapów
+              naraz (sekcja 2a), więc podpis wzięty z sesji potrafił zapowiadać „pismo"
+              nad zdaniem z kanji — czyli kłamać dokładnie tam, gdzie użytkownik szuka
+              wyjaśnienia, dlaczego karta wygląda inaczej niż poprzednia. */}
           <Mono tone="normal" className="truncate">
-            {adapter.name} · {STAGE_LABEL[stage]}
+            {adapter.name} · {STAGE_LABEL[stageOfCard]}
           </Mono>
 
           <Mono tone="normal">
@@ -249,7 +253,7 @@ export function Session() {
 
       {/* Karta rośnie do treści, a nie do wysokości ekranu: rozciągnięta na cały telefon
           zostawiała pod odpowiedzią pół ekranu pustki i odsuwała opcje poza zasięg kciuka. */}
-      <main
+      <section
         className="nabu-card flex flex-col justify-center gap-6 rounded-[22px]
           px-[clamp(22px,4vw,40px)] py-[clamp(26px,4vw,38px)] min-h-[210px] md:min-h-[248px]"
       >
@@ -362,7 +366,7 @@ export function Session() {
             <span className="font-ui text-[14.5px] text-text-2">{reveal.answer.gloss}</span>
           </div>
         )}
-      </main>
+      </section>
 
       {/* Opcje siadają na dole ekranu — tam sięga kciuk (sekcja 8.4). */}
       <div className="mt-auto flex flex-col gap-[10px] pt-2">
