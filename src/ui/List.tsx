@@ -46,6 +46,11 @@ type RowProps = {
   onClick?: () => void
   /** Treść pod etykietą, gdy sama etykieta nie wystarcza. */
   description?: ReactNode
+  /**
+   * Chevron mówi „dalej, na inny ekran". Wiersz, który tylko coś WYBIERA — preset motywu,
+   * pozycję z listy — nie prowadzi nigdzie i chevron w nim kłamie, więc da się go zdjąć.
+   */
+  chevron?: boolean
 }
 
 function Body({ label, value, description, chevron }: RowProps & { chevron: boolean }) {
@@ -79,10 +84,12 @@ function Body({ label, value, description, chevron }: RowProps & { chevron: bool
 const ROW = 'flex min-h-[52px] w-full items-center justify-between gap-4 py-3 text-start'
 
 export function Row(props: RowProps) {
+  const chevron = props.chevron ?? true
+
   if (props.to) {
     return (
       <Link to={props.to} className={`nabu-press ${ROW}`}>
-        <Body {...props} chevron />
+        <Body {...props} chevron={chevron} />
       </Link>
     )
   }
@@ -90,7 +97,7 @@ export function Row(props: RowProps) {
   if (props.onClick) {
     return (
       <button type="button" onClick={props.onClick} className={`nabu-press ${ROW}`}>
-        <Body {...props} chevron />
+        <Body {...props} chevron={chevron} />
       </button>
     )
   }

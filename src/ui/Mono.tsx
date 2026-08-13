@@ -13,7 +13,7 @@ import type { ReactNode } from 'react'
 type MonoProps = {
   children: ReactNode
   /** `quiet` to najcichszy poziom tekstu, `normal` — pomocniczy. */
-  tone?: 'quiet' | 'normal' | 'accent'
+  tone?: 'quiet' | 'normal' | 'accent' | 'wrong'
   className?: string
 }
 
@@ -21,6 +21,9 @@ const TONE: Record<NonNullable<MonoProps['tone']>, string> = {
   quiet: 'text-text-3',
   normal: 'text-text-2',
   accent: 'text-accent',
+  // Werdykt „źle" i akcje nieodwracalne. To nie jest czerwień — w całej aplikacji nie ma
+  // czerwieni (sekcja 9) — tylko ciepły odcień odróżniający się od reszty tekstu.
+  wrong: 'text-wrong-text',
 }
 
 export function Mono({ children, tone = 'quiet', className }: MonoProps) {

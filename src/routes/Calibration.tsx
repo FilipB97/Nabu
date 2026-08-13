@@ -12,7 +12,6 @@ import { loadLexicon } from '@/store/decks'
 import { settingsFor, updateSettings } from '@/store/db'
 import { Button } from '@/ui/Button'
 import { Mono } from '@/ui/Mono'
-import { NavBar } from '@/ui/NavBar'
 import { Progress } from '@/ui/Ticks'
 
 /**
@@ -87,7 +86,7 @@ export function Calibration() {
 
   if (!probes) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-bg">
+      <div className="flex flex-1 items-center justify-center">
         <Mono tone="normal">wczytuję słownictwo…</Mono>
       </div>
     )
@@ -96,7 +95,7 @@ export function Calibration() {
   const probe = probes[at]
   if (!probe) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-bg">
+      <div className="flex flex-1 items-center justify-center">
         <Mono tone="normal">zapisuję…</Mono>
       </div>
     )
@@ -107,33 +106,43 @@ export function Calibration() {
   ]
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-[460px] flex-col bg-bg">
-      <header className="px-5 pt-[calc(env(safe-area-inset-top)+14px)]">
-        <NavBar
-          title={`${adapter.name} · zasięg`}
-          back="/start"
-          action={
-            <Mono tone="normal">
-              {at + 1} / {probes.length}
-            </Mono>
-          }
-        />
-        <Progress
-          className="mt-2"
-          total={probes.length}
-          done={at}
-          label={`słowo ${at + 1} z ${probes.length}`}
-        />
+    <div className="flex flex-1 flex-col gap-5 pb-[env(safe-area-inset-bottom)]">
+      <header className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => navigate('/start')}
+            className="nabu-press font-mono flex min-h-[44px] items-center gap-2 rounded-[10px]
+              border border-border-quiet px-3 text-[11px] tracking-[0.12em] text-text-2 uppercase"
+          >
+            ‹ Przerwij
+          </button>
+          <Mono tone="normal" className="hidden sm:block">
+            {adapter.name} · zasięg
+          </Mono>
+          <Mono tone="normal">
+            {at + 1} / {probes.length}
+          </Mono>
+        </div>
+        <Progress total={probes.length} done={at} label={`słowo ${at + 1} z ${probes.length}`} />
       </header>
 
-      <main className="flex flex-1 flex-col justify-center gap-6 px-7 py-6">
-        <p className={`${fontClass} text-center text-[54px] leading-[1.25] text-text`}>{probe.s}</p>
-        <p className="font-ui text-center text-[14px] leading-[1.6] text-text-2">
+      <main
+        className="nabu-card flex flex-col items-center justify-center gap-5 rounded-[22px]
+          px-6 py-10 min-h-[240px] md:min-h-[280px]"
+      >
+        <p
+          className={`${fontClass} text-center leading-[1.25] text-text
+            text-[clamp(48px,10vw,72px)]`}
+        >
+          {probe.s}
+        </p>
+        <p className="font-ui max-w-[440px] text-center text-[14px] leading-[1.6] text-text-2">
           Znasz to słowo? Nie sprawdzamy Cię — szukamy tylko miejsca, od którego zacząć.
         </p>
       </main>
 
-      <div className="flex flex-col gap-[10px] px-5 pb-[calc(env(safe-area-inset-bottom)+24px)]">
+      <div className="mt-auto flex flex-col gap-[10px] pt-2">
         <div className="flex gap-[10px]">
           <Button full onClick={() => answer('unknown')}>
             Nie

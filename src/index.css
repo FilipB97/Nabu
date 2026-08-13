@@ -70,12 +70,14 @@
   --color-border-quiet: var(--nabu-border-quiet);
   --color-accent: var(--nabu-accent);
   --color-accent-2: var(--nabu-accent-2);
+  --color-accent-deep: var(--nabu-accent-deep);
   --color-accent-text: var(--nabu-accent-text);
   --color-shadow: var(--nabu-shadow);
   --color-tick-done: var(--nabu-tick-done);
   --color-tick-future: var(--nabu-tick-future);
   --color-tick-current: var(--nabu-tick-current);
   --color-wrong-border: var(--nabu-wrong-border);
+  --color-wrong-bg: var(--nabu-wrong-bg);
   --color-wrong-text: var(--nabu-wrong-text);
 
   --font-ui: 'Archivo', system-ui, sans-serif;
@@ -96,23 +98,25 @@
    ------------------------------------------------------------------------- */
 
 :root {
-  --nabu-bg: #0f1622;
-  --nabu-surface: #131c2b;
-  --nabu-surface-2: #222a39;
-  --nabu-text: #e7eaf2;
-  --nabu-text-2: #8a94a9;
-  --nabu-text-3: #767f94;
-  --nabu-border: #2c3852;
-  --nabu-border-quiet: #1d2739;
-  --nabu-accent: #8fa8f0;
-  --nabu-accent-2: #a09ff4;
-  --nabu-accent-text: #000000;
+  --nabu-bg: #0e1014;
+  --nabu-surface: #161a21;
+  --nabu-surface-2: #1c222c;
+  --nabu-text: #e9ebef;
+  --nabu-text-2: #9ba3b2;
+  --nabu-text-3: #7c8494;
+  --nabu-border: #232935;
+  --nabu-border-quiet: #1e242e;
+  --nabu-accent: #8c9bff;
+  --nabu-accent-2: #a79bff;
+  --nabu-accent-deep: #5b6cff;
+  --nabu-accent-text: #0b0d12;
   --nabu-shadow: #000000;
-  --nabu-tick-done: #5a6580;
-  --nabu-tick-future: #222c40;
-  --nabu-tick-current: #e7eaf2;
-  --nabu-wrong-border: #3a2a33;
-  --nabu-wrong-text: #968080;
+  --nabu-tick-done: #5a6373;
+  --nabu-tick-future: #2b3242;
+  --nabu-tick-current: #e9ebef;
+  --nabu-wrong-border: #4a382f;
+  --nabu-wrong-bg: #1e1917;
+  --nabu-wrong-text: #c99a86;
 
   color-scheme: dark;
 }

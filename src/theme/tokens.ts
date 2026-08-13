@@ -20,12 +20,14 @@ export const TOKENS = [
   'border-quiet',
   'accent',
   'accent-2',
+  'accent-deep',
   'accent-text',
   'shadow',
   'tick-done',
   'tick-future',
   'tick-current',
   'wrong-border',
+  'wrong-bg',
   'wrong-text',
 ] as const
 
@@ -59,13 +61,17 @@ export const ROLES: Record<
   // środek. Dlatego `accent` i `accent-2` są tu ROLI `background`, a nie tylko `text` —
   // token bywa jednym i drugim, zależnie od miejsca.
   'accent-2': { role: 'background' },
+  /** Ciemniejszy kraniec paska postępu i obrys trafionej opcji. */
+  'accent-deep': { role: 'background' },
+  /** Tło opcji wybranej błędnie — ledwie ciepłe, bez czerwieni. */
+  'wrong-bg': { role: 'background' },
 
   text: { role: 'text', on: ['bg', 'surface', 'surface-2'] },
   'text-2': { role: 'text', on: ['bg', 'surface', 'surface-2'] },
   'text-3': { role: 'text', on: ['bg'] },
   accent: { role: 'text', on: ['bg', 'surface', 'surface-2'] },
-  'accent-text': { role: 'text', on: ['accent', 'accent-2'] },
-  'wrong-text': { role: 'text', on: ['bg', 'surface'] },
+  'accent-text': { role: 'text', on: ['accent', 'accent-2', 'accent-deep'] },
+  'wrong-text': { role: 'text', on: ['bg', 'surface', 'wrong-bg'] },
 
   'tick-done': { role: 'ui', on: ['bg'] },
   'tick-current': { role: 'ui', on: ['bg'] },

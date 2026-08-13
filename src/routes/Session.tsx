@@ -9,7 +9,6 @@ import { ProduceCard } from '@/session/ProduceCard'
 import { QuizOption, type OptionState } from '@/ui/QuizOption'
 import { Button } from '@/ui/Button'
 import { Mono } from '@/ui/Mono'
-import { NavBar } from '@/ui/NavBar'
 import { Progress } from '@/ui/Ticks'
 
 /**
@@ -140,7 +139,7 @@ export function Session() {
 
   if (phase === 'error') {
     return (
-      <div className="mx-auto flex min-h-screen w-full max-w-[460px] flex-col justify-center gap-6 bg-bg px-7">
+      <div className="mx-auto flex max-w-[520px] flex-1 flex-col justify-center gap-6">
         <Mono tone="normal">talia niepobrana</Mono>
         <p className="font-ui text-[15px] leading-[1.6] text-text">
           Nie udało się wczytać materiału dla tego języka. Talia pobiera się przy pierwszym
@@ -155,7 +154,7 @@ export function Session() {
 
   if (phase !== 'running' || !current || !settings) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-bg">
+      <div className="flex flex-1 items-center justify-center">
         <Mono tone="normal">wczytuję talię…</Mono>
       </div>
     )
@@ -216,21 +215,31 @@ export function Session() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-[460px] flex-col bg-bg">
-      <header className="px-5 pt-[calc(env(safe-area-inset-top)+14px)]">
-        {/* Wyjście z sesji chevronem, jak z każdego innego ekranu. Bez potwierdzenia:
-            każda odpowiedź jest już zapisana, więc przerwanie nic nie kosztuje (5.3). */}
-        <NavBar
-          title={`${adapter.name} · ${STAGE_LABEL[stage]}`}
-          back="/start"
-          action={
-            <Mono tone="normal">
-              {progress.done + 1} / {progress.total}
-            </Mono>
-          }
-        />
+    <div className="flex flex-1 flex-col gap-5 pb-[env(safe-area-inset-bottom)]">
+      <header className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          {/* Wyjście z sesji bez potwierdzenia: każda odpowiedź jest już zapisana,
+              więc przerwanie nic nie kosztuje (sekcja 5.3). */}
+          <button
+            type="button"
+            onClick={() => navigate('/start')}
+            className="nabu-press font-mono flex min-h-[44px] items-center gap-2 rounded-[10px]
+              border border-border-quiet px-3 text-[11px] tracking-[0.12em] text-text-2 uppercase"
+          >
+            ‹ Zakończ
+            {/* Podpowiedź klawiszowa tylko tam, gdzie jest klawiatura. */}
+            <span className="hidden text-text-3 md:inline">· esc</span>
+          </button>
+
+          <Mono tone="normal" className="truncate">
+            {adapter.name} · {STAGE_LABEL[stage]}
+          </Mono>
+
+          <Mono tone="normal">
+            {progress.done + 1} / {progress.total}
+          </Mono>
+        </div>
         <Progress
-          className="mt-2"
           total={progress.total}
           done={progress.done}
           lapses={progress.lapses}
@@ -238,7 +247,12 @@ export function Session() {
         />
       </header>
 
-      <main className="flex flex-1 flex-col justify-center gap-7 px-7 py-10">
+      {/* Karta rośnie do treści, a nie do wysokości ekranu: rozciągnięta na cały telefon
+          zostawiała pod odpowiedzią pół ekranu pustki i odsuwała opcje poza zasięg kciuka. */}
+      <main
+        className="nabu-card flex flex-col justify-center gap-6 rounded-[22px]
+          px-[clamp(22px,4vw,40px)] py-[clamp(26px,4vw,38px)] min-h-[210px] md:min-h-[248px]"
+      >
         {current.production && !reveal ? (
           <ProduceCard
             production={current.production}
@@ -322,25 +336,36 @@ export function Session() {
           </>
         )}
 
+        {/* Wiersz odsłonięcia — treść, po którą jest cała ta przerwa: co było poprawne,
+            jak się to czyta i co znaczy. Nad krawędzią, żeby odczytać go jako odpowiedź
+            na kartę, a nie jako kolejny jej element. */}
         {reveal?.answer && (
-          <p
-            className={`nabu-reveal flex flex-wrap items-baseline gap-x-3 gap-y-1
-              ${jednoelementowa ? 'justify-center' : ''}`}
+          <div
+            className={`nabu-reveal flex flex-wrap items-baseline gap-x-3 gap-y-2
+              border-t border-border pt-[18px] ${jednoelementowa ? 'justify-center' : ''}`}
             aria-live="polite"
           >
-            <Mono tone={hit ? 'accent' : 'normal'}>{hit ? 'dobrze' : 'źle'}</Mono>
+            <Mono tone={hit ? 'accent' : 'wrong'}>{hit ? 'dobrze' : 'źle'}</Mono>
+            {/* Przy karcie pisma i rdzenia słowo stoi już wielkie na środku karty —
+                powtarzanie go tutaj byłoby drugą kopią tej samej rzeczy. */}
+            {!jednoelementowa && (
+              <span className={`${fontClass} text-[21px] leading-none text-text`}>
+                {reveal.answer.term}
+              </span>
+            )}
             {reveal.given !== undefined && !hit && (
               <span className={`${fontClass} text-[15px] text-wrong-text`}>{reveal.given}</span>
             )}
             {reveal.reading && !rubyVisible && reveal.reading !== reveal.answer.gloss && (
-              <span className="font-mono text-[13px] text-text-2">{reveal.reading}</span>
+              <span className="font-mono text-[13px] text-text-3">{reveal.reading}</span>
             )}
-            <span className="font-ui text-[14px] text-text">{reveal.answer.gloss}</span>
-          </p>
+            <span className="font-ui text-[14.5px] text-text-2">{reveal.answer.gloss}</span>
+          </div>
         )}
       </main>
 
-      <div className="flex flex-col gap-[10px] px-5 pb-[calc(env(safe-area-inset-bottom)+24px)]">
+      {/* Opcje siadają na dole ekranu — tam sięga kciuk (sekcja 8.4). */}
+      <div className="mt-auto flex flex-col gap-[10px] pt-2">
         {current.production ? (
           reveal && (
             <Button variant="primary" full onClick={next}>
@@ -349,29 +374,36 @@ export function Session() {
           )
         ) : options ? (
           <>
-            {options.options.map((option, index) => (
-              <QuizOption
-                key={option.id}
-                // Przy etapach 0 i 1 odpowiedzią jest etykieta łacińska, a rzecz w piśmie
-                // docelowym stoi już na przodzie karty. Pokazywanie jej drugi raz w opcji
-                // zamieniłoby wybór w dopasowywanie dwóch identycznych napisów.
-                term={jednoelementowa ? option.gloss : option.term}
-                gloss={jednoelementowa ? '' : option.gloss}
-                state={stateOf(index)}
-                chosen={reveal?.chosen === index}
-                font={jednoelementowa ? 'ui' : adapter.display.font}
-                shortcut={index + 1}
-                onSelect={() => void answer(index)}
-              />
-            ))}
+            {/* Dwie kolumny od tabletu w górę: sześć opcji w jednej kolumnie zjeżdża
+                poniżej krawędzi ekranu, a wtedy część z nich trzeba szukać przewijaniem. */}
+            <div className="grid gap-[10px] md:grid-cols-2">
+              {options.options.map((option, index) => (
+                <QuizOption
+                  key={option.id}
+                  // Przy etapach 0 i 1 odpowiedzią jest etykieta łacińska, a rzecz w piśmie
+                  // docelowym stoi już na przodzie karty. Pokazywanie jej drugi raz w opcji
+                  // zamieniłoby wybór w dopasowywanie dwóch identycznych napisów.
+                  term={jednoelementowa ? option.gloss : option.term}
+                  gloss={jednoelementowa ? '' : option.gloss}
+                  state={stateOf(index)}
+                  chosen={reveal?.chosen === index}
+                  font={jednoelementowa ? 'ui' : adapter.display.font}
+                  shortcut={index + 1}
+                  onSelect={() => void answer(index)}
+                />
+              ))}
+            </div>
 
             {/* Bez `autoFocus`: Enter i spacja i tak przechodzą dalej (obsługa klawiatury
                 wyżej), a wymuszony fokus rysuje obwódkę wokół przycisku przy każdej
                 odpowiedzi — na telefonie wygląda jak usterka. */}
             {reveal && (
-              <div className="mt-3 flex items-center gap-3">
+              <div className="mt-2 flex items-center gap-3">
                 <Button variant="primary" full onClick={next}>
                   Dalej
+                  <span className="font-mono ms-3 hidden text-[11px] opacity-60 md:inline">
+                    enter
+                  </span>
                 </Button>
                 {/* Cofnięcie było dotąd wyłącznie pod klawiszem `Z`, czyli na telefonie
                     nie istniało — a nietrafione dotknięcie zdarza się właśnie tam. */}

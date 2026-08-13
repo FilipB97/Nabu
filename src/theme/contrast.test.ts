@@ -19,7 +19,7 @@ import { ROLES, TOKENS, requiredRatio, type Token } from './tokens'
  * przycisk główny ma wypełnienie gradientem — a wtedy tekst stoi na obu krańcach
  * naraz i oba muszą go unieść.
  */
-const SURFACES = ['bg', 'surface', 'surface-2', 'accent', 'accent-2'] as const satisfies
+const SURFACES = ['bg', 'surface', 'surface-2', 'accent', 'accent-2', 'accent-deep', 'wrong-bg'] as const satisfies
   readonly Token[]
 
 describe('kontrakt tokenów', () => {
