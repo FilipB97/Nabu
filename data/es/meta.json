@@ -1,9 +1,9 @@
 {
   "lang": "es",
-  "version": "2026-08-12",
+  "version": "2026-08-13",
   "license": "Tatoeba CC BY 2.0 FR; FrequencyWords CC BY-SA 3.0; Wikisłownik (plwiktionary) CC BY-SA 3.0",
-  "sentences": 6398,
-  "lexicon": 1692,
+  "sentences": 6419,
+  "lexicon": 1700,
   "script": 0,
   "core": 100,
   "packs": [
@@ -16,74 +16,74 @@
     {
       "file": "sentences-001.json",
       "from": 463,
-      "to": 705,
+      "to": 704,
       "count": 500
     },
     {
       "file": "sentences-002.json",
-      "from": 705,
-      "to": 1042,
+      "from": 704,
+      "to": 1032,
       "count": 500
     },
     {
       "file": "sentences-003.json",
-      "from": 1043,
-      "to": 1400,
+      "from": 1035,
+      "to": 1396,
       "count": 500
     },
     {
       "file": "sentences-004.json",
-      "from": 1400,
-      "to": 1681,
+      "from": 1396,
+      "to": 1658,
       "count": 500
     },
     {
       "file": "sentences-005.json",
-      "from": 1681,
-      "to": 2101,
+      "from": 1666,
+      "to": 2069,
       "count": 500
     },
     {
       "file": "sentences-006.json",
-      "from": 2101,
-      "to": 2537,
+      "from": 2069,
+      "to": 2530,
       "count": 500
     },
     {
       "file": "sentences-007.json",
-      "from": 2539,
-      "to": 3172,
+      "from": 2530,
+      "to": 3149,
       "count": 500
     },
     {
       "file": "sentences-008.json",
-      "from": 3172,
-      "to": 3848,
+      "from": 3149,
+      "to": 3832,
       "count": 500
     },
     {
       "file": "sentences-009.json",
-      "from": 3848,
-      "to": 4986,
+      "from": 3837,
+      "to": 4950,
       "count": 500
     },
     {
       "file": "sentences-010.json",
-      "from": 5007,
-      "to": 6305,
+      "from": 4969,
+      "to": 6252,
       "count": 500
     },
     {
       "file": "sentences-011.json",
-      "from": 6305,
-      "to": 8841,
+      "from": 6252,
+      "to": 8723,
       "count": 500
     },
     {
       "file": "sentences-012.json",
-      "from": 8841,
+      "from": 8741,
       "to": 11998,
-      "count": 398
+      "count": 419
     }
   ]
 }

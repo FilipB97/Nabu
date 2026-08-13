@@ -106,9 +106,39 @@ export function buildScript(adapter: LangAdapter): {
  * Etap 1. Najczęstsze słowa talii, po jednym na lemat, z dystraktorami dobranymi tą samą
  * regułą co przy zdaniach — ta sama część mowy i zbliżone pasmo.
  */
+/**
+ * Znaczenie na kartę rdzenia — inne niż na kartę zdania, i to jest cała rzecz.
+ *
+ * Karta zdania bierze znaczenie z KONTEKSTU: `夜` w zdaniu o wieczorze to „wieczór",
+ * bo zdanie tak mówi. Karta rdzenia nie ma kontekstu — uczy słowa jako słowa, więc musi
+ * wziąć znaczenie PODSTAWOWE. Wcześniej dziedziczyła sens z pierwszego napotkanego
+ * zdania i wychodziło z tego `夜 = wieczór`, `时间 = godzina`, `米 = metr`: prawda
+ * o jednym zdaniu podana jako prawda o słowie.
+ *
+ * Wyjątek: znaczenie zaczynające się wielką literą przy istnieniu innych. Wikisłownik
+ * stawia na pierwszym miejscu nazwę taksonomiczną („Nicotiana, tytoń" dla `담배`),
+ * która jest poprawna i bezużyteczna. Nazwy własne — Tokio, Japonia — nie mają
+ * alternatywy pisanej małą literą, więc zostają.
+ */
+function primarySense(senses: readonly string[]): number {
+  if (senses.length <= 1) return 0
+  const first = senses[0] ?? ''
+  if (!/^\p{Lu}/u.test(first)) return 0
+  const lower = senses.findIndex((sense) => /^\p{Ll}/u.test(sense))
+  return lower >= 0 ? lower : 0
+}
+
 export function buildCore(
   adapter: LangAdapter,
   items: Item[],
+  /**
+   * Hasła słownikowe. Bez nich rdzeń zna tylko to, co widział w zdaniach — a zdanie
+   * mówi o swoim kontekście, nie o słowie.
+   */
+  dictionary?: ReadonlyMap<
+    string,
+    { pl: string; senses: string[]; readings: (string | null)[]; say?: string }
+  >,
 ): { items: CoreEntry[]; lexicon: StageLexicon } {
   const pool = new Map<string, Candidate & { r?: string }>()
 
@@ -117,15 +147,31 @@ export function buildCore(
     if (!token?.pos || !token.gloss) continue
     const lemma = token.lemma ?? token.s.toLocaleLowerCase()
     if (pool.has(lemma)) continue
+
+    // Karta pokazuje POSTAĆ HASŁOWĄ, nie formę z tego zdania. Koreańskie `잡아` jest
+    // formą czasownika `잡다`, a glosa („złapać") opisuje formę słownikową — karta
+    // z formą odmienioną i glosą bezokolicznika uczy pary, której nie ma w słowniku.
+    const entry = dictionary?.get(lemma)
+    const surface = (entry ? lemma : token.s).toLocaleLowerCase()
+
+    const at = entry ? primarySense(entry.senses) : -1
+    const gloss = entry ? (entry.senses[at] ?? entry.pl) : token.gloss
+    // Czytanie z hasła ma pierwszeństwo nad czytaniem z analizatora: pochodzi z tego
+    // samego wiersza słownika co glosa, więc nie może się z nią rozjechać.
+    // Kolejność: czytanie przypisane do TEGO znaczenia, potem wymowa całego hasła,
+    // dopiero na końcu czytanie z analizatora — bo tylko dwa pierwsze pochodzą z tego
+    // samego wiersza słownika co glosa.
+    const reading = (entry?.readings[at] ?? undefined) || token.r || entry?.say
+
     pool.set(lemma, {
       lemma,
       // Forma zapisana małą literą, tak samo jak w leksykonie zdań: `Tan` i `tan`
       // to jedno słowo, a wielka litera bierze się z pozycji w zdaniu.
-      surface: token.s.toLocaleLowerCase(),
-      pl: token.gloss,
+      surface,
+      pl: gloss,
       pos: token.pos,
       band: token.b,
-      ...(token.r ? { r: token.r } : {}),
+      ...(reading ? { r: reading } : {}),
     })
   }
 

@@ -1,9 +1,9 @@
 {
   "lang": "pt",
-  "version": "2026-08-12",
+  "version": "2026-08-13",
   "license": "Tatoeba CC BY 2.0 FR; FrequencyWords CC BY-SA 3.0; Wikisłownik (plwiktionary) CC BY-SA 3.0",
-  "sentences": 4274,
-  "lexicon": 1229,
+  "sentences": 4273,
+  "lexicon": 1230,
   "script": 0,
   "core": 100,
   "packs": [
@@ -22,44 +22,44 @@
     {
       "file": "sentences-002.json",
       "from": 938,
-      "to": 1392,
+      "to": 1399,
       "count": 500
     },
     {
       "file": "sentences-003.json",
-      "from": 1392,
+      "from": 1403,
       "to": 1962,
       "count": 500
     },
     {
       "file": "sentences-004.json",
       "from": 1962,
-      "to": 2732,
+      "to": 2741,
       "count": 500
     },
     {
       "file": "sentences-005.json",
-      "from": 2732,
-      "to": 3755,
+      "from": 2741,
+      "to": 3760,
       "count": 500
     },
     {
       "file": "sentences-006.json",
-      "from": 3760,
-      "to": 5689,
+      "from": 3784,
+      "to": 5705,
       "count": 500
     },
     {
       "file": "sentences-007.json",
-      "from": 5690,
-      "to": 8786,
+      "from": 5705,
+      "to": 8803,
       "count": 500
     },
     {
       "file": "sentences-008.json",
-      "from": 8801,
+      "from": 8821,
       "to": 11928,
-      "count": 274
+      "count": 273
     }
   ]
 }

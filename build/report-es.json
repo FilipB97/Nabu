@@ -1,34 +1,34 @@
 {
   "lang": "es",
-  "zdań": 6398,
+  "zdań": 6419,
   "kandydatów": 43142,
-  "odrzuconychNaJakości": 10667,
+  "odrzuconychNaJakości": 10619,
   "odsetekOdrzutówJakościowych": 25,
-  "odsetekNieprzydatnychNaKartę": 60,
+  "odsetekNieprzydatnychNaKartę": 61,
   "pozaZasięgiem": 398091,
   "innyZapis": 0,
   "powodyJakość": {
-    "pasmo powyżej progu języka": 6007,
-    "nazwa własna": 2872,
-    "za dużo tokenów spoza listy częstości": 1631,
+    "pasmo powyżej progu języka": 6034,
+    "nazwa własna": 2788,
+    "za dużo tokenów spoza listy częstości": 1640,
     "wulgaryzm": 146,
     "znaki spoza zestawu języka": 11
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 11938,
+    "brak tokenu nadającego się na lukę": 11894,
     "za krótkie": 9626,
-    "glosa bez oparcia w tłumaczeniu": 3548,
-    "ta sama rama, inna odpowiedź": 765,
+    "glosa bez oparcia w tłumaczeniu": 3621,
+    "ta sama rama, inna odpowiedź": 763,
     "za długie": 200
   },
   "tłumaczenia": {
-    "bezpośrednie": 1887,
-    "przezAngielski": 4511
+    "bezpośrednie": 1898,
+    "przezAngielski": 4521
   },
   "pasma": {
     "min": 154,
     "mediana": 2214,
-    "p90": 7596,
+    "p90": 7544,
     "max": 11998
   },
   "quizNiedostępny": 0,
@@ -64,25 +64,25 @@
       ]
     },
     {
-      "text": "Hice algo estúpido anoche.",
-      "pl": "Zrobiłem coś głupiego zeszłej nocy.",
-      "luka": "estúpido",
-      "band": 811,
-      "src": "pivot",
+      "text": "Hace un día bonito, ¡vamos a alguna parte!",
+      "pl": "Jest piękna pogoda, idźmy gdzieś!",
+      "luka": "bonito",
+      "band": 805,
+      "src": "direct",
       "dystraktory": [
-        "bonito",
-        "salvo",
+        "tonto",
+        "estúpido",
         "propio",
-        "oficial",
-        "tuyo",
+        "salvo",
         "blanco",
+        "oficial",
         "normal",
-        "necesario"
+        "tuyo"
       ]
     },
     {
-      "text": "Tom nunca ha estado enfermo.",
-      "pl": "Tom nigdy nie był chory.",
+      "text": "Me siento muy enfermo.",
+      "pl": "Czuję się bardzo chory.",
       "luka": "enfermo",
       "band": 1184,
       "src": "pivot",
@@ -98,8 +98,8 @@
       ]
     },
     {
-      "text": "¿Qué programa de televisión te gusta más?",
-      "pl": "Jaki jest twój ulubiony program telewizyjny?",
+      "text": "Yo veo televisión dos veces a la semana.",
+      "pl": "Oglądam telewizję dwa razy w tygodniu.",
       "luka": "televisión",
       "band": 1561,
       "src": "pivot",
@@ -115,25 +115,25 @@
       ]
     },
     {
-      "text": "El ladrón no quiere comprar los zapatos.",
-      "pl": "Złodziej nie chce kupić butów.",
-      "luka": "ladrón",
-      "band": 2022,
-      "src": "pivot",
+      "text": "¿Qué lengua se habla en tu país?",
+      "pl": "Jakim językiem mówi się w Twoim kraju?",
+      "luka": "lengua",
+      "band": 2021,
+      "src": "direct",
       "dystraktory": [
+        "genio",
+        "montaña",
         "sensación",
         "entrenador",
-        "lengua",
-        "examen",
-        "modelo",
-        "salón",
+        "ladrón",
         "alcohol",
-        "tamaño"
+        "enviado",
+        "ángel"
       ]
     },
     {
-      "text": "A él le gusta viajar solo.",
-      "pl": "On lubi podróżować sam.",
+      "text": "Me gusta viajar por tren.",
+      "pl": "Lubię podróżować pociągiem.",
       "luka": "viajar",
       "band": 2530,
       "src": "pivot",
@@ -149,71 +149,71 @@
       ]
     },
     {
-      "text": "No necesito una maleta tan grande.",
-      "pl": "Nie potrzebuję tak dużej walizki.",
-      "luka": "maleta",
-      "band": 3226,
+      "text": "¿El metro va al aeropuerto?",
+      "pl": "Czy metro jedzie na lotnisko?",
+      "luka": "metro",
+      "band": 3230,
       "src": "pivot",
       "dystraktory": [
-        "maestra",
+        "moto",
         "metal",
-        "metro",
-        "habilidad",
-        "nacimiento",
-        "rata",
         "museo",
-        "gasolina"
+        "maleta",
+        "vecino",
+        "refugio",
+        "nacimiento",
+        "emperador"
       ]
     },
     {
-      "text": "El sueldo de un profesor es menor que el de un abogado.",
-      "pl": "Pensja nauczyciela jest niższa od pensji prawnika.",
-      "luka": "sueldo",
-      "band": 4105,
-      "src": "pivot",
-      "dystraktory": [
-        "olvido",
-        "texto",
-        "reto",
-        "mantequilla",
-        "ensalada",
-        "sufrimiento",
-        "cueva",
-        "significado"
-      ]
-    },
-    {
-      "text": "Alicia usa un perfume dulce.",
-      "pl": "Alicja używa słodkich perfum.",
-      "luka": "perfume",
-      "band": 5345,
-      "src": "pivot",
-      "dystraktory": [
-        "poema",
-        "micrófono",
-        "nube",
-        "álbum",
-        "suma",
-        "aparato",
-        "tenis",
-        "perrito"
-      ]
-    },
-    {
-      "text": "Por el aspecto del cielo, parece que va a llover.",
-      "pl": "Sądząc po wyglądzie nieba, może padać.",
-      "luka": "llover",
-      "band": 7868,
+      "text": "Para mí era incómodo.",
+      "pl": "Było mi niewygodnie.",
+      "luka": "incómodo",
+      "band": 4109,
       "src": "direct",
       "dystraktory": [
-        "cavar",
-        "inventar",
-        "alquilar",
-        "prestar",
-        "suicidarse",
-        "combatir",
-        "costar",
-        "ocupar"
+        "agradecido",
+        "plástico",
+        "permitido",
+        "infantil",
+        "ideal",
+        "naranja",
+        "sano",
+        "inconsciente"
+      ]
+    },
+    {
+      "text": "Van a organizar una fiesta para Sam.",
+      "pl": "Zamierzają urządzić imprezę dla Sam.",
+      "luka": "organizar",
+      "band": 5354,
+      "src": "direct",
+      "dystraktory": [
+        "aclarar",
+        "alimentar",
+        "avisar",
+        "confesar",
+        "invitar",
+        "oler",
+        "encender",
+        "pasear"
+      ]
+    },
+    {
+      "text": "Hay una paloma blanca en el tejado.",
+      "pl": "Na dachu jest biały gołąb.",
+      "luka": "paloma",
+      "band": 7850,
+      "src": "pivot",
+      "dystraktory": [
+        "plomo",
+        "pólvora",
+        "balcón",
+        "mariposa",
+        "melodía",
+        "ballena",
+        "manga",
+        "paisaje"
       ]
     },
     {
@@ -227,10 +227,10 @@
         "dinosaurio",
         "aprendizaje",
         "maratón",
+        "concha",
         "recado",
         "pizarra",
-        "tornado",
-        "pony"
+        "tornado"
       ]
     }
   ]

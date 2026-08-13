@@ -42,7 +42,12 @@ describe('tokenizer space', () => {
 })
 
 describe('wybór znaczenia w kontekście', () => {
-  const slav: Entry = { pl: 'Słowianin', senses: ['Słowianin', 'niewolnik'], pos: 'noun' }
+  const slav: Entry = {
+    pl: 'Słowianin',
+    senses: ['Słowianin', 'niewolnik'],
+    readings: [null, null],
+    pos: 'noun',
+  }
 
   it('bierze znaczenie obecne w polskim tłumaczeniu zdania', () => {
     expect(senseInContext(slav, 'Nie jestem twoim niewolnikiem.')).toBe('niewolnik')
@@ -53,17 +58,32 @@ describe('wybór znaczenia w kontekście', () => {
   })
 
   it('zostaje przy pierwszym, gdy pasuje więcej niż jedno — zgadywanie jest gorsze', () => {
-    const both: Entry = { pl: 'kolacja', senses: ['kolacja', 'wieczerza'], pos: 'noun' }
+    const both: Entry = {
+      pl: 'kolacja',
+      senses: ['kolacja', 'wieczerza'],
+      readings: [null, null],
+      pos: 'noun',
+    }
     expect(senseInContext(both, 'Kolacja i wieczerza to to samo.')).toBe('kolacja')
   })
 
   it('dopasowuje po rdzeniu, bo polski odmienia', () => {
     // „pieska" niesie rdzeń „pies", więc wygrywa nad „kot" mimo innej końcówki.
-    const animal: Entry = { pl: 'kot', senses: ['kot', 'pies'], pos: 'noun' }
+    const animal: Entry = {
+      pl: 'kot',
+      senses: ['kot', 'pies'],
+      readings: [null, null],
+      pos: 'noun',
+    }
     expect(senseInContext(animal, 'Widzę psa i pieska.')).toBe('pies')
     expect(senseInContext(animal, 'Widzę kota.')).toBe('kot')
 
-    const baby: Entry = { pl: 'gwóźdź', senses: ['gwóźdź', 'niemowlę'], pos: 'noun' }
+    const baby: Entry = {
+      pl: 'gwóźdź',
+      senses: ['gwóźdź', 'niemowlę'],
+      readings: [null, null],
+      pos: 'noun',
+    }
     expect(senseInContext(baby, 'To są niemowlęta.')).toBe('niemowlę')
   })
 })

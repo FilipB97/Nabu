@@ -12,6 +12,7 @@ import { loadLexicon } from '@/store/decks'
 import { settingsFor, updateSettings } from '@/store/db'
 import { Button } from '@/ui/Button'
 import { Mono } from '@/ui/Mono'
+import { dirOf, fontClassOf } from '@/ui/script'
 import { Progress } from '@/ui/Ticks'
 
 /**
@@ -101,9 +102,7 @@ export function Calibration() {
     )
   }
 
-  const fontClass = { ui: 'font-ui', display: 'font-display', ja: 'font-ja', ko: 'font-ko' }[
-    adapter.display.font
-  ]
+  const fontClass = fontClassOf(adapter)
 
   return (
     <div className="flex flex-1 flex-col gap-5 pb-[env(safe-area-inset-bottom)]">
@@ -132,6 +131,7 @@ export function Calibration() {
           px-6 py-10 min-h-[240px] md:min-h-[280px]"
       >
         <p
+          dir={dirOf(adapter)}
           className={`${fontClass} text-center leading-[1.25] text-text
             text-[clamp(48px,10vw,72px)]`}
         >

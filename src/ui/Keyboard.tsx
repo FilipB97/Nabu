@@ -1,4 +1,5 @@
 import type { LangAdapter } from '@/langs'
+import { fontClassFor } from './script'
 
 /**
  * Klawiatura w aplikacji — sekcja 7.2 planu.
@@ -17,12 +18,6 @@ type KeyboardProps = {
   font: LangAdapter['display']['font']
 }
 
-const FONT_CLASS: Record<LangAdapter['display']['font'], string> = {
-  ui: 'font-ui',
-  display: 'font-display',
-  ja: 'font-ja',
-  ko: 'font-ko',
-}
 
 export function Keyboard({ rows, onKey, onBackspace, font }: KeyboardProps) {
   return (
@@ -36,7 +31,7 @@ export function Keyboard({ rows, onKey, onBackspace, font }: KeyboardProps) {
               onClick={() => onKey(key)}
               // Klawisz musi znieść dziesięć pozycji w rzędzie na ekranie 360 px,
               // więc szerokość jest elastyczna, a wysokość stała i w zasięgu kciuka.
-              className={`nabu-press nabu-card ${FONT_CLASS[font]} min-h-[46px] min-w-0 flex-1
+              className={`nabu-press nabu-card ${fontClassFor(font)} min-h-[46px] min-w-0 flex-1
                 rounded-[10px] px-1 text-[19px] text-text`}
             >
               {key}

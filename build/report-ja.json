@@ -1,6 +1,6 @@
 {
   "lang": "ja",
-  "zdań": 11011,
+  "zdań": 11021,
   "kandydatów": 49453,
   "odrzuconychNaJakości": 4005,
   "odsetekOdrzutówJakościowych": 8,
@@ -13,15 +13,15 @@
     "wulgaryzm": 15
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 25043,
-    "glosa bez oparcia w tłumaczeniu": 4917,
+    "brak tokenu nadającego się na lukę": 24973,
+    "glosa bez oparcia w tłumaczeniu": 4977,
     "za krótkie": 3954,
     "ta sama rama, inna odpowiedź": 351,
     "za długie": 172
   },
   "tłumaczenia": {
-    "bezpośrednie": 5447,
-    "przezAngielski": 5564
+    "bezpośrednie": 5455,
+    "przezAngielski": 5566
   },
   "pasma": {
     "min": 152,
@@ -49,45 +49,45 @@
       ]
     },
     {
-      "text": "トムはテニスするかな？",
-      "pl": "Zastanawiam się, czy Tom gra w tenisa.",
-      "luka": "テニス",
-      "band": 368,
+      "text": "その試合、見ました？",
+      "pl": "Czy oglądałeś ten mecz?",
+      "luka": "試合",
+      "band": 373,
       "src": "pivot",
-      "dystraktory": [
-        "ホテル",
-        "テスト",
-        "クラス",
-        "ニュース",
-        "音",
-        "試合",
-        "口",
-        "一つ"
-      ]
-    },
-    {
-      "text": "私は昨日時計を失いました。",
-      "pl": "Wczoraj straciłem zegarek.",
-      "luka": "時計",
-      "band": 567,
-      "src": "direct",
       "dystraktory": [
         "日本語",
-        "場所",
-        "音",
-        "宿題",
-        "注意",
-        "試合",
-        "簡単",
-        "小説"
+        "試験",
+        "口",
+        "一つ",
+        "小説",
+        "時計",
+        "説明",
+        "夏"
       ]
     },
     {
-      "text": "雨が降っていたのでタクシーに乗った。",
-      "pl": "Pojechałem taksówką, bo padało.",
+      "text": "彼女はバスに間に合った。",
+      "pl": "Zdążyła na autobus.",
+      "luka": "バス",
+      "band": 570,
+      "src": "direct",
+      "dystraktory": [
+        "言葉",
+        "事故",
+        "アメリカ",
+        "母",
+        "成功",
+        "名前",
+        "映画",
+        "結婚"
+      ]
+    },
+    {
+      "text": "「タクシーが使われていますか？」「はい、使われています」",
+      "pl": "Jeździ się tu taksówkami? Tak, jeździ się.",
       "luka": "タクシー",
       "band": 763,
-      "src": "pivot",
+      "src": "direct",
       "dystraktory": [
         "ニューヨーク",
         "コンピューター",
@@ -100,62 +100,62 @@
       ]
     },
     {
-      "text": "彼女は貧しいけれど幸福です。",
-      "pl": "Jest biedna, ale szczęśliwa.",
-      "luka": "幸福",
-      "band": 1011,
-      "src": "pivot",
-      "dystraktory": [
-        "番号",
-        "真実",
-        "名",
-        "敵",
-        "情報",
-        "現在",
-        "春",
-        "答え"
-      ]
-    },
-    {
-      "text": "彼の年齢を考慮に入れた方がよい。",
-      "pl": "Trzeba brać pod uwagę jego wiek.",
-      "luka": "年齢",
-      "band": 1333,
+      "text": "この部屋の中でボール遊びをしてはいけません。",
+      "pl": "W tym pokoju nie wolno grać w piłkę.",
+      "luka": "ボール",
+      "band": 1012,
       "src": "direct",
       "dystraktory": [
-        "来年",
-        "大統領",
-        "機会",
-        "お腹",
-        "自動車",
-        "答え",
-        "財布",
-        "教会"
+        "メール",
+        "ビール",
+        "スキー",
+        "スープ",
+        "ヨーロッパ",
+        "コート",
+        "ギター",
+        "プール"
       ]
     },
     {
-      "text": "ナンシーはなかなか笑顔を見せない。",
-      "pl": "Nancy uśmiecha się rzadko.",
-      "luka": "笑顔",
-      "band": 1739,
+      "text": "この湖はその国でもっとも深いものの一つだ。",
+      "pl": "To jezioro jest wśród najgłębszych w kraju.",
+      "luka": "湖",
+      "band": 1335,
       "src": "pivot",
       "dystraktory": [
-        "計算",
-        "利益",
-        "貧乏",
-        "季節",
-        "不幸",
-        "未来",
-        "喉",
-        "便利"
+        "敵",
+        "客",
+        "腕",
+        "橋",
+        "お腹",
+        "京都",
+        "中国",
+        "単語"
       ]
     },
     {
-      "text": "彼女はメキシコ行きを延期した。",
-      "pl": "Przełożyła swój wyjazd do Meksyku.",
+      "text": "いつも記事を書いています。",
+      "pl": "Stale piszę artykuły.",
+      "luka": "記事",
+      "band": 1742,
+      "src": "direct",
+      "dystraktory": [
+        "火事",
+        "世紀",
+        "喧嘩",
+        "運命",
+        "知り合い",
+        "喉",
+        "否定",
+        "石油"
+      ]
+    },
+    {
+      "text": "私は彼女がメキシコへ行ったことがあるかどうかたずねた。",
+      "pl": "Zapytałem ją, czy była kiedyś w Meksyku.",
       "luka": "メキシコ",
       "band": 2367,
-      "src": "direct",
+      "src": "pivot",
       "dystraktory": [
         "コメント",
         "システム",
@@ -202,20 +202,20 @@
       ]
     },
     {
-      "text": "これはセルビアで三番目に大きい町である。",
-      "pl": "To trzecie co do wielkości miasto Serbii.",
-      "luka": "セルビア",
-      "band": 7832,
-      "src": "pivot",
+      "text": "銅は電気をよく伝える。",
+      "pl": "Miedź dobrze przewodzi prąd.",
+      "luka": "銅",
+      "band": 7842,
+      "src": "direct",
       "dystraktory": [
-        "アイドル",
-        "エアロビクス",
-        "ウール",
-        "ベルギー",
-        "マイケル",
-        "ホノルル",
-        "ペルー",
-        "アクセント"
+        "同級生",
+        "河",
+        "奇麗",
+        "銀河",
+        "南極",
+        "同性愛",
+        "家内",
+        "不眠症"
       ]
     },
     {

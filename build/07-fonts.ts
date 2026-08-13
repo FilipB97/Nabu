@@ -43,17 +43,30 @@ const KANA =
   'ガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポッャュョァィゥェォ' +
   '、。「」・'
 
+/**
+ * Alfabet arabski w całości. Etap 0 wymaga wszystkich 28 liter, a subset po samej talii
+ * dałby litery w formach, które w niej wystąpiły — a litera arabska ma cztery kształty
+ * zależne od pozycji i wszystkie muszą być w kroju, bo inaczej wyraz rozpadnie się
+ * na oderwane znaki przy pierwszym słowie spoza subsetu.
+ */
+const ARABIC = 'اأإآبتثجحخدذرزسشصضطظعغفقكلمنهوىيءؤئةًٌٍَُِّْ٠١٢٣٤٥٦٧٨٩،؟؛'
+
 /** Znaki z dema, żeby strona demonstracyjna działała także bez talii japońskiej. */
 const DEMO = '水氷湯米建物確認물불밀말좀주세요안녕하십니까'
 
 /** Zbiera znaki występujące w taliach, w rozbiciu na systemy pisma. */
-async function charsFromData(): Promise<{ latin: string; hangul: string; cjk: string }> {
+async function charsFromData(): Promise<{
+  latin: string
+  hangul: string
+  cjk: string
+  arabic: string
+}> {
   const chars = new Set<string>()
   let langs: string[] = []
   try {
     langs = await readdir(DATA)
   } catch {
-    return { latin: '', hangul: '', cjk: '' }
+    return { latin: '', hangul: '', cjk: '', arabic: '' }
   }
 
   for (const lang of langs) {
@@ -74,6 +87,7 @@ async function charsFromData(): Promise<{ latin: string; hangul: string; cjk: st
     latin: pick(/[\p{Script=Latin}\p{P}\p{S}]/u),
     hangul: pick(/\p{Script=Hangul}/u),
     cjk: pick(/[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u),
+    arabic: pick(/\p{Script=Arabic}/u),
   }
 }
 
@@ -117,6 +131,13 @@ const JOBS: FontJob[] = [
     file: 'noto-serif-kr',
     url: `${GH}/ofl/notoserifkr/NotoSerifKR%5Bwght%5D.ttf`,
     chars: DEMO + LATIN + fromData.hangul,
+  },
+  {
+    // Naskh, nie Kufi ani Nastaliq: to jest krój, którym drukuje się książki i prasę,
+    // więc uczący się widzi kształty, które spotka poza aplikacją.
+    file: 'noto-naskh-arabic',
+    url: `${GH}/ofl/notonaskharabic/NotoNaskhArabic%5Bwght%5D.ttf`,
+    chars: ARABIC + LATIN + fromData.arabic,
   },
 ]
 

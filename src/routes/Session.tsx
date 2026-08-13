@@ -9,6 +9,7 @@ import { ProduceCard } from '@/session/ProduceCard'
 import { QuizOption, type OptionState } from '@/ui/QuizOption'
 import { Button } from '@/ui/Button'
 import { Mono } from '@/ui/Mono'
+import { dirOf, fontClassOf } from '@/ui/script'
 import { Progress } from '@/ui/Ticks'
 
 /**
@@ -202,9 +203,7 @@ export function Session() {
     )
   }
 
-  const fontClass = { ui: 'font-ui', display: 'font-display', ja: 'font-ja', ko: 'font-ko' }[
-    adapter.display.font
-  ]
+  const fontClass = fontClassOf(adapter)
 
   // Etapy 0 i 1 pytają o pojedynczy znak albo pojedyncze słowo, a odpowiedzią jest
   // etykieta łacińska: czytanie albo polska glosa. Zdanie, tłumaczenie i luka nie mają
@@ -318,6 +317,7 @@ export function Session() {
             <Mono tone="accent">nowe · {STAGE_LABEL[stageOfCard]}</Mono>
 
             <p
+              dir={dirOf(adapter)}
               className={`${fontClass} leading-[1.2] text-text`}
               style={{ fontSize: jednoelementowa ? 'clamp(72px,16vw,104px)' : 'clamp(34px,7vw,48px)' }}
             >
@@ -365,6 +365,7 @@ export function Session() {
             {!jednoelementowa && (
               <div className="flex flex-col gap-2 border-t border-border-quiet pt-4">
                 <p
+                  dir={dirOf(adapter)}
                   className={`${fontClass} text-text-2`}
                   style={{ fontSize: `${Math.round(adapter.display.size * 0.62)}px` }}
                 >
@@ -399,6 +400,7 @@ export function Session() {
           </div>
         ) : jednoelementowa ? (
           <p
+            dir={dirOf(adapter)}
             className={`${fontClass} text-center text-text`}
             style={{
               // Znak pisma jest całą treścią karty, więc dostaje całą uwagę. Słowo rdzenia
@@ -412,6 +414,7 @@ export function Session() {
         ) : (
           <>
             <p
+              dir={dirOf(adapter)}
               className={`${fontClass} text-text`}
               style={{
                 fontSize: `${adapter.display.size}px`,
@@ -470,7 +473,10 @@ export function Session() {
             {/* Przy karcie pisma i rdzenia słowo stoi już wielkie na środku karty —
                 powtarzanie go tutaj byłoby drugą kopią tej samej rzeczy. */}
             {!jednoelementowa && (
-              <span className={`${fontClass} text-[21px] leading-none text-text`}>
+              <span
+                dir={dirOf(adapter)}
+                className={`${fontClass} text-[21px] leading-none text-text`}
+              >
                 {reveal.answer.term}
               </span>
             )}
@@ -514,6 +520,7 @@ export function Session() {
                   state={stateOf(index)}
                   chosen={reveal?.chosen === index}
                   font={jednoelementowa ? 'ui' : adapter.display.font}
+                  rtl={!jednoelementowa && adapter.rtl}
                   shortcut={index + 1}
                   onSelect={() => void answer(index)}
                 />
@@ -544,7 +551,9 @@ export function Session() {
           // użytkownik widzi po prostu kartę z odsłonięciem.
           <div className="flex flex-col gap-[10px]">
             <div className="nabu-card flex flex-wrap items-baseline gap-x-3 gap-y-1 px-5 py-4">
-              <span className={`${fontClass} text-[25px] text-text`}>{target?.s}</span>
+              <span dir={dirOf(adapter)} className={`${fontClass} text-[25px] text-text`}>
+                {target?.s}
+              </span>
               <span className="font-ui text-[13px] text-text-2">{target?.gloss}</span>
             </div>
             <div className="flex gap-[10px]">

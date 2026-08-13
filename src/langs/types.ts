@@ -112,7 +112,7 @@ export type LangAdapter = {
 
   display: {
     /** Nazwa rodziny z `@theme` w `index.css`, nie konkretny krój. */
-    font: 'ui' | 'display' | 'ja' | 'ko'
+    font: 'ui' | 'display' | 'ja' | 'ko' | 'ar'
     /** Stopień pisma tekstu docelowego w px, przy domyślnym ustawieniu wielkości. */
     size: number
     /**
