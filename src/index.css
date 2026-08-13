@@ -44,6 +44,13 @@
   font-display: swap;
 }
 @font-face {
+  font-family: 'Noto Naskh Arabic';
+  src: url('/fonts/noto-naskh-arabic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
   font-family: 'Noto Serif KR';
   src: url('/fonts/noto-serif-kr.woff2') format('woff2');
   font-weight: 400;
@@ -85,6 +92,7 @@
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
   --font-ja: 'Noto Serif JP', 'Hiragino Mincho ProN', serif;
   --font-ko: 'Noto Serif KR', 'Apple SD Gothic Neo', serif;
+  --font-ar: 'Noto Naskh Arabic', 'Geeza Pro', 'Segoe UI', serif;
 }
 
 /* -------------------------------------------------------------------------

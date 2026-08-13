@@ -4,6 +4,7 @@ import { QuizOption, type OptionState } from '@/ui/QuizOption'
 import { Button } from '@/ui/Button'
 import { Mono } from '@/ui/Mono'
 import { Progress } from '@/ui/Ticks'
+import { fontClassFor } from '@/ui/script'
 
 /**
  * Karta `quiz-cloze` — sekcja 7 i 8.4 planu.
@@ -41,12 +42,6 @@ export type QuizContent = {
   options: ReadonlyArray<{ term: string; gloss: string }>
 }
 
-const FONT_CLASS: Record<LangAdapter['display']['font'], string> = {
-  ui: 'font-ui',
-  display: 'font-display',
-  ja: 'font-ja',
-  ko: 'font-ko',
-}
 
 type QuizCardProps = {
   content: QuizContent
@@ -71,7 +66,7 @@ export function QuizCard({
   const answered = pick !== null
   const right = answered && pick === content.correct
   const { adapter } = content
-  const fontClass = FONT_CLASS[adapter.display.font]
+  const fontClass = fontClassFor(adapter.display.font)
 
   const choose = useCallback((index: number) => {
     setPick((current) => (current === null ? index : current))

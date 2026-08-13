@@ -15,7 +15,7 @@
  * jest najbardziej prawdopodobny.
  */
 
-import { copyFile, writeFile } from 'node:fs/promises'
+import { copyFile, readdir, rm, writeFile } from 'node:fs/promises'
 import { adapterFor } from '../src/langs/index.ts'
 import type { LangAdapter } from '../src/langs/types.ts'
 import { fetchSources } from './01-fetch.ts'
@@ -274,6 +274,12 @@ function pickCloze(
 
   if (best < 0) return -1
 
+  // Luka musi stać w POSTACI HASŁOWEJ. Koreańskie `잡아` jest formą czasownika `잡다`,
+  // a glosa opisuje formę słownikową — więc poprawna opcja jest odmieniona, a wszystkie
+  // błędne stoją w bezokoliczniku. Wybór staje się wtedy zadaniem z gramatyki: wystarczy
+  // wskazać jedyną opcję o innym kształcie, nie znając ani jednego z tych słów.
+  if (tokens[best]!.lemma !== tokens[best]!.s.toLocaleLowerCase()) return -1
+
   // Lemat luki musi być w zdaniu JEDYNY. „Lo hecho, hecho está" z luką na pierwszym
   // `hecho` zostawia drugie widoczne obok — odpowiedź stoi w pytaniu. Wyszło dopiero
   // na gotowej karcie, bo w danych nic tego nie zdradza.
@@ -388,6 +394,12 @@ export async function assemble(lang: string): Promise<{ items: Item[]; rejects: 
     const target = slimmed[cloze]!
     const entry = lexicon.entries.get(tokens[cloze]!.lemma)
     if (entry) target.gloss = senseInContext(entry, translation.pl)
+
+    // Wymowa słowa w luce, gdy analizator jej nie podaje. Dotyczy pism, które nie niosą
+    // samogłosek: arabskie `مشكلة` bez transliteracji jest ciągiem czterech spółgłosek,
+    // którego uczący się nie ma jak przeczytać — a to jest właśnie ODPOWIEDŹ, czyli
+    // jedyne słowo na karcie, które musi dać się wymówić.
+    if (!target.r && entry?.say) target.r = entry.say
 
     if (!target.gloss || !glossSupported(target.gloss, translation.pl)) {
       bump('glosa bez oparcia w tłumaczeniu')
@@ -527,9 +539,16 @@ export async function writeReport(lang: string, items: Item[], rejects: Rejects)
  * Aplikacja ładuje paczkę wtedy, gdy pasmo użytkownika do niej dojdzie — dzięki temu
  * pierwsze uruchomienie ściąga kilkaset kilobajtów, a nie kilkanaście megabajtów.
  */
-export async function writeDeck(lang: string, items: Item[]): Promise<void> {
+export async function writeDeck(lang: string, items: Item[], dictionary?: Lexicon): Promise<void> {
   const adapter = adapterFor(lang)
   await ensureDir(dataPath(adapter.code, ''))
+
+  // Paczki z poprzedniego przebiegu, których ten już nie zapisze. `meta.json` ich nie
+  // wymienia, więc aplikacja ich nie czyta — ale zostają w repo, puchną w git i kłamią
+  // każdemu, kto policzy zdania po plikach zamiast po indeksie. Raz już zafałszowały audyt.
+  for (const file of await readdir(dataPath(adapter.code, ''))) {
+    if (/^sentences-\d+\.json$/.test(file)) await rm(dataPath(adapter.code, file))
+  }
 
   const packs: { file: string; from: number; to: number; count: number }[] = []
 
@@ -565,7 +584,7 @@ export async function writeDeck(lang: string, items: Item[]): Promise<void> {
   if (script.items.length > 0) {
     await writeFile(dataPath(adapter.code, 'script.json'), JSON.stringify(script), 'utf8')
   }
-  const core = buildCore(adapter, items)
+  const core = buildCore(adapter, items, dictionary?.entries)
   await writeFile(dataPath(adapter.code, 'core.json'), JSON.stringify(core), 'utf8')
 
   const meta = {
@@ -590,6 +609,6 @@ if (import.meta.filename === process.argv[1]) {
   const { items, rejects } = await assemble(lang)
   await assignDistractors(items, lang)
   await writeReport(lang, items, rejects)
-  await writeDeck(lang, items)
+  await writeDeck(lang, items, await loadLexicon(adapterFor(lang).code))
   console.log('\nGotowe. Przejrzyj build/report-*.json.')
 }

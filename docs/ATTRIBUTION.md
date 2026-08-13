@@ -16,7 +16,7 @@ ani przetłumaczone maszynowo — zdania, ich polskie tłumaczenia i glosy pocho
 | Segmentacja i czytania japońskie | [kuromoji.js](https://github.com/takuyaa/kuromoji.js) + IPADIC | Apache 2.0 |
 | Segmentacja i pinyin chiński | [CC-CEDICT](https://www.mdbg.net/chinese/dictionary?page=cc-cedict) | CC BY-SA 4.0 |
 | Rozkład kanji na komponenty | [KRADFILE](http://www.edrdg.org/krad/kradinf.html), EDRDG | CC BY-SA 3.0 |
-| Kroje pisma | Archivo, Spectral, IBM Plex Mono, Noto Serif JP, Noto Serif KR | SIL OFL 1.1 |
+| Kroje pisma | Archivo, Spectral, IBM Plex Mono, Noto Serif JP, Noto Serif KR, Noto Naskh Arabic | SIL OFL 1.1 |
 
 **Dane pochodne dziedziczą SA.** Dotyczy to zawartości katalogu `data/`, nie kodu
 aplikacji — kod jest na MIT. Subsety krojów w `public/fonts/` mają nazwy odróżniające

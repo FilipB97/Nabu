@@ -1,33 +1,33 @@
 {
   "lang": "sv",
-  "zdań": 1163,
+  "zdań": 1190,
   "kandydatów": 8080,
-  "odrzuconychNaJakości": 1212,
+  "odrzuconychNaJakości": 1206,
   "odsetekOdrzutówJakościowych": 15,
-  "odsetekNieprzydatnychNaKartę": 71,
+  "odsetekNieprzydatnychNaKartę": 70,
   "pozaZasięgiem": 48738,
   "innyZapis": 0,
   "powodyJakość": {
-    "pasmo powyżej progu języka": 726,
+    "pasmo powyżej progu języka": 727,
     "za dużo tokenów spoza listy częstości": 295,
-    "nazwa własna": 174,
+    "nazwa własna": 167,
     "wulgaryzm": 15,
     "znaki spoza zestawu języka": 2
   },
   "powodyPrzydatność": {
     "za krótkie": 2375,
-    "brak tokenu nadającego się na lukę": 2255,
-    "glosa bez oparcia w tłumaczeniu": 888,
-    "ta sama rama, inna odpowiedź": 172,
+    "brak tokenu nadającego się na lukę": 2218,
+    "glosa bez oparcia w tłumaczeniu": 900,
+    "ta sama rama, inna odpowiedź": 176,
     "za długie": 15
   },
   "tłumaczenia": {
-    "bezpośrednie": 362,
-    "przezAngielski": 801
+    "bezpośrednie": 367,
+    "przezAngielski": 823
   },
   "pasma": {
     "min": 154,
-    "mediana": 1991,
+    "mediana": 1957,
     "p90": 7115,
     "max": 11826
   },
@@ -51,54 +51,54 @@
       ]
     },
     {
-      "text": "Jag har fått en bil.",
-      "pl": "Dostałem samochód.",
+      "text": "Jag har en ny bil.",
+      "pl": "Mam nowy samochód.",
       "luka": "bil",
       "band": 382,
-      "src": "direct",
+      "src": "pivot",
       "dystraktory": [
         "bror",
         "plats",
         "familj",
         "dotter",
         "rum",
+        "mor",
         "ord",
-        "dags",
-        "fara"
+        "dags"
       ]
     },
     {
-      "text": "Jag vet inte exakt när jag kommer att komma tillbaka.",
-      "pl": "Nie wiem dokładnie kiedy będę z powrotem.",
-      "luka": "exakt",
-      "band": 667,
+      "text": "Tom kände sig skyldig.",
+      "pl": "Tom czuł się winny.",
+      "luka": "skyldig",
+      "band": 660,
       "src": "pivot",
       "dystraktory": [
-        "hemskt",
-        "egentligen",
-        "tillräckligt",
-        "snabbt",
-        "enkelt",
-        "olika",
-        "ofta",
-        "tyvärr"
-      ]
-    },
-    {
-      "text": "Han försökte att göra sin fru lycklig, men han kunde inte.",
-      "pl": "Chciał uczynić żonę szczęśliwą, ale nie mógł.",
-      "luka": "lycklig",
-      "band": 887,
-      "src": "pivot",
-      "dystraktory": [
-        "försiktig",
-        "stolt",
-        "svart",
-        "stark",
-        "hungrig",
-        "ung",
+        "sjuk",
+        "snäll",
+        "dum",
+        "trött",
+        "full",
         "annorlunda",
-        "upptagen"
+        "ung",
+        "arg"
+      ]
+    },
+    {
+      "text": "Tom kör en svart bil.",
+      "pl": "Tom jeździ czarnym samochodem.",
+      "luka": "svart",
+      "band": 884,
+      "src": "pivot",
+      "dystraktory": [
+        "stark",
+        "stolt",
+        "försiktig",
+        "lycklig",
+        "hungrig",
+        "upptagen",
+        "annorlunda",
+        "ung"
       ]
     },
     {
@@ -110,68 +110,68 @@
       "dystraktory": [
         "van",
         "gravid",
+        "äldre",
         "värd",
         "blå",
         "viktig",
         "vit",
-        "upptagen",
-        "nöjd"
+        "upptagen"
       ]
     },
     {
-      "text": "Du har ett bra minne.",
-      "pl": "Masz dobrą pamięć.",
-      "luka": "minne",
-      "band": 1553,
+      "text": "Jag kommer inte från en rik familj.",
+      "pl": "Nie pochodzę z bogatej rodziny.",
+      "luka": "rik",
+      "band": 1544,
       "src": "direct",
       "dystraktory": [
-        "procent",
-        "guld",
-        "medicin",
-        "lärare",
-        "exempel",
-        "kött",
-        "dator",
-        "hotell"
+        "rolig",
+        "färdig",
+        "oskyldig",
+        "öppen",
+        "konstig",
+        "röd",
+        "besviken",
+        "vit"
       ]
     },
     {
-      "text": "Vad skulle det betyda?",
-      "pl": "Co by to znaczyło?",
-      "luka": "betyda",
-      "band": 2121,
-      "src": "direct",
-      "dystraktory": [
-        "skrämma",
-        "röka",
-        "finna",
-        "bestämma",
-        "simma",
-        "övertyga",
-        "handla",
-        "sakna"
-      ]
-    },
-    {
-      "text": "Han har inte hatt på sig.",
-      "pl": "On nie nosi kapelusza.",
-      "luka": "hatt",
-      "band": 2741,
+      "text": "Han gick långsamt så att barnet kunde hänga med.",
+      "pl": "Szedł wolno, by dziecko mogło za nim nadążyć.",
+      "luka": "långsamt",
+      "band": 2109,
       "src": "pivot",
       "dystraktory": [
-        "choklad",
-        "fotboll",
-        "tjuv",
-        "grönt",
-        "restaurang",
-        "tystnad",
-        "fågel",
-        "spöke"
+        "personligen",
+        "personligt",
+        "hittills",
+        "fullständigt",
+        "sällan",
+        "senast",
+        "dyrt",
+        "kallt"
       ]
     },
     {
-      "text": "Jag glömde min plånbok.",
-      "pl": "Zapomniałem portfela.",
+      "text": "Tycker ni att jag är ful?",
+      "pl": "Myślisz, że jestem brzydki?",
+      "luka": "ful",
+      "band": 2695,
+      "src": "pivot",
+      "dystraktory": [
+        "förälskad",
+        "vänlig",
+        "sann",
+        "djup",
+        "modig",
+        "tung",
+        "blind",
+        "född"
+      ]
+    },
+    {
+      "text": "Ge mig din plånbok.",
+      "pl": "Daj mi swój portfel.",
       "luka": "plånbok",
       "band": 3619,
       "src": "pivot",
@@ -187,11 +187,11 @@
       ]
     },
     {
-      "text": "Kan du laga en toalett?",
-      "pl": "Czy możesz naprawić toaletę?",
+      "text": "Var är närmaste toalett?",
+      "pl": "Gdzie jest najbliższa toaleta?",
       "luka": "toalett",
       "band": 5050,
-      "src": "pivot",
+      "src": "direct",
       "dystraktory": [
         "tradition",
         "italienska",
@@ -204,20 +204,20 @@
       ]
     },
     {
-      "text": "Har ni något att tillägga?",
-      "pl": "Macie coś do dodania?",
-      "luka": "tillägga",
-      "band": 7497,
-      "src": "direct",
+      "text": "Det är svårt att hålla konversation med någon som bara säger ja och nej.",
+      "pl": "Trudno jest utrzymać rozmowę z kimś, kto mówi tylko „Tak” i „Nie”.",
+      "luka": "konversation",
+      "band": 7509,
+      "src": "pivot",
       "dystraktory": [
-        "trösta",
-        "stryka",
-        "regna",
-        "kila",
-        "adoptera",
-        "klargöra",
-        "undervisa",
-        "anpassa"
+        "plast",
+        "kuvert",
+        "tvål",
+        "takt",
+        "äpple",
+        "argument",
+        "konflikt",
+        "väster"
       ]
     },
     {

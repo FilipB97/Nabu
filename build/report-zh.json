@@ -1,6 +1,6 @@
 {
   "lang": "zh",
-  "zdań": 1022,
+  "zdań": 1018,
   "kandydatów": 6288,
   "odrzuconychNaJakości": 1141,
   "odsetekOdrzutówJakościowych": 18,
@@ -14,20 +14,20 @@
     "wulgaryzm": 6
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 2320,
+    "brak tokenu nadającego się na lukę": 2322,
     "za krótkie": 1367,
-    "glosa bez oparcia w tłumaczeniu": 382,
+    "glosa bez oparcia w tłumaczeniu": 384,
     "ta sama rama, inna odpowiedź": 41,
     "za długie": 15
   },
   "tłumaczenia": {
-    "bezpośrednie": 83,
-    "przezAngielski": 939
+    "bezpośrednie": 82,
+    "przezAngielski": 936
   },
   "pasma": {
     "min": 155,
     "mediana": 2804,
-    "p90": 8407,
+    "p90": 8439,
     "max": 11983
   },
   "quizNiedostępny": 0,
@@ -101,25 +101,25 @@
       ]
     },
     {
-      "text": "比尔给我带来了这本书。",
-      "pl": "Bill kupił mi tę książkę.",
-      "luka": "书",
-      "band": 1907,
-      "src": "direct",
+      "text": "爸爸恢复了健康。",
+      "pl": "Ojciec wrócił do zdrowia.",
+      "luka": "健康",
+      "band": 1903,
+      "src": "pivot",
       "dystraktory": [
-        "学生",
-        "礼物",
-        "弟弟",
-        "动物",
-        "大学",
-        "米",
-        "笨蛋",
-        "日本"
+        "酒店",
+        "啤酒",
+        "天使",
+        "包",
+        "命",
+        "蛋糕",
+        "宇宙",
+        "爱情"
       ]
     },
     {
-      "text": "说英语很有用。",
-      "pl": "Mówienie po angielsku jest przydatne.",
+      "text": "她在忙着学英语。",
+      "pl": "Jest zajęta nauką angielskiego.",
       "luka": "英语",
       "band": 2511,
       "src": "pivot",
@@ -127,45 +127,45 @@
         "椅子",
         "菜",
         "作家",
-        "上学",
         "面包",
         "天气",
         "票",
-        "科学"
+        "科学",
+        "教育"
       ]
     },
     {
-      "text": "他昨天到了东京。",
-      "pl": "Wczoraj przybył do Tokio.",
-      "luka": "昨天",
-      "band": 3222,
+      "text": "把灯关了。我睡不着。",
+      "pl": "Zgaś światło. Nie mogę zasnąć.",
+      "luka": "灯",
+      "band": 3264,
       "src": "pivot",
       "dystraktory": [
-        "未来",
-        "城市",
-        "男孩",
-        "音乐",
-        "妹妹",
-        "日本",
-        "自由",
-        "弟弟"
-      ]
-    },
-    {
-      "text": "我想吃韩国菜。",
-      "pl": "Lubię kuchnię koreańską.",
-      "luka": "菜",
-      "band": 4061,
-      "src": "pivot",
-      "dystraktory": [
-        "茶",
-        "英语",
+        "三明治",
+        "河",
         "椅子",
-        "词",
-        "空气",
-        "上学",
-        "红色",
-        "山"
+        "出租车",
+        "救护车",
+        "观点",
+        "卧室",
+        "宗教"
+      ]
+    },
+    {
+      "text": "我厌倦了看电视。",
+      "pl": "Jestem zmęczony oglądaniem telewizji.",
+      "luka": "电视",
+      "band": 4083,
+      "src": "pivot",
+      "dystraktory": [
+        "电脑",
+        "道",
+        "婚礼",
+        "新闻",
+        "历史",
+        "银行",
+        "队",
+        "头发"
       ]
     },
     {
@@ -186,20 +186,20 @@
       ]
     },
     {
-      "text": "我的父亲很快就会康复。",
-      "pl": "Mój ojciec wkrótce wyzdrowieje.",
-      "luka": "父亲",
-      "band": 6443,
+      "text": "他的化学很差。",
+      "pl": "On jest słaby w chemii.",
+      "luka": "化学",
+      "band": 6483,
       "src": "pivot",
       "dystraktory": [
-        "明天",
-        "警察",
-        "月",
-        "电话",
-        "医生",
-        "女孩",
-        "世界",
-        "母亲"
+        "大学生",
+        "北",
+        "例子",
+        "季节",
+        "数学",
+        "教师",
+        "信封",
+        "计算机"
       ]
     },
     {

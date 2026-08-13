@@ -156,6 +156,21 @@ Cztery pierwsze kosztują razem mniej niż jeden japoński, a dają natychmiasto
 
 Chiński i arabski dokładamy po v1, każdy jako osobne, zamknięte zadanie.
 
+**Stan po dołożeniu arabskiego.** Etap 0 (28 liter w siedmiu porcjach po rodzinach
+kształtu), etap 1 (100 słów) i 909 zdań. Trzy rzeczy, o których trzeba pamiętać:
+
+- **Dźwięk jest tu warunkiem, nie dodatkiem** (uwaga do poziomu D wyżej). Zapis bez
+  wokalizacji nie niesie samogłosek krótkich, więc zdania nie da się przeczytać
+  na głos wyłącznie z tego, co widać na karcie. Bez głosu systemowego `ar-SA` arabski
+  jest nauką pisma i słownictwa, nie wymowy — i tak trzeba go użytkownikowi opisać.
+- **Rodzajnik `ال` rozdzielamy przy tokenizacji** (`splitToken`), tak samo jak koreańskie
+  partykuły. Bez tego luka wypadała na całej zbitce `المدرسة`, a wszystkie dystraktory
+  stały w formie słownikowej — poprawną opcję dało się wskazać po kształcie, nie znając
+  ani jednego z tych słów. Reguła podniosła talię z 276 zdań do 909.
+- **Materiału jest mało i to jest sufit, nie ustawienie.** Tatoeba ma dla arabskiego
+  5 559 zdań z tłumaczeniem polskim (24 bezpośrednio, reszta przez angielski) — dla
+  porównania hiszpański ma ich dziesiątki tysięcy.
+
 ### 2.4 Wielojęzyczność w interfejsie
 
 - Przełączanie języka jest zawsze o jedno dotknięcie — pasek na górze ekranu startu,
@@ -1049,6 +1064,34 @@ na siłę: błędny wybór jest gorszy od domyślnego.
 Co odpada razem z modelem: klucz API, koszt wywołań, walidacja odpowiedzi, ponowienia,
 ryzyko jakości tłumaczeń z sekcji 14, a przede wszystkim **niemożność powtórzenia builda
 przez kogokolwiek bez własnego klucza**.
+
+**Karta rdzenia bierze znaczenie PODSTAWOWE, karta zdania — kontekstowe.** To jest ta sama
+zasada z drugiej strony i wyszła dopiero na gotowych taliach. Rdzeń dziedziczył sens
+z pierwszego napotkanego zdania, więc `夜` uczyło się jako „wieczór" (bo takie było tamto
+zdanie), `时间` jako „godzina", a `米` jako „metr". Zdanie ma prawo do swojego kontekstu;
+karta słowa nie ma kontekstu i musi podać znaczenie słownikowe.
+
+Trzy reguły, które z tego wynikają:
+
+- **Postać hasłowa na karcie.** Koreańskie `잡아` jest formą czasownika `잡다`, a glosa
+  („złapać") opisuje formę słownikową. Karta pokazuje więc `잡다`, a luka w zdaniu
+  w ogóle nie może wypaść na formie odmienionej — inaczej poprawna opcja jest jedyną
+  o innym kształcie i wybiera się ją, nie znając ani jednego z tych słów.
+- **Czytanie z tego samego wiersza słownika co glosa.** Analizator morfologiczny podaje
+  czytanie ze swojego słownika i przy kanji o wielu czytaniach rozjeżdża się ze znaczeniem:
+  `金 きん „pieniądze"` łączy czytanie złota ze znaczeniem pieniędzy. Wikisłownik zapisuje
+  japońskie hasła jako `czytanie → znaczenie`, więc bierzemy oba naraz. Dla arabskiego tym
+  źródłem jest transliteracja (`kitāb`) albo IPA — bez niej zapis bez samogłosek krótkich
+  jest niewymawialny.
+- **Znaczenie pisane wielką literą ustępuje pisanemu małą.** Wikisłownik stawia czasem
+  na pierwszym miejscu nazwę taksonomiczną: `담배` to „Nicotiana, tytoń" przed „papieros".
+  Nazwy własne (Tokio, Japonia) nie mają wariantu małą literą, więc zostają.
+
+Dwa filtry glos też okazały się za ostre i kosztowały konkretne karty. Prefiks `czas `
+na liście odsyłaczy gramatycznych odrzucał glosę `czas` — chińskie `时间` straciło przez to
+znaczenie podstawowe. Limit czterech słów wycinał `ryż (łuskane ziarno, do gotowania)`,
+zostawiając dalsze „metr". Odsyłacze rozpoznaje teraz `od:` w treści, a doprecyzowanie
+w nawiasie zdejmujemy dopiero wtedy, gdy glosa nie mieści się w limicie.
 
 Rdzeń słownictwa (etap 1, ~80 pozycji na język) nadal **tłumaczymy ręcznie i commitujemy**.
 Definicja słownikowa bywa dla tych słów za szeroka, a użytkownik zobaczy je setki razy.

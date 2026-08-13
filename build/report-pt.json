@@ -1,34 +1,34 @@
 {
   "lang": "pt",
-  "zdań": 4274,
+  "zdań": 4273,
   "kandydatów": 32186,
-  "odrzuconychNaJakości": 7672,
+  "odrzuconychNaJakości": 7667,
   "odsetekOdrzutówJakościowych": 24,
   "odsetekNieprzydatnychNaKartę": 63,
   "pozaZasięgiem": 411309,
   "innyZapis": 0,
   "powodyJakość": {
-    "pasmo powyżej progu języka": 4671,
-    "nazwa własna": 1506,
-    "za dużo tokenów spoza listy częstości": 1401,
+    "pasmo powyżej progu języka": 4673,
+    "nazwa własna": 1497,
+    "za dużo tokenów spoza listy częstości": 1403,
     "wulgaryzm": 85,
     "znaki spoza zestawu języka": 9
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 9242,
+    "brak tokenu nadającego się na lukę": 9235,
     "za krótkie": 6927,
-    "glosa bez oparcia w tłumaczeniu": 3350,
-    "ta sama rama, inna odpowiedź": 578,
+    "glosa bez oparcia w tłumaczeniu": 3361,
+    "ta sama rama, inna odpowiedź": 580,
     "za długie": 143
   },
   "tłumaczenia": {
     "bezpośrednie": 229,
-    "przezAngielski": 4045
+    "przezAngielski": 4044
   },
   "pasma": {
     "min": 150,
     "mediana": 2237,
-    "p90": 7236,
+    "p90": 7242,
     "max": 11928
   },
   "quizNiedostępny": 0,
@@ -85,8 +85,8 @@
       ]
     },
     {
-      "text": "Está frio lá fora.",
-      "pl": "Na zewnątrz jest zimno.",
+      "text": "Este quarto está frio.",
+      "pl": "Ten pokój jest zimny.",
       "luka": "frio",
       "band": 1047,
       "src": "pivot",
@@ -102,8 +102,8 @@
       ]
     },
     {
-      "text": "Do nada, minha mãe começou a cantar.",
-      "pl": "Nagle moja matka zaczęła śpiewać.",
+      "text": "Espero cantar melhor na próxima vez.",
+      "pl": "Spodziewam się śpiewać lepiej następnym razem.",
       "luka": "cantar",
       "band": 1420,
       "src": "pivot",
@@ -119,25 +119,25 @@
       ]
     },
     {
-      "text": "O nome de Tom era o terceiro na lista.",
-      "pl": "Imię Toma było trzecie na liście.",
-      "luka": "terceiro",
-      "band": 1853,
+      "text": "O cinema estava cheio de gente.",
+      "pl": "Kino było pełne ludzi.",
+      "luka": "cinema",
+      "band": 1857,
       "src": "pivot",
       "dystraktory": [
-        "escuro",
-        "caro",
-        "vinte",
-        "ferido",
-        "universo",
-        "nervoso",
-        "rico",
-        "óbvio"
+        "cadeia",
+        "bilhete",
+        "fantasma",
+        "vento",
+        "propriedade",
+        "chapéu",
+        "dedo",
+        "controle"
       ]
     },
     {
-      "text": "Eu não uso mais óculos.",
-      "pl": "Nie noszę już okularów.",
+      "text": "Você viu meus óculos em algum lugar?",
+      "pl": "Widziałeś gdzieś moje okulary?",
       "luka": "óculos",
       "band": 2378,
       "src": "pivot",
@@ -153,71 +153,71 @@
       ]
     },
     {
-      "text": "O museu está aberto hoje?",
-      "pl": "Czy muzeum jest dzisiaj otwarte?",
-      "luka": "museu",
-      "band": 3112,
+      "text": "Eu posso te ensinar a rezar.",
+      "pl": "Mogę cię nauczyć się modlić.",
+      "luka": "rezar",
+      "band": 3116,
       "src": "pivot",
       "dystraktory": [
-        "comissário",
-        "mágico",
-        "combustível",
-        "comunicação",
-        "pulso",
-        "física",
-        "mistério",
-        "desastre"
+        "caçar",
+        "abandonar",
+        "nadar",
+        "celebrar",
+        "almoçar",
+        "repetir",
+        "participar",
+        "cozinhar"
       ]
     },
     {
-      "text": "Você deve ser capaz de falar em inglês ou espanhol nessa empresa.",
-      "pl": "Musisz mówić albo po angielsku, albo po hiszpańsku w tej firmie.",
-      "luka": "espanhol",
-      "band": 4025,
+      "text": "Isso é novidade para mim.",
+      "pl": "To dla mnie nowość.",
+      "luka": "novidade",
+      "band": 4049,
       "src": "pivot",
       "dystraktory": [
-        "barato",
-        "furioso",
-        "descoberto",
-        "delicioso",
-        "sagrado",
-        "italiano",
-        "curto",
-        "sensível"
+        "personalidade",
+        "dificuldade",
+        "equipe",
+        "dúzia",
+        "piano",
+        "tatuagem",
+        "estupidez",
+        "salada"
       ]
     },
     {
-      "text": "Meu tio é o autor do livro.",
-      "pl": "Autorem książki jest mój wujek.",
-      "luka": "autor",
-      "band": 5670,
+      "text": "Nada é mais valioso do que a saúde.",
+      "pl": "Nie ma nic cenniejszego niż zdrowie.",
+      "luka": "valioso",
+      "band": 5689,
       "src": "pivot",
       "dystraktory": [
-        "outono",
-        "lanterna",
-        "cauda",
-        "colher",
-        "alívio",
-        "quarta-feira",
-        "riqueza",
-        "diamante"
+        "sortudo",
+        "exato",
+        "inferior",
+        "direto",
+        "diagnóstico",
+        "adequado",
+        "submarino",
+        "falecido"
       ]
     },
     {
-      "text": "Não sou tão interessado em literatura como você.",
-      "pl": "Nie interesuje mnie literatura tak jak ciebie.",
-      "luka": "literatura",
-      "band": 7756,
+      "text": "Eu comecei a suar.",
+      "pl": "Zacząłem się pocić.",
+      "luka": "suar",
+      "band": 7777,
       "src": "pivot",
       "dystraktory": [
-        "telegrama",
-        "cimento",
-        "neta",
-        "pimenta",
-        "cantor",
-        "farmácia",
-        "porão",
-        "bruto"
+        "flutuar",
+        "colaborar",
+        "misturar",
+        "emprestar",
+        "admirar",
+        "prevenir",
+        "alugar",
+        "adiar"
       ]
     },
     {

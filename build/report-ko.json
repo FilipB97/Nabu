@@ -1,6 +1,6 @@
 {
   "lang": "ko",
-  "zdań": 378,
+  "zdań": 375,
   "kandydatów": 2300,
   "odrzuconychNaJakości": 360,
   "odsetekOdrzutówJakościowych": 16,
@@ -14,19 +14,19 @@
     "wulgaryzm": 4
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 698,
+    "brak tokenu nadającego się na lukę": 713,
     "za krótkie": 579,
-    "glosa bez oparcia w tłumaczeniu": 267,
+    "glosa bez oparcia w tłumaczeniu": 255,
     "za długie": 14,
     "ta sama rama, inna odpowiedź": 4
   },
   "tłumaczenia": {
     "bezpośrednie": 11,
-    "przezAngielski": 367
+    "przezAngielski": 364
   },
   "pasma": {
     "min": 324,
-    "mediana": 7346,
+    "mediana": 7416,
     "p90": 23042,
     "max": 29831
   },
@@ -50,58 +50,53 @@
       ]
     },
     {
-      "text": "이 사진은 흑백이다.",
-      "pl": "Zdjęcie jest czarno-białe.",
-      "luka": "사진",
-      "band": 995,
+      "text": "여기 자주 와?",
+      "pl": "Często tu bywasz?",
+      "luka": "자주",
+      "band": 1006,
       "src": "pivot",
       "dystraktory": [
-        "산",
-        "가족",
-        "사랑",
-        "바보",
-        "딸",
-        "거짓말",
-        "달",
-        "학교"
+        "일찍",
+        "어제",
+        "매우"
       ]
     },
     {
-      "text": "톰은 음악 공부하는 걸 좋아해.",
-      "pl": "Tom chętnie uczy się muzyki.",
-      "luka": "음악",
-      "band": 1686,
+      "text": "나는 질문이 있다.",
+      "pl": "Mam pytanie.",
+      "luka": "질문",
+      "band": 1690,
       "src": "pivot",
       "dystraktory": [
-        "의사",
-        "음식",
-        "방",
-        "팀",
-        "산",
-        "병원",
-        "약",
-        "크리스마스"
-      ]
-    },
-    {
-      "text": "비가 와요.",
-      "pl": "Pada deszcz.",
-      "luka": "비",
-      "band": 2966,
-      "src": "pivot",
-      "dystraktory": [
-        "키스",
-        "방법",
-        "편지",
-        "병",
-        "와인",
+        "꿈",
         "피",
-        "버스",
-        "목소리"
+        "나무",
+        "점심",
+        "크리스마스",
+        "건물",
+        "할아버지",
+        "전쟁"
       ]
     },
     {
-      "text": "영어를 못해요.",
+      "text": "그는 하루 종일 편지를 찾고 있었다.",
+      "pl": "Przez cały dzień szukał listu.",
+      "luka": "편지",
+      "band": 3145,
+      "src": "direct",
+      "dystraktory": [
+        "은행",
+        "비",
+        "메시지",
+        "감정",
+        "병",
+        "번호",
+        "목소리",
+        "피"
+      ]
+    },
+    {
+      "text": "영어를 못합니다.",
       "pl": "Nie mówię po angielsku.",
       "luka": "영어",
       "band": 4891,
@@ -118,20 +113,20 @@
       ]
     },
     {
-      "text": "폭발로 모든 것이 파괴되었다.",
-      "pl": "Eksplozja zniszczyła wszystko.",
-      "luka": "폭발",
-      "band": 5839,
+      "text": "내일 절에 한번 가보자.",
+      "pl": "Zwiedźmy jutro parę świątyń.",
+      "luka": "내일",
+      "band": 6017,
       "src": "pivot",
       "dystraktory": [
-        "도망",
-        "직장",
-        "소설",
-        "소년",
-        "공기",
-        "평화",
-        "토끼",
-        "여동생"
+        "사실",
+        "일",
+        "선생님",
+        "새",
+        "생각",
+        "소리",
+        "돈",
+        "친구"
       ]
     },
     {
@@ -152,71 +147,71 @@
       ]
     },
     {
-      "text": "정말로 직장을 그만둘 생각이신가요?",
-      "pl": "Naprawdę chcesz rzucić pracę?",
-      "luka": "직장",
-      "band": 11645,
+      "text": "비가 옵니다.",
+      "pl": "Pada deszcz.",
+      "luka": "비",
+      "band": 11970,
       "src": "pivot",
       "dystraktory": [
-        "도망",
-        "극장",
-        "폭발",
-        "삶",
-        "자살",
-        "주소",
-        "땅",
-        "과학"
-      ]
-    },
-    {
-      "text": "톰은 메리의 감정을 상하게 했다.",
-      "pl": "Tom zranił uczucia Mary.",
-      "luka": "감정",
-      "band": 15579,
-      "src": "pivot",
-      "dystraktory": [
-        "감옥",
+        "키스",
         "방법",
-        "감사",
-        "빵",
-        "땅",
         "편지",
-        "은행",
-        "달러"
+        "병",
+        "와인",
+        "피",
+        "버스",
+        "목소리"
       ]
     },
     {
-      "text": "그녀는 어제 병원에 갔다.",
-      "pl": "Poszła wczoraj do szpitala.",
-      "luka": "병원",
+      "text": "식물에 물을 주세요.",
+      "pl": "Podlej rośliny.",
+      "luka": "식물",
+      "band": 15580,
+      "src": "pivot",
+      "dystraktory": [
+        "자신감",
+        "비서",
+        "침실",
+        "손톱",
+        "수요일",
+        "사전",
+        "연필",
+        "거미"
+      ]
+    },
+    {
+      "text": "나는 가족과 함께 오스트레일리아로 가고 싶다.",
+      "pl": "Chcę pojechać do Australii z rodziną.",
+      "luka": "가족",
       "band": 19326,
       "src": "pivot",
       "dystraktory": [
-        "방",
-        "산",
-        "음악",
-        "영화",
-        "별",
-        "할아버지",
-        "팀",
-        "질문"
+        "사진",
+        "바보",
+        "딸",
+        "거짓말",
+        "학교",
+        "달",
+        "약",
+        "길"
       ]
     },
     {
-      "text": "그 가격에는 세금이 포함되어 있다.",
-      "pl": "Cena zawiera podatek.",
-      "luka": "세금",
-      "band": 23400,
+      "text": "1939년에 전쟁이 일어났다.",
+      "pl": "Wojna wybuchła w roku 1939.",
+      "luka": "전쟁",
+      "band": 23448,
       "src": "pivot",
       "dystraktory": [
-        "금",
-        "사기",
-        "스페인어",
-        "섬",
-        "하늘",
-        "수학",
-        "안경",
-        "샤워"
+        "점심",
+        "담배",
+        "건물",
+        "은행",
+        "맥주",
+        "화장실",
+        "질문",
+        "쿠키"
       ]
     },
     {

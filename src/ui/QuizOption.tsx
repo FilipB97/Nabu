@@ -1,4 +1,5 @@
 import type { LangAdapter } from '@/langs'
+import { fontClassFor } from './script'
 
 /**
  * Opcja quizu — sekcja 7 i 8.4 planu.
@@ -28,12 +29,6 @@ const STATE_CLASSES: Record<OptionState, string> = {
   dimmed: 'nabu-card text-text-3 opacity-70 shadow-none',
 }
 
-const FONT_CLASS: Record<LangAdapter['display']['font'], string> = {
-  ui: 'font-ui',
-  display: 'font-display',
-  ja: 'font-ja',
-  ko: 'font-ko',
-}
 
 type QuizOptionProps = {
   /** Słowo w piśmie docelowym. */
@@ -44,6 +39,8 @@ type QuizOptionProps = {
   /** Czy to jest opcja, którą wybrał użytkownik. Steruje znakiem `✓`. */
   chosen?: boolean
   font: LangAdapter['display']['font']
+  /** Pismo prawostronne — dotyczy wyłącznie słowa docelowego, nie glosy ani numeru. */
+  rtl?: boolean
   /** Numer na klawiaturze, 1–6. Na desktopie to podstawowy sposób wyboru (sekcja 8.4). */
   shortcut?: number
   onSelect?: () => void
@@ -55,6 +52,7 @@ export function QuizOption({
   state,
   chosen = false,
   font,
+  rtl = false,
   shortcut,
   onSelect,
 }: QuizOptionProps) {
@@ -76,7 +74,12 @@ export function QuizOption({
         ${answered ? 'cursor-default' : 'cursor-pointer'} ${STATE_CLASSES[state]}`}
     >
       <span className="flex min-w-0 flex-wrap items-baseline gap-x-[10px] gap-y-1">
-        <span className={`${FONT_CLASS[font]} text-[25px] leading-[1.3]`}>{term}</span>
+        <span
+          dir={rtl ? 'rtl' : undefined}
+          className={`${fontClassFor(font)} text-[25px] leading-[1.3]`}
+        >
+          {term}
+        </span>
         <span
           className={`font-ui text-[13px] leading-tight transition-opacity duration-200
             ${answered ? 'opacity-100' : 'opacity-0'}`}

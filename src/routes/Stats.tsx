@@ -8,6 +8,7 @@ import { db } from '@/store/db'
 import { Bars } from '@/ui/Ticks'
 import { Group, Row } from '@/ui/List'
 import { Mono } from '@/ui/Mono'
+import { dirOf, fontClassOf } from '@/ui/script'
 
 /**
  * Statystyki — sekcja 8.6 planu, M9.
@@ -132,9 +133,7 @@ export function Stats() {
     )
   }
 
-  const fontClass = { ui: 'font-ui', display: 'font-display', ja: 'font-ja', ko: 'font-ko' }[
-    adapter.display.font
-  ]
+  const fontClass = fontClassOf(adapter)
 
   return (
     <div className="flex flex-col gap-[22px] pb-4">
@@ -190,7 +189,7 @@ export function Stats() {
             <Row
               key={`${pair.correct}-${pair.chosen}`}
               label={
-                <span className={`${fontClass} text-[19px]`}>
+                <span className={`${fontClass} text-[19px]`} dir={dirOf(adapter)}>
                   {pair.correct} <span className="text-text-3">→</span> {pair.chosen}
                 </span>
               }

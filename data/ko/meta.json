@@ -1,9 +1,9 @@
 {
   "lang": "ko",
-  "version": "2026-08-12",
+  "version": "2026-08-13",
   "license": "Tatoeba CC BY 2.0 FR; FrequencyWords CC BY-SA 3.0; Wikisłownik (plwiktionary) CC BY-SA 3.0",
-  "sentences": 378,
-  "lexicon": 185,
+  "sentences": 375,
+  "lexicon": 183,
   "script": 40,
   "core": 100,
   "packs": [
@@ -11,7 +11,7 @@
       "file": "sentences-000.json",
       "from": 324,
       "to": 29831,
-      "count": 378
+      "count": 375
     }
   ]
 }

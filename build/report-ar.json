@@ -1,0 +1,240 @@
+{
+  "lang": "ar",
+  "zdań": 909,
+  "kandydatów": 5554,
+  "odrzuconychNaJakości": 1373,
+  "odsetekOdrzutówJakościowych": 25,
+  "odsetekNieprzydatnychNaKartę": 59,
+  "pozaZasięgiem": 62919,
+  "innyZapis": 0,
+  "powodyJakość": {
+    "znaki spoza zestawu języka": 1224,
+    "za dużo tokenów spoza listy częstości": 76,
+    "pasmo powyżej progu języka": 68,
+    "wulgaryzm": 5
+  },
+  "powodyPrzydatność": {
+    "brak tokenu nadającego się na lukę": 1624,
+    "za krótkie": 857,
+    "glosa bez oparcia w tłumaczeniu": 697,
+    "ta sama rama, inna odpowiedź": 83,
+    "za długie": 11
+  },
+  "tłumaczenia": {
+    "bezpośrednie": 60,
+    "przezAngielski": 849
+  },
+  "pasma": {
+    "min": 236,
+    "mediana": 9974,
+    "p90": 28101,
+    "max": 43988
+  },
+  "quizNiedostępny": 0,
+  "próbka": [
+    {
+      "text": "تلك فكرة جيدة.",
+      "pl": "To dobry pomysł.",
+      "luka": "فكرة",
+      "band": 236,
+      "src": "pivot",
+      "dystraktory": [
+        "عمل",
+        "مشكلة",
+        "ليلة",
+        "فتاة",
+        "يوم",
+        "سبب",
+        "لحظة",
+        "غرفة"
+      ]
+    },
+    {
+      "text": "يريد الكلب لحما.",
+      "pl": "Pies chce mięsa.",
+      "luka": "كلب",
+      "band": 1631,
+      "src": "pivot",
+      "dystraktory": [
+        "قلب",
+        "حرب",
+        "ملك",
+        "مسألة",
+        "وسط",
+        "سكوت",
+        "بداية",
+        "مدرسة"
+      ]
+    },
+    {
+      "text": "هذا اجتماع مهم.",
+      "pl": "To jest bardzo ważne spotkanie.",
+      "luka": "اجتماع",
+      "band": 3067,
+      "src": "pivot",
+      "dystraktory": [
+        "كتابة",
+        "مستشفى",
+        "مالك",
+        "مناسبة",
+        "فوضى",
+        "أصغر",
+        "جزيرة",
+        "صعوبة"
+      ]
+    },
+    {
+      "text": "لماذا اشتريت سيارة؟",
+      "pl": "Dlaczego kupiłeś samochód?",
+      "luka": "سيارة",
+      "band": 4494,
+      "src": "pivot",
+      "dystraktory": [
+        "ساعة",
+        "رقم",
+        "صباح",
+        "فرصة",
+        "طريق",
+        "نهاية",
+        "غرفة",
+        "حياة"
+      ]
+    },
+    {
+      "text": "كم سعر هذا الفستان؟",
+      "pl": "Ile kosztuje ta suknia?",
+      "luka": "فستان",
+      "band": 6558,
+      "src": "pivot",
+      "dystraktory": [
+        "سلة",
+        "سيف",
+        "سبتمبر",
+        "مسرحية",
+        "سياسة",
+        "بحيرة",
+        "مؤتمر",
+        "خبز"
+      ]
+    },
+    {
+      "text": "يحب أهل أوروبا شرب الخمر.",
+      "pl": "Europejczycy lubią pić wino.",
+      "luka": "خمر",
+      "band": 9126,
+      "src": "pivot",
+      "dystraktory": [
+        "مصرف",
+        "تعبير",
+        "أسرة",
+        "أكتوبر",
+        "يمين",
+        "قمر",
+        "زجاج",
+        "تنس"
+      ]
+    },
+    {
+      "text": "إنه يحب مشاهدة التلفاز.",
+      "pl": "On lubi oglądać telewizję.",
+      "luka": "تلفاز",
+      "band": 11241,
+      "src": "pivot",
+      "dystraktory": [
+        "صيف",
+        "فرشاة",
+        "غروب",
+        "نور",
+        "خشب",
+        "شمس",
+        "مقبرة",
+        "محاضرة"
+      ]
+    },
+    {
+      "text": "ما أقصر الحياة!",
+      "pl": "Ależ to życie jest krótkie!",
+      "luka": "حياة",
+      "band": 14845,
+      "src": "direct",
+      "dystraktory": [
+        "رؤية",
+        "نهاية",
+        "ترجمة",
+        "سيارة",
+        "فرصة",
+        "صباح",
+        "طفل",
+        "كلمة"
+      ]
+    },
+    {
+      "text": "آه ، هناك فراشة!",
+      "pl": "Och, tam jest motyl!",
+      "luka": "فراشة",
+      "band": 18783,
+      "src": "pivot",
+      "dystraktory": [
+        "تفاحة",
+        "ذبابة",
+        "مرأة",
+        "شوكة",
+        "سكرتيرة",
+        "كمان",
+        "اعتذار",
+        "مطر"
+      ]
+    },
+    {
+      "text": "إنه يتكلم الإنجليزية.",
+      "pl": "On mówi po angielsku.",
+      "luka": "إنجليزية",
+      "band": 24476,
+      "src": "direct",
+      "dystraktory": [
+        "ضجيج",
+        "نظارة",
+        "شوكولاتة",
+        "ريح",
+        "لحن",
+        "صيدلية",
+        "هوكي",
+        "طماطم"
+      ]
+    },
+    {
+      "text": "يحب كل الخضر باستثناء الملفوف.",
+      "pl": "On lubi wszystkie warzywa z wyjątkiem kapusty.",
+      "luka": "ملفوف",
+      "band": 29413,
+      "src": "pivot",
+      "dystraktory": [
+        "سفير",
+        "باص",
+        "موزة",
+        "مسبح",
+        "فضة",
+        "فاكس",
+        "جمل",
+        "سوشي"
+      ]
+    },
+    {
+      "text": "هل هذه الكتب مستعارة من المكتبة.",
+      "pl": "Czy to są książki z biblioteki?",
+      "luka": "مكتبة",
+      "band": 43988,
+      "src": "pivot",
+      "dystraktory": [
+        "متحف",
+        "أكتوبر",
+        "رياضة",
+        "أسرة",
+        "ثانوية",
+        "تنس",
+        "مواطن",
+        "مصرف"
+      ]
+    }
+  ]
+}

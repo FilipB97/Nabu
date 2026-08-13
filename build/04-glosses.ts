@@ -33,6 +33,25 @@ export type Entry = {
    * „Słowianin" zamiast „niewolnik", a `árabe` przy „língua" wychodzi jako „Arab".
    */
   senses: string[]
+  /**
+   * Czytania odpowiadające znaczeniom z `senses`, tam gdzie hasło je podaje —
+   * `null` na pozycjach bez czytania. Wikisłownik zapisuje je po lewej stronie strzałki
+   * (`げつ → miesiąc`), a to jest jedyne miejsce, w którym CZYTANIE I ZNACZENIE pochodzą
+   * z jednego źródła. Analizator morfologiczny podaje czytanie z własnego słownika
+   * i przy kanji o wielu czytaniach rozjeżdża się z glosą: karta `金 きん „pieniądze"`
+   * łączy czytanie „złota" ze znaczeniem „pieniędzy" i uczy pary, która nie istnieje.
+   */
+  readings: (string | null)[]
+  /**
+   * Wymowa całego hasła, gdy nie da się jej przypisać do konkretnego znaczenia:
+   * transliteracja (`kitāb`), a gdy jej nie ma — zapis IPA (`'jawm`).
+   *
+   * Dla arabskiego to jedyne źródło wymowy, jakie mamy: zapis nie niesie samogłosek
+   * krótkich, więc `كتاب` bez transliteracji jest dla uczącego się ciągiem trzech
+   * spółgłosek, którego nie ma jak przeczytać. Plan nazywa wymowę warunkiem sensowności
+   * poziomu D i to jest właśnie ten warunek.
+   */
+  say?: string
   /** Część mowy wg Wikisłownika; potrzebna do doboru dystraktorów (sekcja 10.1b). */
   pos: string
 }
@@ -52,14 +71,26 @@ export type Lexicon = {
  * „forma żeńska od…", „zob. …". Jako glosa w quizie byłyby bezużyteczne, a jako
  * dystraktor wręcz mylące — użytkownik zobaczyłby dwie opcje o tym samym znaczeniu.
  */
-const REDIRECT = /^(lm|lp|lmn|forma|rodzaj|zob\.|zdrobn|stopień|imiesł|czas |tryb |os\. )/i
+const REDIRECT = /^(lm|lp|lmn|zob\.|zdrobn|imiesł|w złożeniach)/i
 
 /**
  * Wikisłownik zapisuje odsyłacze do formy jako „ż lp od: pleno" — kwalifikator gramatyczny
  * z przodu, więc dopasowanie do początku ciągu tego nie łapie. „od:" w środku glosy
  * praktycznie zawsze oznacza odsyłacz.
+ *
+ * To ono, a nie lista prefiksów, wyłapuje odsyłacze zaczynające się od zwykłych słów:
+ * „czas przeszły od: robić". Trzymanie `czas ` na liście prefiksów kosztowało nas glosę
+ * `时间 = czas` — chińskie słowo „czas" zostało odrzucone jako forma gramatyczna
+ * i karta dostała drugie znaczenie, „godzina".
  */
 const FORM_OF = /\bod:\s/i
+
+/**
+ * Doprecyzowanie w nawiasie na końcu: „ryż (łuskane ziarno, do gotowania)".
+ * Zwykle jest cenne, ale przy limicie czterech słów potrafi wyrzucić całą glosę —
+ * a wtedy zostaje znaczenie dalsze i mniej trafne („米 = metr" zamiast „ryż").
+ */
+const CLARIFIER = /\s*\([^)]*\)\s*$/
 
 /** Znaczniki gramatyczne w nawiasach i kwalifikatory na początku glosy. */
 const QUALIFIER = /^\([^)]*\)\s*/
@@ -73,15 +104,56 @@ const QUALIFIER = /^\([^)]*\)\s*/
  */
 const READING_ARROW = '→'
 
-function cleanGloss(raw: string): string | null {
+function cleanGloss(raw: string): { gloss: string; reading: string | null } | null {
   const withoutQualifier = raw.replace(QUALIFIER, '').trim()
   const arrow = withoutQualifier.lastIndexOf(READING_ARROW)
   const gloss = arrow >= 0 ? withoutQualifier.slice(arrow + 1).trim() : withoutQualifier
+  // Czytanie zostaje po lewej stronie strzałki. Nie wyrzucamy go, tylko zapamiętujemy
+  // osobno: na karcie rdzenia jest jedynym czytaniem, o którym wiemy, że opisuje TO
+  // znaczenie, a nie inne znaczenie tego samego znaku.
+  const left = arrow >= 0 ? withoutQualifier.slice(0, arrow).trim() : ''
+  const reading = left.length > 0 && left.length <= 12 ? left : null
   if (gloss.length === 0 || gloss.length > 60) return null
   if (REDIRECT.test(gloss) || FORM_OF.test(gloss)) return null
-  // Definicje opisowe („taki, który…") nie nadają się na opcję w quizie.
-  if (gloss.split(/\s+/).length > 4) return null
-  return gloss
+
+  // Definicje opisowe („taki, który…") nie nadają się na opcję w quizie. Zanim jednak
+  // odrzucimy glosę za długość, próbujemy zdjąć z niej doprecyzowanie w nawiasie —
+  // lepsza jest krótka glosa trafna niż dłuższa z dalszego znaczenia.
+  const short =
+    gloss.split(/\s+/).length > 4 ? gloss.replace(CLARIFIER, '').trim() || gloss : gloss
+  if (short.split(/\s+/).length > 4) return null
+  return { gloss: short, reading }
+}
+
+/**
+ * Wymowa hasła — WYŁĄCZNIE transliteracja, nigdy IPA.
+ *
+ * IPA jest w zrzucie częstsza, ale na karcie jest gorsza niż nic: `夜` dostawało
+ * `joɽu͍` zamiast `よる`, czyli zapis wymagający znajomości alfabetu fonetycznego
+ * postawiony obok słowa, którego użytkownik dopiero się uczy. Transliteracja (`kitāb`,
+ * `tambae`, `go`) czyta się bez żadnego przygotowania i to jest cały jej sens.
+ *
+ * Wikisłownik zapisuje ją z etykietą systemu (`ISO: yawm`) i czasem z wariantami
+ * po ukośniku (`ghórfa / ḡórfa`) — zdejmujemy etykietę i bierzemy pierwszy wariant.
+ * Puste `ISO:` bez wartości zdarza się i musi wypaść, bo inaczej karta pokazuje
+ * samą nazwę systemu transliteracji.
+ */
+function pronunciationOf(record: Record<string, unknown>): string | null {
+  const forms = Array.isArray(record['forms']) ? record['forms'] : []
+
+  for (const entry of forms) {
+    const item = entry as { form?: unknown; tags?: unknown }
+    const tags = Array.isArray(item.tags) ? item.tags.map(String) : []
+    if (!tags.some((tag) => /transliteration|romanization/i.test(tag))) continue
+    if (typeof item.form !== 'string') continue
+
+    const cleaned = (item.form.split('/')[0] ?? '')
+      .replace(/^\s*[A-Za-z-]{2,10}\s*:\s*/, '')
+      .trim()
+    if (cleaned.length > 0 && cleaned.length <= 24) return cleaned
+  }
+
+  return null
 }
 
 /**
@@ -137,17 +209,28 @@ export async function loadLexicon(langCode: string): Promise<Lexicon> {
 
     if (!entries.has(key)) {
       const collected: string[] = []
+      const readings: (string | null)[] = []
       for (const sense of senses) {
         const glosses = (sense as { glosses?: unknown }).glosses
         if (!Array.isArray(glosses)) continue
         const first = glosses[0]
         if (typeof first !== 'string') continue
-        const gloss = cleanGloss(first)
-        if (gloss && !collected.includes(gloss)) collected.push(gloss)
+        const parsed = cleanGloss(first)
+        if (parsed && !collected.includes(parsed.gloss)) {
+          collected.push(parsed.gloss)
+          readings.push(parsed.reading)
+        }
         if (collected.length >= MAX_SENSES) break
       }
       if (collected.length > 0) {
-        entries.set(key, { pl: collected[0]!, senses: collected, pos })
+        const say = pronunciationOf(record)
+        entries.set(key, {
+          pl: collected[0]!,
+          senses: collected,
+          readings,
+          ...(say ? { say } : {}),
+          pos,
+        })
       }
     }
 
