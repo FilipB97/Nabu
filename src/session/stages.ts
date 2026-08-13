@@ -22,6 +22,30 @@ export const MASTERY_SHARE = 0.9
 /** Etapy, przez które prowadzimy: produkcja jest trybem karty, nie bramą języka. */
 export type GatedStage = Extract<Stage, 'script' | 'core' | 'sentences'>
 
+/**
+ * Nazwa etapu na ekranie. Etap 0 pyta o nią adapter, bo nie w każdym języku jest nim
+ * pismo: dla japońskiego i koreańskiego to kana i hangul, dla chińskiego — wymowa,
+ * czyli pinyin i tony. Podpis „pismo" nad kartą z tonem mówiłby nieprawdę o tym,
+ * czego użytkownik się właśnie uczy.
+ */
+export function stageLabel(adapter: LangAdapter, stage: Stage): string {
+  if (stage === 'script') return adapter.scriptLabel ?? 'pismo'
+  if (stage === 'core') return 'rdzeń'
+  if (stage === 'sentences') return 'zdania'
+  return 'produkcja'
+}
+
+/** Jedno zdanie o tym, po co jest ten etap — pod paskiem postępu na ekranie głównym. */
+export function stageHint(adapter: LangAdapter, stage: GatedStage): string {
+  if (stage === 'script') {
+    return adapter.scriptLabel === undefined
+      ? 'Najpierw znaki. Bez nich zdanie jest obrazkiem.'
+      : `Najpierw ${adapter.scriptLabel}. Bez niej reszta jest zgadywanką.`
+  }
+  if (stage === 'core') return 'Sto najczęstszych słów. Potem zdania mają się o co oprzeć.'
+  return 'Zdania z korpusu, po jednym nowym słowie na raz.'
+}
+
 export function gatedStages(adapter: LangAdapter): GatedStage[] {
   return stagesFor(adapter).filter((stage): stage is GatedStage => stage !== 'production')
 }

@@ -217,6 +217,14 @@ export type LangAdapter = {
   scriptAbout?: string
 
   /**
+   * Jak nazywa się etap 0 w tym języku. Domyślnie „pismo" — bo dla japońskiego
+   * i koreańskiego etapem 0 jest kana i hangul. Chiński łamie to założenie: znaki nie
+   * są alfabetem, więc jego etap 0 uczy WYMOWY (pinyin i tony), a podpis „pismo"
+   * mówiłby użytkownikowi coś nieprawdziwego o tym, czego się właśnie uczy.
+   */
+  scriptLabel?: string
+
+  /**
    * Zdanie o konkretnym znaku, pokazywane przy PIERWSZYM spotkaniu, zanim padnie
    * pytanie. Ma powiedzieć, do czego znak należy i z czego się bierze jego czytanie —
    * inaczej wybór spośród czterech nieznanych sylab jest losowaniem, a nie nauką.
