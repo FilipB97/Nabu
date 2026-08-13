@@ -66,7 +66,7 @@ function ControlRow({
 export function Settings() {
   const navigate = useNavigate()
   const { preset, mode, variant, setPreset, setMode } = useTheme()
-  const { current, rows, refresh } = useLangs()
+  const { current, rows, select, refresh } = useLangs()
   /** Ile talii siedzi już w pamięci podręcznej i ile miejsca zajmują dane witryny. */
   const [decks, setDecks] = useState<{ count: number; megabytes: number } | null>(null)
   /** Kasowanie jest nieodwracalne, więc pyta o potwierdzenie — wierszem, nie oknem. */
@@ -100,6 +100,36 @@ export function Settings() {
       <h1 className="font-display text-[clamp(28px,5vw,38px)] leading-none text-text">
         Ustawienia
       </h1>
+
+      {/*
+        Języki są w ustawieniach, mimo że przełącznik jest też na ekranie głównym.
+        Powód jest prosty: „gdzie się dodaje kolejny język" to pytanie, z którym idzie się
+        do ustawień, i odpowiedź musi tam być — nawet jeśli szybsza droga jest gdzie indziej.
+      */}
+      <Group
+        label="języki"
+        hint="Dwa aktywne naraz to rozsądny sufit. Język utrzymywany nie dostaje nowych pozycji,
+          więc kosztuje kilka minut dziennie zamiast kilkunastu."
+      >
+        {(rows ?? []).map((row) => {
+          const chosen = row.settings.lang === current?.settings.lang
+          return (
+            <Row
+              key={row.settings.lang}
+              onClick={() => select(row.settings.lang)}
+              chevron={false}
+              label={
+                <span className={chosen ? 'text-accent' : undefined}>
+                  {adapterFor(row.settings.lang).name}
+                </span>
+              }
+              description={row.settings.active ? 'aktywny' : 'utrzymywany'}
+              value={<Mono tone={chosen ? 'accent' : 'quiet'}>{row.due} do powtórki</Mono>}
+            />
+          )
+        })}
+        <Row label="Dodaj język" description="Nowa talia, poziom wejściowy i kalibracja." to="/dodaj" />
+      </Group>
 
       <Group
         label="wygląd"
