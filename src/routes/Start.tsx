@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { useCallback, useEffect, useState, type ReactNode } from 'react'
+import { useNavigate } from 'react-router'
 import { LANG_CODES, adapterFor, interferesWith } from '@/langs'
 import { currentStage, gatedStages, stageProgress, type GatedStage } from '@/session/stages'
 import { LEVELS, levelById, type Level } from '@/session/calibration'
@@ -18,6 +18,7 @@ import {
 import { hasVoice, onVoicesChanged, primeSpeech } from '@/audio/speak'
 import { Mark } from '@/ui/Ticks'
 import { Mono } from '@/ui/Mono'
+import { Group, Row } from '@/ui/List'
 import { Choice } from '@/ui/Choice'
 import { Button } from '@/ui/Button'
 
@@ -32,7 +33,7 @@ import { Button } from '@/ui/Button'
  * z przyciskiem startu — to jest jedyna rzecz, po którą użytkownik tu przychodzi.
  */
 
-type Row = {
+type LangRow = {
   settings: LangSettings
   due: number
   backlog: number
@@ -59,9 +60,20 @@ const INTENSITY_LABEL: Record<LangSettings['intensity'], string> = {
   long: 'długa',
 }
 
+/** Wiersz ustawienia: etykieta i pod nią przełącznik. Segment na wąskim ekranie nie mieści
+ *  się obok etykiety, a ściśnięty do połowy szerokości przestaje być czytelny. */
+function SettingRow({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2 py-4">
+      <span className="font-ui text-[15px] text-text">{label}</span>
+      {children}
+    </div>
+  )
+}
+
 export function Start() {
   const navigate = useNavigate()
-  const [rows, setRows] = useState<Row[] | null>(null)
+  const [rows, setRows] = useState<LangRow[] | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
   /**
    * Głosy systemowe pojawiają się asynchronicznie, a na iOS także po pobraniu przez
@@ -302,30 +314,27 @@ export function Start() {
                 </Button>
               </div>
 
-              <Choice
-                label="sesja"
-                value={chosen.settings.intensity}
-                options={(['short', 'normal', 'long'] as const).map((level) => ({
-                  value: level,
-                  label: `${INTENSITY_LABEL[level]} · ${INTENSITY[level].due}`,
-                }))}
-                onChange={(intensity) => void change({ intensity })}
-              />
+              <Group label="sesja" hint="Ile kart do powtórki bierzemy na jedno podejście.">
+                <SettingRow label="Długość">
+                  <Choice
+                    value={chosen.settings.intensity}
+                    options={(['short', 'normal', 'long'] as const).map((level) => ({
+                      value: level,
+                      label: `${INTENSITY_LABEL[level]} · ${INTENSITY[level].due}`,
+                    }))}
+                    onChange={(intensity) => void change({ intensity })}
+                  />
+                </SettingRow>
+              </Group>
 
               {/* Pełny ekran ustawień jest w M9. Tutaj są trzy rzeczy, które zmienia się
                   w trakcie nauki, a nie raz na zawsze — reszta może poczekać. */}
-              <details className="group">
-                <summary className="nabu-press flex cursor-pointer list-none items-center gap-2 py-2">
-                  <Mono>ustawienia języka</Mono>
-                  <span className="font-mono text-[11px] text-text-3 group-open:hidden">+</span>
-                  <span className="font-mono hidden text-[11px] text-text-3 group-open:inline">
-                    −
-                  </span>
-                </summary>
-
-                <div className="mt-5 flex flex-col gap-6">
+              <Group
+                label="ustawienia języka"
+                hint="Dotyczą tylko wybranego języka. Motyw i wygląd są w ustawieniach ogólnych."
+              >
+                <SettingRow label="Opcji w quizie">
                   <Choice
-                    label="opcji w quizie"
                     value={chosen.settings.quizOptions}
                     options={[
                       { value: 3, label: '3' },
@@ -333,34 +342,22 @@ export function Start() {
                       { value: 6, label: '6' },
                     ]}
                     onChange={(quizOptions) => void change({ quizOptions })}
-                    hint="Więcej opcji to mniejsza szansa trafienia strzałem, ale dłuższe czytanie."
                   />
+                </SettingRow>
 
+                <SettingRow label="Po trafieniu">
                   <Choice
-                    label="po trafieniu"
                     value={chosen.settings.autoAdvance}
                     options={[
                       { value: false, label: 'czekaj' },
                       { value: true, label: 'dalej sam' },
                     ]}
                     onChange={(autoAdvance) => void change({ autoAdvance })}
-                    hint="Po odpowiedzi widać poprawne słowo, czytanie i znaczenie. Pudło zawsze czeka na dotknięcie."
                   />
+                </SettingRow>
 
+                <SettingRow label="Tempo mowy">
                   <Choice
-                    label="produkcja"
-                    value={chosen.settings.production}
-                    options={[
-                      { value: 'off' as const, label: 'wyłączona' },
-                      { value: 'mature' as const, label: 'od dojrzałych' },
-                      { value: 'always' as const, label: 'zawsze' },
-                    ]}
-                    onChange={(production) => void change({ production })}
-                    hint="Karta dojrzała przestaje być quizem i prosi o odtworzenie słowa z pamięci."
-                  />
-
-                  <Choice
-                    label="tempo mowy"
                     value={chosen.settings.rate}
                     options={[
                       { value: 0.45, label: 'wolno' },
@@ -368,11 +365,23 @@ export function Start() {
                       { value: 0.85, label: 'szybko' },
                     ]}
                     onChange={(rate) => void change({ rate })}
-                    hint="Dotyczy czytania zdań i kart ze słuchu."
                   />
+                </SettingRow>
 
+                <SettingRow label="Produkcja">
                   <Choice
-                    label="etap"
+                    value={chosen.settings.production}
+                    options={[
+                      { value: 'off' as const, label: 'wyłączona' },
+                      { value: 'mature' as const, label: 'od dojrzałych' },
+                      { value: 'always' as const, label: 'zawsze' },
+                    ]}
+                    onChange={(production) => void change({ production })}
+                  />
+                </SettingRow>
+
+                <SettingRow label="Etap">
+                  <Choice
                     value={chosen.settings.stageOverride ?? 'auto'}
                     options={[
                       { value: 'auto' as const, label: 'po kolei' },
@@ -384,21 +393,20 @@ export function Start() {
                     onChange={(value) =>
                       void change({ stageOverride: value === 'auto' ? null : value })
                     }
-                    hint="Etapy nie blokują sztywno. Możesz przeskoczyć wcześniejsze, jeśli już je znasz."
                   />
+                </SettingRow>
 
+                <SettingRow label="Tryb">
                   <Choice
-                    label="tryb"
                     value={chosen.settings.active}
                     options={[
                       { value: true, label: 'aktywny' },
                       { value: false, label: 'utrzymywany' },
                     ]}
                     onChange={(active) => void change({ active })}
-                    hint="Utrzymywany nie dostaje nowych słów — tylko powtórki tego, co już umiesz."
                   />
-                </div>
-              </details>
+                </SettingRow>
+              </Group>
             </div>
           )}
         </>
@@ -456,25 +464,19 @@ export function Start() {
         </div>
       )}
 
-      {/* Stopka: postęp i ustawienia w tym samym miejscu co narzędzia deweloperskie —
-          test dźwięku z sekcji 11 wykonuje się na urządzeniu, więc musi być dostępny
-          z telefonu, ale nic z tego nie zasługuje na pasek u góry. */}
-      <nav className="mt-auto flex flex-wrap gap-5 pt-8">
-        {chosen && (
-          <Link to={`/postep/${chosen.settings.lang}`} className="nabu-press">
-            <Mono tone="normal">postęp</Mono>
-          </Link>
-        )}
-        <Link to="/ustawienia" className="nabu-press">
-          <Mono tone="normal">ustawienia</Mono>
-        </Link>
-        <Link to="/demo">
-          <Mono>demo</Mono>
-        </Link>
-        <Link to="/audio">
-          <Mono>test dźwięku</Mono>
-        </Link>
-      </nav>
+      {/* Stopka jako lista, nie rząd linków: to są przejścia do innych ekranów,
+          więc mają wyglądać i zachowywać się jak wszystkie inne przejścia. */}
+      <div className="mt-auto flex flex-col gap-7 pt-4">
+        <Group>
+          {chosen && <Row label="Postęp" to={`/postep/${chosen.settings.lang}`} />}
+          <Row label="Ustawienia" to="/ustawienia" />
+        </Group>
+
+        <Group label="narzędzia" hint="Test dźwięku wykonuje się na urządzeniu, nie na desktopie.">
+          <Row label="Demo karty" to="/demo" />
+          <Row label="Test dźwięku" to="/audio" />
+        </Group>
+      </div>
     </div>
   )
 }

@@ -9,6 +9,7 @@ import { ProduceCard } from '@/session/ProduceCard'
 import { QuizOption, type OptionState } from '@/ui/QuizOption'
 import { Button } from '@/ui/Button'
 import { Mono } from '@/ui/Mono'
+import { NavBar } from '@/ui/NavBar'
 import { Progress } from '@/ui/Ticks'
 
 /**
@@ -216,31 +217,25 @@ export function Session() {
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-[460px] flex-col bg-bg">
-      <header className="px-6 pt-[calc(env(safe-area-inset-top)+18px)]">
+      <header className="px-5 pt-[calc(env(safe-area-inset-top)+14px)]">
+        {/* Wyjście z sesji chevronem, jak z każdego innego ekranu. Bez potwierdzenia:
+            każda odpowiedź jest już zapisana, więc przerwanie nic nie kosztuje (5.3). */}
+        <NavBar
+          title={`${adapter.name} · ${STAGE_LABEL[stage]}`}
+          back="/start"
+          action={
+            <Mono tone="normal">
+              {progress.done + 1} / {progress.total}
+            </Mono>
+          }
+        />
         <Progress
+          className="mt-2"
           total={progress.total}
           done={progress.done}
           lapses={progress.lapses}
           label={`karta ${progress.done + 1} z ${progress.total}`}
         />
-        <div className="mt-[14px] flex items-center justify-between gap-3">
-          {/* Wyjście z sesji. Bez potwierdzenia: każda odpowiedź jest już zapisana,
-              więc przerwanie nic nie kosztuje (sekcja 5.3). */}
-          <button
-            type="button"
-            onClick={() => navigate('/start')}
-            aria-label="Zakończ sesję i wróć"
-            className="nabu-press -m-3 rounded-full p-3"
-          >
-            <Mono tone="normal">← wyjdź</Mono>
-          </button>
-          <Mono>
-            {adapter.name} · {STAGE_LABEL[stage]}
-          </Mono>
-          <Mono tone="normal">
-            {progress.done + 1} / {progress.total}
-          </Mono>
-        </div>
       </header>
 
       <main className="flex flex-1 flex-col justify-center gap-7 px-7 py-10">
