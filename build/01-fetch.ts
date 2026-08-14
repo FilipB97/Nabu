@@ -47,14 +47,22 @@ export async function fetchSources(lang: string): Promise<Sources> {
     `${TATOEBA}/${code}/${code}-${POL}_links.tsv.bz2`,
     `${code}-${POL}_links.tsv`,
   )
-  const pivotLinks = await downloadBz2(
-    `${TATOEBA}/${code}/${code}-${ENG}_links.tsv.bz2`,
-    `${code}-${ENG}_links.tsv`,
-  )
-  const pivotToPolish = await downloadBz2(
-    `${TATOEBA}/${ENG}/${ENG}-${POL}_links.tsv.bz2`,
-    `${ENG}-${POL}_links.tsv`,
-  )
+  // Angielski jest językiem pośredniczącym, więc dla niego samego pośrednictwo nie
+  // istnieje: `eng-eng_links` nie ma i nie może być, a wszystkie jego zdania i tak
+  // wchodzą ścieżką bezpośrednią. Puste ścieżki mówią krokowi 05, żeby ten etap pominął.
+  const viaPivot = code !== ENG
+  const pivotLinks = viaPivot
+    ? await downloadBz2(
+        `${TATOEBA}/${code}/${code}-${ENG}_links.tsv.bz2`,
+        `${code}-${ENG}_links.tsv`,
+      )
+    : ''
+  const pivotToPolish = viaPivot
+    ? await downloadBz2(
+        `${TATOEBA}/${ENG}/${ENG}-${POL}_links.tsv.bz2`,
+        `${ENG}-${POL}_links.tsv`,
+      )
+    : ''
 
   // Lista częstości nie jest spakowana i jest mała, więc idzie zwykłym pobraniem.
   // Języki liczące częstość z korpusu (japoński — patrz `freqSource`) jej nie potrzebują.

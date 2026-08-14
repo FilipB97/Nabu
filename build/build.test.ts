@@ -43,6 +43,7 @@ describe('tokenizer space', () => {
 
 describe('wybór znaczenia w kontekście', () => {
   const slav: Entry = {
+    head: 'x',
     pl: 'Słowianin',
     senses: ['Słowianin', 'niewolnik'],
     readings: [null, null],
@@ -59,6 +60,7 @@ describe('wybór znaczenia w kontekście', () => {
 
   it('zostaje przy pierwszym, gdy pasuje więcej niż jedno — zgadywanie jest gorsze', () => {
     const both: Entry = {
+      head: 'x',
       pl: 'kolacja',
       senses: ['kolacja', 'wieczerza'],
       readings: [null, null],
@@ -70,6 +72,7 @@ describe('wybór znaczenia w kontekście', () => {
   it('dopasowuje po rdzeniu, bo polski odmienia', () => {
     // „pieska" niesie rdzeń „pies", więc wygrywa nad „kot" mimo innej końcówki.
     const animal: Entry = {
+      head: 'x',
       pl: 'kot',
       senses: ['kot', 'pies'],
       readings: [null, null],
@@ -79,6 +82,7 @@ describe('wybór znaczenia w kontekście', () => {
     expect(senseInContext(animal, 'Widzę kota.')).toBe('kot')
 
     const baby: Entry = {
+      head: 'x',
       pl: 'gwóźdź',
       senses: ['gwóźdź', 'niemowlę'],
       readings: [null, null],

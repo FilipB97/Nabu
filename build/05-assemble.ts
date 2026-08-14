@@ -154,6 +154,10 @@ async function buildTranslations(
     if (text && !out.has(from)) out.set(from, { pl: text, src: 'direct' })
   }
 
+  // Brak ścieżek pośrednich znaczy, że językiem docelowym JEST język pośredni —
+  // wtedy warstwa druga nie ma czego dołożyć i cała talia stoi na tłumaczeniach wprost.
+  if (!sources.pivotLinks || !sources.pivotToPolish) return out
+
   const engToPol = await readPairs(readTsv(sources.pivotToPolish))
   for (const [from, engs] of await readPairs(readTsv(sources.pivotLinks))) {
     if (out.has(from)) continue

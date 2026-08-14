@@ -25,6 +25,13 @@ import { cachePath, download, readLines } from './lib/io.ts'
 const WIKTIONARY = 'https://kaikki.org/plwiktionary/raw-wiktextract-data.jsonl'
 
 export type Entry = {
+  /**
+   * Hasło w pisowni słownikowej. Klucz mapy jest sprowadzony do małych liter, bo `Tan`
+   * i `tan` w zdaniu to jedno słowo — ale KARTA musi pokazać pisownię prawdziwą.
+   * W niemieckim wielka litera rzeczownika jest cechą słowa, nie pozycji w zdaniu,
+   * więc `frau` zamiast `Frau` to po prostu błąd ortograficzny na karcie.
+   */
+  head: string
   /** Glosa domyślna — pierwsze sensowne znaczenie. */
   pl: string
   /**
@@ -225,6 +232,7 @@ export async function loadLexicon(langCode: string): Promise<Lexicon> {
       if (collected.length > 0) {
         const say = pronunciationOf(record)
         entries.set(key, {
+          head: word,
           pl: collected[0]!,
           senses: collected,
           readings,

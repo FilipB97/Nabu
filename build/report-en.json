@@ -1,0 +1,241 @@
+{
+  "lang": "en",
+  "zdań": 13902,
+  "kandydatów": 75518,
+  "odrzuconychNaJakości": 25074,
+  "odsetekOdrzutówJakościowych": 33,
+  "odsetekNieprzydatnychNaKartę": 48,
+  "pozaZasięgiem": 1957615,
+  "innyZapis": 0,
+  "powodyJakość": {
+    "za dużo tokenów spoza listy częstości": 18381,
+    "pasmo powyżej progu języka": 5246,
+    "nazwa własna": 1310,
+    "wulgaryzm": 103,
+    "znaki spoza zestawu języka": 34
+  },
+  "powodyPrzydatność": {
+    "brak tokenu nadającego się na lukę": 13352,
+    "glosa bez oparcia w tłumaczeniu": 10467,
+    "za krótkie": 10213,
+    "ta sama rama, inna odpowiedź": 2018,
+    "za długie": 492
+  },
+  "tłumaczenia": {
+    "bezpośrednie": 13902,
+    "przezAngielski": 0
+  },
+  "pasma": {
+    "min": 150,
+    "mediana": 1988,
+    "p90": 7248,
+    "max": 11984
+  },
+  "quizNiedostępny": 0,
+  "próbka": [
+    {
+      "text": "My God! What is that?",
+      "pl": "Mój Boże! Co to jest?",
+      "luka": "God",
+      "band": 150,
+      "src": "direct",
+      "dystraktory": [
+        "stop",
+        "call",
+        "thought",
+        "talk",
+        "money",
+        "guy",
+        "lot",
+        "name"
+      ]
+    },
+    {
+      "text": "I went out for a moment.",
+      "pl": "Wyszedłem na chwilę.",
+      "luka": "moment",
+      "band": 448,
+      "src": "direct",
+      "dystraktory": [
+        "rest",
+        "week",
+        "waiting",
+        "number",
+        "fire",
+        "daughter",
+        "side",
+        "word"
+      ]
+    },
+    {
+      "text": "What a strange dog!",
+      "pl": "Co za dziwny pies!",
+      "luka": "strange",
+      "band": 734,
+      "src": "direct",
+      "dystraktory": [
+        "strong",
+        "straight",
+        "speaking",
+        "moving",
+        "tired",
+        "amazing",
+        "clean",
+        "born"
+      ]
+    },
+    {
+      "text": "Close the window before going to bed.",
+      "pl": "Zamknij okno zanim pójdziesz spać.",
+      "luka": "window",
+      "band": 982,
+      "src": "direct",
+      "dystraktory": [
+        "visit",
+        "wine",
+        "wall",
+        "wind",
+        "card",
+        "walking",
+        "girlfriend",
+        "seat"
+      ]
+    },
+    {
+      "text": "Everyone is very excited.",
+      "pl": "Każdy jest bardzo podekscytowany.",
+      "luka": "excited",
+      "band": 1316,
+      "src": "direct",
+      "dystraktory": [
+        "empty",
+        "wild",
+        "excellent",
+        "asleep",
+        "favorite",
+        "following",
+        "large",
+        "local"
+      ]
+    },
+    {
+      "text": "We have less snow than usual.",
+      "pl": "Mamy mniej śniegu niż zazwyczaj.",
+      "luka": "snow",
+      "band": 1792,
+      "src": "direct",
+      "dystraktory": [
+        "signal",
+        "roof",
+        "silence",
+        "shower",
+        "storm",
+        "sugar",
+        "speech",
+        "stomach"
+      ]
+    },
+    {
+      "text": "This vehicle is dangerous.",
+      "pl": "Ten pojazd jest niebezpieczny.",
+      "luka": "vehicle",
+      "band": 2263,
+      "src": "direct",
+      "dystraktory": [
+        "desire",
+        "result",
+        "metal",
+        "bride",
+        "treasure",
+        "pride",
+        "value",
+        "desert"
+      ]
+    },
+    {
+      "text": "Tom is looking for his wallet.",
+      "pl": "Tom szuka swojej portmonetki.",
+      "luka": "wallet",
+      "band": 2925,
+      "src": "direct",
+      "dystraktory": [
+        "collection",
+        "accent",
+        "balance",
+        "concert",
+        "adult",
+        "cave",
+        "dollar",
+        "shout"
+      ]
+    },
+    {
+      "text": "Would you like to go to the mall with us?",
+      "pl": "Chcesz iść z nami do galerii handlowej?",
+      "luka": "mall",
+      "band": 4051,
+      "src": "direct",
+      "dystraktory": [
+        "e-mail",
+        "motel",
+        "eagle",
+        "palm",
+        "satellite",
+        "manner",
+        "tale",
+        "lap"
+      ]
+    },
+    {
+      "text": "I have to reply to this letter.",
+      "pl": "Muszę odpowiedzieć na ten list.",
+      "luka": "reply",
+      "band": 5462,
+      "src": "direct",
+      "dystraktory": [
+        "butterfly",
+        "sympathy",
+        "cellar",
+        "pregnancy",
+        "muslim",
+        "chemistry",
+        "recipe",
+        "depression"
+      ]
+    },
+    {
+      "text": "The runner jumped over the hole in the ground.",
+      "pl": "Biegacz przeskoczył przez dziurę w ziemi.",
+      "luka": "runner",
+      "band": 7570,
+      "src": "direct",
+      "dystraktory": [
+        "ruler",
+        "banker",
+        "bomber",
+        "mentor",
+        "raven",
+        "freezer",
+        "squirrel",
+        "semester"
+      ]
+    },
+    {
+      "text": "This category of workers is especially vulnerable to accidents at the workplace.",
+      "pl": "Ta kategoria pracowników jest szczególnie narażona na wypadki na stanowisku pracy.",
+      "luka": "workplace",
+      "band": 11984,
+      "src": "direct",
+      "dystraktory": [
+        "bookstore",
+        "maple",
+        "cockroach",
+        "toothpaste",
+        "screwdriver",
+        "agriculture",
+        "bankruptcy",
+        "darts"
+      ]
+    }
+  ]
+}
