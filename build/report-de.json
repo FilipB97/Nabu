@@ -1,0 +1,241 @@
+{
+  "lang": "de",
+  "zdań": 11085,
+  "kandydatów": 61650,
+  "odrzuconychNaJakości": 18540,
+  "odsetekOdrzutówJakościowych": 30,
+  "odsetekNieprzydatnychNaKartę": 52,
+  "pozaZasięgiem": 715478,
+  "innyZapis": 0,
+  "powodyJakość": {
+    "nazwa własna": 10562,
+    "pasmo powyżej progu języka": 5961,
+    "za dużo tokenów spoza listy częstości": 1967,
+    "wulgaryzm": 32,
+    "znaki spoza zestawu języka": 18
+  },
+  "powodyPrzydatność": {
+    "brak tokenu nadającego się na lukę": 12713,
+    "za krótkie": 9485,
+    "glosa bez oparcia w tłumaczeniu": 7123,
+    "ta sama rama, inna odpowiedź": 2279,
+    "za długie": 425
+  },
+  "tłumaczenia": {
+    "bezpośrednie": 3912,
+    "przezAngielski": 7173
+  },
+  "pasma": {
+    "min": 151,
+    "mediana": 2231,
+    "p90": 7979,
+    "max": 11997
+  },
+  "quizNiedostępny": 0,
+  "próbka": [
+    {
+      "text": "Ich bin mir sicher, dass er kommen wird.",
+      "pl": "Jestem pewny, że przyjdzie.",
+      "luka": "sicher",
+      "band": 151,
+      "src": "pivot",
+      "dystraktory": [
+        "schön",
+        "klar",
+        "genau",
+        "richtig",
+        "schnell",
+        "andere",
+        "tot",
+        "wahr"
+      ]
+    },
+    {
+      "text": "Was habt ihr gestern gemacht?",
+      "pl": "Co robiłeś wczoraj?",
+      "luka": "gestern",
+      "band": 475,
+      "src": "pivot",
+      "dystraktory": [
+        "etwa",
+        "anders",
+        "endlich",
+        "überhaupt",
+        "je",
+        "fast",
+        "niemals",
+        "unten"
+      ]
+    },
+    {
+      "text": "Ich werde dies kaufen.",
+      "pl": "Ja to kupię.",
+      "luka": "kaufen",
+      "band": 754,
+      "src": "pivot",
+      "dystraktory": [
+        "rufen",
+        "laufen",
+        "vertrauen",
+        "aufhören",
+        "genommen",
+        "sitzen",
+        "anrufen",
+        "heißen"
+      ]
+    },
+    {
+      "text": "Bitte folgen Sie seinem Beispiel.",
+      "pl": "Proszę, idźcie za jego przykładem.",
+      "luka": "Beispiel",
+      "band": 1095,
+      "src": "direct",
+      "dystraktory": [
+        "brief",
+        "reise",
+        "weile",
+        "seele",
+        "beziehung",
+        "liste",
+        "geist",
+        "minute"
+      ]
+    },
+    {
+      "text": "Ich habe euch im Fernsehen gesehen.",
+      "pl": "Widziałem cię w telewizji.",
+      "luka": "Fernsehen",
+      "band": 1504,
+      "src": "pivot",
+      "dystraktory": [
+        "rennen",
+        "verdienen",
+        "gleichen",
+        "verzeihen",
+        "schließen",
+        "danken",
+        "bedeuten",
+        "stimmen"
+      ]
+    },
+    {
+      "text": "Dieses Buch ist es wert, zweimal gelesen zu werden.",
+      "pl": "Ta książka jest warta przeczytania dwa razy.",
+      "luka": "zweimal",
+      "band": 1986,
+      "src": "pivot",
+      "dystraktory": [
+        "weshalb",
+        "selbstverständlich",
+        "nirgendwo",
+        "seitdem",
+        "mindestens",
+        "weiterhin",
+        "normalerweise",
+        "morgens"
+      ]
+    },
+    {
+      "text": "Tom gibt jede Menge Geld für Kleidung aus.",
+      "pl": "Tom wydaje dużo pieniędzy na ubrania.",
+      "luka": "Kleidung",
+      "band": 2528,
+      "src": "pivot",
+      "dystraktory": [
+        "beerdigung",
+        "bedeutung",
+        "sendung",
+        "hemd",
+        "zunge",
+        "geburt",
+        "talent",
+        "westen"
+      ]
+    },
+    {
+      "text": "Da ist Staub auf dem Tisch.",
+      "pl": "Na stole jest kurz.",
+      "luka": "Staub",
+      "band": 3264,
+      "src": "pivot",
+      "dystraktory": [
+        "sand",
+        "stern",
+        "text",
+        "sport",
+        "sicht",
+        "bauer",
+        "donnerstag",
+        "lektion"
+      ]
+    },
+    {
+      "text": "Sei höflich zu deinen Eltern.",
+      "pl": "Bądź uprzejmy dla swoich rodziców.",
+      "luka": "höflich",
+      "band": 4402,
+      "src": "pivot",
+      "dystraktory": [
+        "friedlich",
+        "heftig",
+        "gemütlich",
+        "ohnmächtig",
+        "öffentlich",
+        "verschlossen",
+        "billig",
+        "tödlich"
+      ]
+    },
+    {
+      "text": "Verzeihung! Wo ist die U-Bahn?",
+      "pl": "Przepraszam. Gdzie jest metro?",
+      "luka": "U-Bahn",
+      "band": 5752,
+      "src": "pivot",
+      "dystraktory": [
+        "kätzchen",
+        "besprechung",
+        "zutritt",
+        "pfad",
+        "würstchen",
+        "privatsphäre",
+        "zahnarzt",
+        "schublade"
+      ]
+    },
+    {
+      "text": "Bist du ein guter Tänzer?",
+      "pl": "Czy jesteś dobrym tancerzem?",
+      "luka": "Tänzer",
+      "band": 8238,
+      "src": "direct",
+      "dystraktory": [
+        "sänger",
+        "tänzerin",
+        "tennis",
+        "wecker",
+        "tierarzt",
+        "poker",
+        "mechaniker",
+        "feder"
+      ]
+    },
+    {
+      "text": "Denken Sie, dass es gefährlich ist genetisch veränderte Nahrung zu essen?",
+      "pl": "Uważasz, że jedzenie żywności zmodyfikowanej genetycznie jest niebezpieczne?",
+      "luka": "genetisch",
+      "band": 11997,
+      "src": "pivot",
+      "dystraktory": [
+        "phantastisch",
+        "sonderlich",
+        "geheimnisvoll",
+        "angepasst",
+        "oberflächlich",
+        "giftig",
+        "erkältet",
+        "weiblich"
+      ]
+    }
+  ]
+}

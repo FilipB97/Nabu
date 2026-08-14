@@ -137,7 +137,7 @@ export function buildCore(
    */
   dictionary?: ReadonlyMap<
     string,
-    { pl: string; senses: string[]; readings: (string | null)[]; say?: string }
+    { head: string; pl: string; senses: string[]; readings: (string | null)[]; say?: string }
   >,
 ): { items: CoreEntry[]; lexicon: StageLexicon } {
   const pool = new Map<string, Candidate & { r?: string }>()
@@ -151,8 +151,11 @@ export function buildCore(
     // Karta pokazuje POSTAĆ HASŁOWĄ, nie formę z tego zdania. Koreańskie `잡아` jest
     // formą czasownika `잡다`, a glosa („złapać") opisuje formę słownikową — karta
     // z formą odmienioną i glosą bezokolicznika uczy pary, której nie ma w słowniku.
+    // Pisownia z hasła słownikowego, nie z formy w zdaniu ani z klucza mapy: hasło zna
+    // wielkie litery, których klucz nie niesie (`Frau`), i formę podstawową, której nie
+    // niesie zdanie (`잡다` zamiast `잡아`).
     const entry = dictionary?.get(lemma)
-    const surface = (entry ? lemma : token.s).toLocaleLowerCase()
+    const surface = entry?.head ?? token.s.toLocaleLowerCase()
 
     const at = entry ? primarySense(entry.senses) : -1
     const gloss = entry ? (entry.senses[at] ?? entry.pl) : token.gloss
@@ -165,8 +168,6 @@ export function buildCore(
 
     pool.set(lemma, {
       lemma,
-      // Forma zapisana małą literą, tak samo jak w leksykonie zdań: `Tan` i `tan`
-      // to jedno słowo, a wielka litera bierze się z pozycji w zdaniu.
       surface,
       pl: gloss,
       pos: token.pos,

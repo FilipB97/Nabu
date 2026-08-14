@@ -137,10 +137,22 @@ słownictwa. Zero zmian w silniku, zero zmian w komponentach.
 
 | Poziom | Języki | Co je wyróżnia | Koszt |
 |---|---|---|---|
-| **A** | hiszpański, portugalski, szwedzki, włoski, niemiecki, norweski | alfabet łaciński, spacje, brak czytań i transkrypcji | ~1 h każdy |
+| **A** | angielski, niemiecki, hiszpański, portugalski, szwedzki, włoski, norweski | alfabet łaciński, spacje, brak czytań i transkrypcji | ~1 h każdy |
 | **B** | koreański | hangul jest w pełni fonetyczny, spacje są; potrzebna tylko etap 0 i opcjonalna romanizacja | ~3 h |
 | **C** | japoński, chiński | brak spacji → segmentacja; japoński dodatkowo ma niejednoznaczne czytania kanji | 1–2 dni |
 | **D** | arabski, hebrajski | spacje są, ale zapis bez wokalizacji — z tekstu nie da się wyprowadzić wymowy; do tego RTL | 1 dzień + decyzja produktowa |
+
+Dwie uwagi do poziomu A, obie wyszły dopiero przy dokładaniu angielskiego i niemieckiego:
+
+- **Angielski jest językiem pośredniczącym pipeline'u**, więc dla niego samego warstwa
+  pośrednia nie istnieje (`eng-eng_links` nie ma i nie może być). Krok 01 pomija wtedy
+  pobranie, krok 05 pomija scalanie, a cała talia stoi na tłumaczeniach bezpośrednich —
+  co przy najgęściej powiązanej parze w Tatoebie nie jest stratą, tylko uproszczeniem.
+- **Wielka litera bywa cechą słowa, nie pozycji w zdaniu.** Sprowadzanie form do małych
+  liter jest poprawne dla hiszpańskiego i angielskiego, a dla niemieckiego daje `frau`
+  zamiast `Frau` — błąd ortograficzny na karcie. Pisownia na karcie bierze się teraz
+  z hasła słownikowego, nie z formy w zdaniu; to jedno rozwiązanie obsługuje też
+  koreańskie formy odmienione (`잡다` zamiast `잡아`).
 
 Uwaga do poziomu D: dla arabskiego **dźwięk nie jest dodatkiem, tylko warunkiem
 sensowności** — TTS Apple ma model wokalizacji, którego nie ma w tekście z korpusu.
