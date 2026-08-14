@@ -71,7 +71,10 @@ export function AddLanguage() {
       level,
       bandFrom: spec.bandFrom,
       bandTo: spec.bandTo,
-      ...(spec.skipScript ? { stageOverride: 'core' as const } : {}),
+      // Poziom mówi, OD CZEGO zaczynamy — nie przypina etapu. Różnica jest istotna:
+      // przypięcie zostaje na zawsze i to przez nie „Zaawansowany" siedział w kółko
+      // na stu najczęstszych słowach.
+      startStage: spec.startStage,
       calibrated: !spec.calibrate,
     })
     select(code)

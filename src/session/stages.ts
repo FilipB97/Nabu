@@ -76,11 +76,20 @@ export function currentStage(
   cards: readonly CardState[],
   meta: DeckMeta,
   override: GatedStage | null = null,
+  /**
+   * Etap wejściowy z poziomu deklarowanego przy dodaniu języka. Wcześniejsze etapy
+   * są zaliczone z definicji — użytkownik powiedział, że je zna, i nie ma powodu
+   * kazać mu przerabiać stu najczęstszych słów, żeby dojść do zdań.
+   */
+  startStage: GatedStage | null = null,
 ): GatedStage {
   const stages = gatedStages(adapter)
   if (override && stages.includes(override)) return override
 
-  for (const stage of stages) {
+  // Etap wejściowy nieobecny w tym języku (np. „pismo" dla angielskiego) po prostu
+  // nie przesuwa startu — `indexOf` daje wtedy −1, a my zaczynamy od zera.
+  const from = startStage ? stages.indexOf(startStage) : 0
+  for (const stage of stages.slice(Math.max(0, from))) {
     if (!isMastered(cards, meta, stage)) return stage
   }
   return stages.at(-1) ?? 'sentences'

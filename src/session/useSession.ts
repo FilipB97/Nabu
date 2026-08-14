@@ -348,7 +348,7 @@ export function useSession(lang: string) {
       // Etap decyduje, skąd biorą się NOWE pozycje. Powtórki przychodzą ze wszystkich
       // etapów naraz — kana opanowana miesiąc temu ma wracać także wtedy, gdy użytkownik
       // jest już przy zdaniach (sekcja 2a).
-      const stage = currentStage(adapter, allCards, meta, config.stageOverride)
+      const stage = currentStage(adapter, allCards, meta, config.stageOverride, config.startStage)
       setStage(stage)
       canListen.current = hasVoice(adapter.tts.locale)
 
