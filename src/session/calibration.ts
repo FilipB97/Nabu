@@ -139,6 +139,15 @@ export const LEVELS: ReadonlyArray<{
   startStage: GatedStage
   /** Czy uruchamiamy kalibrację. Przy „od zera" nie ma czego kalibrować. */
   calibrate: boolean
+  /**
+   * Domyślny tryb produkcji dla tego poziomu.
+   *
+   * Wybór jednej z czterech opcji sprawdza wiedzę BIERNĄ i da się go wyćwiczyć, nie
+   * znając słowa — dla kogoś, kto zna język, jest to test zbyt łatwy, żeby czegokolwiek
+   * uczyć. Konto zaawansowane odtwarza więc słowo z pamięci od razu, a nie dopiero
+   * wtedy, gdy karta dojrzeje po trzech tygodniach.
+   */
+  production: 'mature' | 'always'
 }> = [
   {
     id: 'zero',
@@ -148,6 +157,7 @@ export const LEVELS: ReadonlyArray<{
     bandTo: 500,
     startStage: 'script',
     calibrate: false,
+    production: 'mature',
   },
   {
     id: 'basics',
@@ -157,6 +167,7 @@ export const LEVELS: ReadonlyArray<{
     bandTo: 1500,
     startStage: 'core',
     calibrate: true,
+    production: 'mature',
   },
   {
     id: 'ok',
@@ -166,15 +177,17 @@ export const LEVELS: ReadonlyArray<{
     bandTo: 4000,
     startStage: 'sentences',
     calibrate: true,
+    production: 'mature',
   },
   {
     id: 'advanced',
     label: 'Zaawansowany',
-    description: 'Szukam słów rzadkich, nie podstaw.',
+    description: 'Szukam słów rzadkich. Odpowiadasz z pamięci, nie z listy.',
     bandFrom: 2000,
     bandTo: 12000,
     startStage: 'sentences',
     calibrate: true,
+    production: 'always',
   },
 ]
 

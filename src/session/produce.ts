@@ -40,6 +40,11 @@ export function productionFor(
 ): Production | null {
   if (setting === 'off') return null
   if (setting === 'mature' && !isMature(card)) return null
+  // Nawet przy „zawsze" pierwsze spotkanie nie jest produkcją. Pozycja właśnie została
+  // pokazana na karcie wprowadzenia, więc wpisanie jej z pamięci nie byłoby odtworzeniem,
+  // tylko przepisaniem tego, co widać było przed sekundą. Odtwarzanie zaczyna się przy
+  // pierwszej POWTÓRCE — a ta przy kartach nowych wraca jeszcze w tej samej sesji.
+  if (card.reps === 0) return null
 
   const target = item.tokens[item.cloze]
   if (!target?.gloss) return null

@@ -75,6 +75,9 @@ export function AddLanguage() {
       // przypięcie zostaje na zawsze i to przez nie „Zaawansowany" siedział w kółko
       // na stu najczęstszych słowach.
       startStage: spec.startStage,
+      // Poziom decyduje też o tym, CZY odpowiadasz z pamięci. Dla konta zaawansowanego
+      // wybór jednej z czterech opcji jest testem zbyt łatwym, żeby czegokolwiek uczyć.
+      production: spec.production,
       calibrated: !spec.calibrate,
     })
     select(code)
