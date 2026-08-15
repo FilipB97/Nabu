@@ -40,7 +40,7 @@ export const ja: LangAdapter = {
     shape: 'kanji-components',
     minOptions: 4,
   },
-  production: ['draw', 'kana'],
+  production: ['draw', 'kana', 'speak'],
   scriptItems: kanaItems,
   scriptAbout:
     'Japoński zapisuje się trzema pismami naraz. Kana — hiragana i katakana — jest ' +

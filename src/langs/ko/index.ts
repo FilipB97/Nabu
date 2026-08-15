@@ -33,7 +33,7 @@ export const ko: LangAdapter = {
   sentence: { minTokens: 3, maxTokens: 16, maxUnknown: 1, clozeSlack: 3 },
   maxBand: 30000,
   quiz: { clozePos: ['noun', 'adv'], shape: 'jamo', minOptions: 4 },
-  production: ['jamo'],
+  production: ['jamo', 'speak'],
   lemmaCandidates,
   splitToken: splitParticle,
   scriptItems: jamoItems,

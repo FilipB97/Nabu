@@ -167,6 +167,25 @@ describe('kiedy karta idzie w produkcję', () => {
   it('przy „wyłączonej" produkcji nie ma nigdy', () => {
     expect(productionFor(en, card(9, 30), zdanie, 'off')).toBeNull()
   })
+
+  it('mówienie bez rozpoznawania w ogóle się nie pojawia', () => {
+    // Domyślnie `canSpeak` jest fałszem, więc urządzenie bez rozpoznawania mowy
+    // dostaje wpisywanie — karta nie może zależeć od funkcji, której nie ma.
+    expect(productionFor(en, card(1, 0), zdanie, 'always')?.mode).toBe('type')
+  })
+
+  it('mówienie wchodzi co drugą powtórkę, żeby nie wyprzeć zapisu', () => {
+    expect(productionFor(en, card(1, 0), zdanie, 'always', true)?.mode).toBe('speak')
+    expect(productionFor(en, card(2, 0), zdanie, 'always', true)?.mode).toBe('type')
+    expect(productionFor(en, card(3, 0), zdanie, 'always', true)?.mode).toBe('speak')
+  })
+
+  it('mówienie pyta o słowo i podaje zdanie jako kontekst', () => {
+    const speak = productionFor(en, card(1, 0), zdanie, 'always', true)
+    expect(speak?.expected).toBe('pleased')
+    expect(speak?.prompt).toBe('zadowolony')
+    expect(speak?.context).toBe('Są zadowoleni z pracy.')
+  })
 })
 
 

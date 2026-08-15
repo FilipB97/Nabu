@@ -43,7 +43,7 @@ export const zh: LangAdapter = {
     shape: 'kanji-components',
     minOptions: 4,
   },
-  production: ['draw'],
+  production: ['draw', 'speak'],
   scriptItems: pinyinItems,
   scriptLabel: 'wymowa',
   scriptAbout:

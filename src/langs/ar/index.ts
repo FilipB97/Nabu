@@ -58,7 +58,7 @@ export const ar: LangAdapter = {
     shape: 'edit',
     minOptions: 4,
   },
-  production: ['type'],
+  production: ['type', 'speak'],
   lemmaCandidates,
   splitToken: splitProclitics,
   scriptItems: arabicLetters,

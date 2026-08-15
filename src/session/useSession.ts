@@ -37,6 +37,7 @@ import {
   type Lexicon,
 } from '@/store/decks'
 import { hasVoice } from '@/audio/speak'
+import { canRecognize } from '@/audio/listen'
 import { currentStage, type GatedStage } from './stages.ts'
 import { checkProduction, productionFor, type Production } from './produce.ts'
 import {
@@ -270,6 +271,7 @@ export function useSession(lang: string) {
         entry.card,
         entry.item,
         config.production,
+        canRecognize(),
       )
       if (production) {
         shownAt.current = Date.now()

@@ -50,7 +50,7 @@ export function Start() {
           języków to sto kart dziennie i porzucenie aplikacji w drugim tygodniu.
         </p>
         <Link to="/dodaj" className="nabu-press nabu-accent-fill font-ui flex min-h-[58px]
-          max-w-[280px] items-center justify-center text-[16px]">
+          max-w-[280px] items-center justify-center rounded-[16px] text-[16px]">
           Wybierz język
         </Link>
       </div>

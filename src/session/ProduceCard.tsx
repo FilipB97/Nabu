@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useState } from 'react'
 import type { LangAdapter } from '@/langs'
 import type { Production } from './produce.ts'
+import { explain, listenOnce, RecognitionError } from '@/audio/listen'
+import { stopSpeaking } from '@/audio/speak'
 import { Button } from '@/ui/Button'
 import { Keyboard } from '@/ui/Keyboard'
 import { Mono } from '@/ui/Mono'
@@ -24,6 +26,91 @@ type ProduceCardProps = {
   onAnswer: (given: string, hints: number) => void
 }
 
+/**
+ * Karta mówienia — tryb `speak`.
+ *
+ * Osobny komponent, bo nie ma tu ani pola tekstowego, ani podpowiedzi literowej:
+ * jedynym wejściem jest głos, a jedyną pomocą — usłyszenie wzorca. Podpis mówi wprost,
+ * co ta karta sprawdza. Rozpoznawanie mowy odpowiada na pytanie „czy maszyna mnie
+ * zrozumiała", nie „czy mam dobry akcent", i obiecywanie drugiego byłoby kłamstwem
+ * wbudowanym w interfejs (ADR-003).
+ */
+function SpeakCard({
+  production,
+  adapter,
+  onAnswer,
+}: Omit<ProduceCardProps, 'fontClass'>) {
+  const [state, setState] = useState<'gotowe' | 'słucham' | 'błąd'>('gotowe')
+  const [problem, setProblem] = useState('')
+
+  const listen = useCallback(async () => {
+    // Synteza i rozpoznawanie dzielą jeden tor dźwięku: nasłuch przy mówiącej
+    // przeglądarce nagrywa ją samą i rozpoznaje własny wzorzec jako odpowiedź.
+    stopSpeaking()
+    setState('słucham')
+    setProblem('')
+    try {
+      const heard = await listenOnce(adapter.tts.locale)
+      // Bierzemy wariant najbliższy oczekiwanemu, nie pierwszy z brzegu: przy pojedynczym
+      // słowie bez kontekstu właściwy bywa drugi, a odrzucenie go byłoby karą za sposób
+      // działania modelu, nie za wymowę użytkownika.
+      const target = production.expected.toLocaleLowerCase()
+      const best =
+        heard.alternatives.find((text) => text.toLocaleLowerCase().includes(target)) ??
+        heard.alternatives[0] ??
+        ''
+      setState('gotowe')
+      onAnswer(best, 0)
+    } catch (error) {
+      setState('błąd')
+      setProblem(explain(error instanceof RecognitionError ? error.code : 'nieznany'))
+    }
+  }, [adapter, production, onAnswer])
+
+  return (
+    <div className="flex flex-col items-center gap-5">
+      <Mono tone="normal">powiedz to słowo</Mono>
+      <p className="font-ui text-center text-[34px] leading-[1.25] text-text">
+        {production.prompt}
+      </p>
+      {production.context && (
+        <p className="font-ui text-center text-[13px] leading-[1.5] text-text-3">
+          {production.context}
+        </p>
+      )}
+
+      <button
+        type="button"
+        onClick={() => void listen()}
+        disabled={state === 'słucham'}
+        aria-label="Nagraj odpowiedź"
+        className={`nabu-press flex h-[104px] w-[104px] items-center justify-center rounded-full
+          text-[34px] ${state === 'słucham' ? 'nabu-card-raised text-accent' : 'nabu-accent-fill'}`}
+      >
+        {state === 'słucham' ? '…' : '◉'}
+      </button>
+
+      <p className="font-ui max-w-[420px] text-center text-[12.5px] leading-[1.5] text-text-3">
+        {state === 'słucham'
+          ? 'Słucham — powiedz głośno i wyraźnie.'
+          : 'Sprawdzamy, czy słowo daje się rozpoznać. To nie jest ocena akcentu.'}
+      </p>
+
+      {problem && (
+        <p className="font-ui max-w-[420px] text-center text-[13px] leading-[1.5] text-wrong-text">
+          {problem}
+        </p>
+      )}
+
+      {/* Wyjście awaryjne. Mikrofon bywa niedostępny w miejscu publicznym, a karta nie
+          może przez to zablokować sesji — pominięcie liczy się jak nietrafiona odpowiedź. */}
+      <Button variant="ghost" onClick={() => onAnswer('', 0)}>
+        nie mogę teraz mówić
+      </Button>
+    </div>
+  )
+}
+
 export function ProduceCard({ production, adapter, fontClass, onAnswer }: ProduceCardProps) {
   const [typed, setTyped] = useState('')
   const [keys, setKeys] = useState<string[]>([])
@@ -40,6 +127,10 @@ export function ProduceCard({ production, adapter, fontClass, onAnswer }: Produc
   }, [])
 
   const revealed = [...production.expected].slice(0, hints).join('')
+
+  if (production.mode === 'speak') {
+    return <SpeakCard production={production} adapter={adapter} onAnswer={onAnswer} />
+  }
 
   return (
     <div className="flex flex-col gap-5">
