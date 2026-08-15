@@ -311,6 +311,11 @@ export function Settings() {
               />
             </ControlRow>
             <Row label="Test dźwięku" description="Sprawdza syntezator na tym urządzeniu." to="/audio" />
+            <Row
+              label="Sonda mowy"
+              description="Czy da się słuchać przez mikrofon — materiał do decyzji o ocenie wymowy."
+              to="/mowa"
+            />
           </Group>
         </>
       )}
