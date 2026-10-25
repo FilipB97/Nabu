@@ -319,7 +319,7 @@ export async function assemble(lang: string): Promise<{ items: Item[]; rejects: 
       : await loadFrequency(sources.frequency)
   // Segmentacja chińskiego rozstrzyga remisy częstością — patrz `segment()`.
   setSegmentRanks(ranks)
-  const lexicon = await loadLexicon(adapter.code)
+  const lexicon = await loadLexicon(adapter.wiktionary ?? adapter.code)
   const translations = await buildTranslations(sources)
   console.log(`  tłumaczeń polskich: ${translations.size}`)
 
@@ -613,6 +613,7 @@ if (import.meta.filename === process.argv[1]) {
   const { items, rejects } = await assemble(lang)
   await assignDistractors(items, lang)
   await writeReport(lang, items, rejects)
-  await writeDeck(lang, items, await loadLexicon(adapterFor(lang).code))
+  const adapter = adapterFor(lang)
+  await writeDeck(lang, items, await loadLexicon(adapter.wiktionary ?? adapter.code))
   console.log('\nGotowe. Przejrzyj build/report-*.json.')
 }

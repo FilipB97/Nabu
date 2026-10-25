@@ -100,6 +100,34 @@ Otwórz podgląd, poczekaj na rejestrację service workera, odetnij sieć i odś
 Na urządzeniu: otwórz adres z Pages w Safari, dodaj do ekranu głównego, włącz tryb
 samolotowy, uruchom z ikony.
 
+## Domena
+
+Aplikacja stoi pod **odswiezona.pl**. Adres bierze się z `public/CNAME`, który Vite
+kopiuje do `dist/`, a build Pages leci bez `NABU_BASE`, czyli z `base: '/'` — domena
+własna serwuje z korzenia, nie z podkatalogu jak `*.github.io/Nabu`.
+
+Czego wymaga to po stronie DNS (jednorazowo, u rejestratora domeny):
+
+| typ | nazwa | wartość |
+|---|---|---|
+| A | `@` | `185.199.108.153` |
+| A | `@` | `185.199.109.153` |
+| A | `@` | `185.199.110.153` |
+| A | `@` | `185.199.111.153` |
+| AAAA | `@` | `2606:50c0:8000::153` |
+| AAAA | `@` | `2606:50c0:8001::153` |
+| AAAA | `@` | `2606:50c0:8002::153` |
+| AAAA | `@` | `2606:50c0:8003::153` |
+| CNAME | `www` | `filipb97.github.io.` |
+
+Potem w repozytorium: **Settings → Pages → Custom domain** wpisać `odswiezona.pl`
+i zaznaczyć **Enforce HTTPS**, gdy certyfikat się wystawi (zwykle kilkanaście minut
+po propagacji DNS). Do tego czasu strona odpowiada ostrzeżeniem o certyfikacie —
+to stan przejściowy, nie usterka.
+
+Stary adres `filipb97.github.io/Nabu` przestaje być miejscem docelowym: GitHub
+przekierowuje go na domenę własną, więc linki nie gniją.
+
 ## Dokumenty
 
 - [`plan.md`](plan.md) — specyfikacja produktu i plan wdrożenia

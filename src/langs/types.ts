@@ -83,6 +83,16 @@ export type LangAdapter = {
   tatoeba: string
   /** Kod listy częstości FrequencyWords, do kroku `03-frequency`. */
   freq: string
+  /**
+   * Kod języka w zrzucie Wikisłownika, gdy różni się od `code` — do kroku `04-glosses`.
+   *
+   * Trzeci kod obok `tatoeba` i `freq`, i z tego samego powodu: każde źródło nazywa
+   * języki po swojemu. Norweski jest tu wyraźnym przypadkiem — aplikacja zna go jako
+   * `no`, Tatoeba jako `nob`, a Wikisłownik rozdziela bokmål (`nb`) od nynorsku (`nn`)
+   * i pod samym `no` nie ma praktycznie nic. Brak tego pola kosztował pustą talię:
+   * pipeline przeszedł bez błędu, zbudował zero haseł i zero zdań.
+   */
+  wiktionary?: string
 
   /**
    * Skąd biorą się rangi częstości.

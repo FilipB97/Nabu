@@ -45,10 +45,12 @@ jobs:
       - name: Testy
         run: npm test
 
+      # Bez `NABU_BASE`, czyli `base: '/'`. Strona stoi pod własną domeną
+      # (`public/CNAME` → odswiezona.pl), a ta serwuje z korzenia, nie z podkatalogu.
+      # Adres `*.github.io/Nabu` przekierowuje się wtedy na domenę samoczynnie, więc
+      # stary link nie przestaje działać — tylko prowadzi gdzie indziej.
       - name: Build
         run: npm run build
-        env:
-          NABU_BASE: /${{ github.event.repository.name }}/
 
       # Artefakt powstaje tylko dla `main` — z pull requesta nie ma czego wdrażać.
       - uses: actions/upload-pages-artifact@v3

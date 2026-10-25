@@ -1,0 +1,234 @@
+{
+  "lang": "no",
+  "zdań": 336,
+  "kandydatów": 2749,
+  "odrzuconychNaJakości": 470,
+  "odsetekOdrzutówJakościowych": 17,
+  "odsetekNieprzydatnychNaKartę": 71,
+  "pozaZasięgiem": 16143,
+  "innyZapis": 0,
+  "powodyJakość": {
+    "pasmo powyżej progu języka": 243,
+    "za dużo tokenów spoza listy częstości": 127,
+    "nazwa własna": 94,
+    "wulgaryzm": 4,
+    "znaki spoza zestawu języka": 2
+  },
+  "powodyPrzydatność": {
+    "brak tokenu nadającego się na lukę": 914,
+    "za krótkie": 794,
+    "glosa bez oparcia w tłumaczeniu": 194,
+    "ta sama rama, inna odpowiedź": 22,
+    "za długie": 19
+  },
+  "tłumaczenia": {
+    "bezpośrednie": 35,
+    "przezAngielski": 301
+  },
+  "pasma": {
+    "min": 153,
+    "mediana": 1364,
+    "p90": 5168,
+    "max": 11607
+  },
+  "quizNiedostępny": 0,
+  "próbka": [
+    {
+      "text": "Vi vil være sammen for alltid.",
+      "pl": "Będziemy razem na zawsze.",
+      "luka": "alltid",
+      "band": 153,
+      "src": "pivot",
+      "dystraktory": [
+        "hjem",
+        "lenge",
+        "nesten",
+        "fort",
+        "hjemme",
+        "herfra"
+      ]
+    },
+    {
+      "text": "Dette var hennes første jobb.",
+      "pl": "To była jej pierwsza praca.",
+      "luka": "jobb",
+      "band": 316,
+      "src": "pivot",
+      "dystraktory": [
+        "gutt",
+        "hatt",
+        "jente",
+        "venn",
+        "ord",
+        "mor",
+        "spørsmål",
+        "kvinne"
+      ]
+    },
+    {
+      "text": "Bedre sent enn aldri.",
+      "pl": "Lepiej późno niż wcale.",
+      "luka": "sent",
+      "band": 488,
+      "src": "pivot",
+      "dystraktory": [
+        "altså",
+        "fort",
+        "herfra",
+        "nesten",
+        "hjemme",
+        "ofte",
+        "dessverre",
+        "vennligst"
+      ]
+    },
+    {
+      "text": "Å vinne er ikke alt.",
+      "pl": "Wygrana to nie wszystko.",
+      "luka": "vinne",
+      "band": 819,
+      "src": "pivot",
+      "dystraktory": [
+        "glemme",
+        "lese",
+        "sitte",
+        "danse",
+        "tjene",
+        "begynne",
+        "låne",
+        "løpe"
+      ]
+    },
+    {
+      "text": "Musikk er viktig for meg.",
+      "pl": "Muzyka jest dla mnie ważna.",
+      "luka": "Musikk",
+      "band": 1137,
+      "src": "pivot",
+      "dystraktory": [
+        "bok",
+        "konge",
+        "måned",
+        "bank",
+        "bestemor",
+        "glass",
+        "film",
+        "brev"
+      ]
+    },
+    {
+      "text": "Jeg synes du har blitt mye bedre i engelsk.",
+      "pl": "Uważam, że twój angielski bardzo się poprawił.",
+      "luka": "engelsk",
+      "band": 1291,
+      "src": "pivot",
+      "dystraktory": [
+        "åpen",
+        "fornøyd",
+        "uskyldig",
+        "blå",
+        "nødvendig",
+        "nøyaktig",
+        "trist",
+        "rik"
+      ]
+    },
+    {
+      "text": "Når står du vanligvis opp?",
+      "pl": "O której godzinie zwykle wstajesz?",
+      "luka": "vanligvis",
+      "band": 1581,
+      "src": "pivot",
+      "dystraktory": [
+        "vennligst",
+        "dessverre",
+        "ofte"
+      ]
+    },
+    {
+      "text": "Dette er din seier.",
+      "pl": "To wasze zwycięstwo.",
+      "luka": "seier",
+      "band": 2340,
+      "src": "pivot",
+      "dystraktory": [
+        "sekund",
+        "melk",
+        "sverd",
+        "suksess",
+        "stjerne",
+        "kylling",
+        "avgjørelse",
+        "språk"
+      ]
+    },
+    {
+      "text": "Det er en restaurant her.",
+      "pl": "Tutaj jest restauracja.",
+      "luka": "restaurant",
+      "band": 2696,
+      "src": "pivot",
+      "dystraktory": [
+        "stjerne",
+        "bensin",
+        "samvittighet",
+        "bjørn",
+        "fugl",
+        "språk",
+        "øst",
+        "torsdag"
+      ]
+    },
+    {
+      "text": "Har du en penn?",
+      "pl": "Czy masz długopis?",
+      "luka": "penn",
+      "band": 3749,
+      "src": "pivot",
+      "dystraktory": [
+        "feber",
+        "billett",
+        "snø",
+        "oktober",
+        "dusj",
+        "ulv",
+        "slave",
+        "buss"
+      ]
+    },
+    {
+      "text": "Hva slags plante er det?",
+      "pl": "Co to za roślina?",
+      "luka": "plante",
+      "band": 5304,
+      "src": "pivot",
+      "dystraktory": [
+        "slips",
+        "student",
+        "piano",
+        "kredittkort",
+        "førerkort",
+        "iskrem",
+        "dato",
+        "hale"
+      ]
+    },
+    {
+      "text": "Dette stedet har en mystisk atmosfære.",
+      "pl": "To miejsce ma tajemniczą atmosferę.",
+      "luka": "atmosfære",
+      "band": 11607,
+      "src": "pivot",
+      "dystraktory": [
+        "pulver",
+        "biologi",
+        "syltetøy",
+        "pave",
+        "røyking",
+        "rødvin",
+        "flue",
+        "genser"
+      ]
+    }
+  ]
+}

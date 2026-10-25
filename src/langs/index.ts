@@ -1,6 +1,9 @@
 import type { LangAdapter } from './types.ts'
 import { en } from './en/index.ts'
 import { de } from './de/index.ts'
+import { it } from './it/index.ts'
+import { fi } from './fi/index.ts'
+import { no } from './no/index.ts'
 import { es } from './es/index.ts'
 import { pt } from './pt/index.ts'
 import { sv } from './sv/index.ts'
@@ -16,7 +19,7 @@ import { ar } from './ar/index.ts'
  * potem języki z obcym pismem. To nie jest przypadek — trzy pierwsze kosztują razem
  * mniej niż jeden japoński i dają natychmiastowy dowód, że rdzeń jest neutralny.
  */
-const ADAPTERS = [en, de, es, pt, sv, ko, ja, zh, ar] as const
+const ADAPTERS = [en, de, it, es, pt, sv, no, fi, ko, ja, zh, ar] as const
 
 export const LANGS: Record<string, LangAdapter> = Object.fromEntries(
   ADAPTERS.map((adapter) => [adapter.code, adapter]),
@@ -40,6 +43,10 @@ export const INTERFERING_PAIRS: ReadonlyArray<readonly [string, string]> = [
   // i znaczeniem (`Haus` / `hus`, `trinken` / `dricka`), a różnice są na tyle drobne,
   // że przy równoległej nauce mieszają się w obie strony.
   [de.code, sv.code],
+  // Norweski i szwedzki są wzajemnie zrozumiałe w mowie i różnią się głównie drobiazgami
+  // w zapisie (`jeg` / `jag`, `ikke` / `inte`). Przy równoległej nauce nie da się ich
+  // trzymać osobno — to najsilniejsza para na tej liście.
+  [no.code, sv.code],
 ]
 
 export function interferesWith(code: string): string[] {
@@ -48,7 +55,7 @@ export function interferesWith(code: string): string[] {
 
 // Eksport po nazwie, żeby reszta aplikacji mogła sięgnąć po konkretny adapter
 // bez wpisywania kodu języka jako literału (patrz reguła ESLint).
-export { en, de, es, pt, sv, ko, ja, zh, ar }
+export { en, de, it, es, pt, sv, no, fi, ko, ja, zh, ar }
 
 export type { LangAdapter, ProductionMode, ScriptBatch, ScriptItem, Stage } from './types.ts'
 export { stagesFor } from './types.ts'
