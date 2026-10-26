@@ -61,6 +61,23 @@ export class SessionQueue {
   }
 
   /**
+   * Odkłada bieżącą pozycję o `after` miejsc dalej, NIE licząc jej jako odpowiedzianej.
+   *
+   * To jest porcja wprowadzania: po przeczytaniu nowego słowa nie pytamy o nie od razu,
+   * tylko pokazujemy kolejne, a pytanie przychodzi, gdy pozycja wróci na czoło. Wprowadzenie
+   * nie jest odpowiedzią, więc licznik sesji nie może drgnąć — inaczej pasek postępu
+   * pokazywałby pracę, której użytkownik nie wykonał.
+   *
+   * Zachowujemy `fresh`, w odróżnieniu od `reinsert`: pozycja nadal jest wprowadzana
+   * po raz pierwszy i ma się policzyć w podsumowaniu jako nowa.
+   */
+  defer(after: number): void {
+    const entry = this.entries.shift()
+    if (!entry) return
+    this.entries.splice(Math.min(after, this.entries.length), 0, entry)
+  }
+
+  /**
    * Wpycha kartę z powrotem, za `REINSERT_AFTER` innych kart. Gdy tyle ich nie ma,
    * karta idzie na koniec — sesja się przedłuża, ale karta nie znika.
    */

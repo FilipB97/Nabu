@@ -78,6 +78,42 @@ describe('kolejka sesji', () => {
     queue.reinsert(first)
     expect(queue.peek()!.fresh).toBe(false)
   })
+
+  it('odłożenie przesuwa pozycję o porcję, nie licząc jej jako odpowiedzianej', () => {
+    // Porcja wprowadzania: pokazujemy słowo, odkładamy je o cztery inne i dopiero
+    // wtedy pytamy. Bez tego odstępu pytanie sprawdza pamięć sprzed sekundy.
+    const queue = new SessionQueue([1, 2, 3, 4, 5, 6].map((n) => entry(`k${n}`)))
+    expect(queue.done).toBe(0)
+    queue.defer(4)
+    expect(queue.done).toBe(0)
+    expect(queue.total).toBe(6)
+    expect(queue.peek()!.card.id).toBe('k2')
+
+    const order: string[] = []
+    let next = queue.take()
+    while (next) {
+      order.push(next.card.id)
+      next = queue.take()
+    }
+    expect(order.indexOf('k1')).toBe(4)
+  })
+
+  it('odłożona pozycja zostaje nowa — ma się policzyć w podsumowaniu', () => {
+    // Inaczej niż `reinsert`: tam karta wraca po ODPOWIEDZI i nie jest już nowa.
+    // Tu wraca po samym przeczytaniu i wprowadzenie dopiero ją czeka.
+    const queue = new SessionQueue([{ ...entry('a'), fresh: true }, entry('b')])
+    queue.defer(1)
+    expect(queue.peek()!.card.id).toBe('b')
+    queue.take()
+    expect(queue.peek()!.fresh).toBe(true)
+  })
+
+  it('porcja większa niż reszta kolejki odkłada na koniec, nie gubi pozycji', () => {
+    const queue = new SessionQueue([entry('a'), entry('b')])
+    queue.defer(99)
+    expect(queue.total).toBe(2)
+    expect(queue.peek()!.card.id).toBe('b')
+  })
 })
 
 describe('dobór nowych pozycji metodą i+1', () => {

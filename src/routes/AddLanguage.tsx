@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { LANG_CODES, adapterFor, interferesWith } from '@/langs'
 import { useLangs } from '@/app/lang'
-import { LEVELS, levelById, type Level } from '@/session/calibration'
+import { LEVELS, introBatchFor, levelById, type Level } from '@/session/calibration'
 import { loadMeta } from '@/store/decks'
 import { settingsFor, updateSettings } from '@/store/db'
 import { Button } from '@/ui/Button'
@@ -78,6 +78,10 @@ export function AddLanguage() {
       // Poziom decyduje też o tym, CZY odpowiadasz z pamięci. Dla konta zaawansowanego
       // wybór jednej z czterech opcji jest testem zbyt łatwym, żeby czegokolwiek uczyć.
       production: spec.production,
+      // I o tym, CZY pokazujemy słowo przed pytaniem. Dla konta zaawansowanego ekran
+      // wprowadzenia jest zdradzeniem odpowiedzi — pytamy od razu, a znaczenie podajemy
+      // po odpowiedzi, czyli dokładnie tam, gdzie jest czego się dowiedzieć.
+      introBatch: introBatchFor(level),
       calibrated: !spec.calibrate,
     })
     select(code)

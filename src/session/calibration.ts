@@ -261,3 +261,40 @@ export function planAfter(level: Level, knownBand: number, deck: DeckReach): Pla
 export function knownFrontier(settings: { knownBand: number; bandFrom: number }): number {
   return Math.min(settings.knownBand, settings.bandFrom - 1)
 }
+
+
+/**
+ * Ile nowych pozycji pokazujemy, zanim padnie pierwsze pytanie — sekcja 6.2.
+ *
+ * **Pokazać słowo z glosą i w następnym kroku zapytać o to samo słowo to sprawdzenie
+ * echa, nie pamięci.** Odpowiedź daje się wtedy odczytać z pamięci świeżej, karta
+ * dostaje ocenę „trafione", harmonogram odsuwa ją o kilka dni i wraca ona wtedy,
+ * gdy po tej odpowiedzi nie zostało nic. Tak wyglądało pierwsze spotkanie z każdą
+ * nową pozycją, od początku projektu.
+ *
+ * Porcja wstawia między pokazanie a pytanie inne pozycje. Nie musi być duża: przypomnienie
+ * ma być TRUDNE, ale wykonalne, a kilka pozycji odstępu wystarcza, żeby odpowiedź trzeba
+ * było wydobyć, a nie odczytać.
+ *
+ * Zero jest osobnym trybem, nie najmniejszą porcją: znaczy „nie pokazuj wcale, pytaj
+ * od razu". Dla kogoś, kto słowo zna, ekran wprowadzenia jest zdradzeniem odpowiedzi,
+ * a odsłonięcie po odpowiedzi uczy go tego, czego faktycznie nie wiedział.
+ */
+export const INTRO_BATCHES = [
+  { value: 0, label: 'od razu', hint: 'Pytanie bez pokazywania. Znaczenie poznajesz po odpowiedzi.' },
+  { value: 5, label: 'po pięciu', hint: 'Pięć nowych słów, potem pytania o nie.' },
+  { value: 15, label: 'cała porcja', hint: 'Najpierw wszystkie nowe słowa sesji, potem pytania.' },
+] as const
+
+export const DEFAULT_INTRO_BATCH = 5
+
+/**
+ * Porcja domyślna dla poziomu wejściowego.
+ *
+ * „Zaawansowany" dostaje zero, bo dla niego wprowadzenie jest spoilerem: duża część
+ * pozycji w jego paśmie to słowa, które rozpozna albo odgadnie z kontekstu, a pokazanie
+ * glosy przed pytaniem odbiera jedyną okazję, żeby to sprawdzić.
+ */
+export function introBatchFor(level: Level): number {
+  return level === 'advanced' ? 0 : DEFAULT_INTRO_BATCH
+}

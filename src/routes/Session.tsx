@@ -488,7 +488,14 @@ export function Session() {
       <div className="mt-auto flex flex-col gap-[10px] pt-2">
         {current.intro ? (
           <Button variant="primary" full onClick={learned}>
-            {current.batch ? 'Poznaj tę porcję' : 'Rozumiem, pytaj'}
+            {/* „Pytaj" byłoby teraz nieprawdą: przy porcji większej niż jeden po tym
+                przycisku przychodzi KOLEJNE nowe słowo, a pytanie dopiero po całej porcji.
+                Podpis ma mówić, co się zaraz stanie, bo na tym stoi zaufanie do przycisku. */}
+            {current.batch
+              ? 'Poznaj tę porcję'
+              : (settings?.introBatch ?? 0) > 1
+                ? 'Zapamiętane, dalej'
+                : 'Rozumiem, pytaj'}
             <span className="font-mono ms-3 hidden text-[11px] opacity-60 md:inline">enter</span>
           </Button>
         ) : current.production ? (

@@ -1,5 +1,6 @@
 import Dexie, { type Table } from 'dexie'
 import type { CardState, LogEntry } from '@/srs/types'
+import { DEFAULT_INTRO_BATCH, introBatchFor } from '@/session/calibration'
 
 /**
  * Magazyn lokalny — sekcja 5.3 i 5.5 planu.
@@ -44,6 +45,14 @@ export type LangSettings = {
   startStage: 'script' | 'core' | 'sentences' | null
   /** Liczba opcji w quizie: 3, 4 albo 6. */
   quizOptions: number
+  /**
+   * Ile nowych pozycji pokazujemy, zanim padnie pierwsze pytanie — sekcja 6.2.
+   *
+   * Zero znaczy „pytaj od razu, bez pokazywania": dla kogoś, kto słowo zna, ekran
+   * wprowadzenia jest zdradzeniem odpowiedzi, a nie lekcją. Jedynka to dawne
+   * zachowanie — pokaż i natychmiast zapytaj — czyli sprawdzenie echa, nie pamięci.
+   */
+  introBatch: number
   /** Przejście dalej po trafieniu, bez dotykania „Dalej". Pudło zawsze czeka. */
   autoAdvance: boolean
   production: 'off' | 'mature' | 'always'
@@ -104,6 +113,23 @@ class NabuDb extends Dexie {
      * pytania o słowa, które zna, i nie miał jak z tego wyjść inaczej niż przez
      * ustawienia. Przenosimy tę wartość tam, gdzie jej miejsce, i zdejmujemy przypięcie.
      */
+    /**
+     * Wersja 4 — porcja wprowadzania.
+     *
+     * Dotychczas nowa pozycja była pokazywana z glosą i w następnym kroku pytana
+     * o to samo. Odstęp między pokazaniem a pytaniem wynosił zero, więc odpowiedź
+     * dawało się odczytać z pamięci świeżej i karta dostawała ocenę, na którą
+     * użytkownik nie zapracował. Kontom zastanym wpisujemy domyślną porcję.
+     */
+    this.version(4).upgrade((tx) =>
+      tx
+        .table<LangSettings>('settings')
+        .toCollection()
+        .modify((row) => {
+          if (row.introBatch === undefined) row.introBatch = introBatchFor(row.level)
+        }),
+    )
+
     this.version(3).upgrade((tx) =>
       tx
         .table<LangSettings>('settings')
@@ -129,6 +155,7 @@ const DEFAULTS: Omit<LangSettings, 'lang' | 'addedAt'> = {
   stageOverride: null,
   startStage: null,
   quizOptions: 4,
+  introBatch: DEFAULT_INTRO_BATCH,
   // Domyślnie czekamy na dotknięcie. Odsłonięcie niesie treść do nauczenia się —
   // poprawne słowo, jego czytanie i glosę — więc nie może znikać samo.
   autoAdvance: false,
