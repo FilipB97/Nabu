@@ -1,29 +1,29 @@
 {
   "lang": "zh",
-  "version": "2026-08-13",
+  "version": "2026-10-26",
   "license": "Tatoeba CC BY 2.0 FR; FrequencyWords CC BY-SA 3.0; Wikisłownik (plwiktionary) CC BY-SA 3.0",
-  "sentences": 1018,
-  "lexicon": 328,
+  "sentences": 1034,
+  "lexicon": 330,
   "script": 46,
   "core": 100,
   "packs": [
     {
       "file": "sentences-000.json",
       "from": 155,
-      "to": 2787,
+      "to": 2654,
       "count": 500
     },
     {
       "file": "sentences-001.json",
-      "from": 2792,
-      "to": 11048,
+      "from": 2659,
+      "to": 10998,
       "count": 500
     },
     {
       "file": "sentences-002.json",
-      "from": 11048,
+      "from": 11039,
       "to": 11983,
-      "count": 18
+      "count": 34
     }
   ]
 }

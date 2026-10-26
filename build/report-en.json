@@ -1,28 +1,28 @@
 {
   "lang": "en",
-  "zdań": 13902,
-  "kandydatów": 75518,
-  "odrzuconychNaJakości": 25074,
+  "zdań": 13927,
+  "kandydatów": 75704,
+  "odrzuconychNaJakości": 25168,
   "odsetekOdrzutówJakościowych": 33,
   "odsetekNieprzydatnychNaKartę": 48,
-  "pozaZasięgiem": 1957615,
+  "pozaZasięgiem": 1963868,
   "innyZapis": 0,
   "powodyJakość": {
-    "za dużo tokenów spoza listy częstości": 18381,
-    "pasmo powyżej progu języka": 5246,
-    "nazwa własna": 1310,
+    "za dużo tokenów spoza listy częstości": 18443,
+    "pasmo powyżej progu języka": 5268,
+    "nazwa własna": 1320,
     "wulgaryzm": 103,
     "znaki spoza zestawu języka": 34
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 13352,
-    "glosa bez oparcia w tłumaczeniu": 10467,
-    "za krótkie": 10213,
-    "ta sama rama, inna odpowiedź": 2018,
+    "brak tokenu nadającego się na lukę": 13375,
+    "glosa bez oparcia w tłumaczeniu": 10482,
+    "za krótkie": 10241,
+    "ta sama rama, inna odpowiedź": 2019,
     "za długie": 492
   },
   "tłumaczenia": {
-    "bezpośrednie": 13902,
+    "bezpośrednie": 13927,
     "przezAngielski": 0
   },
   "pasma": {
@@ -43,16 +43,16 @@
         "stop",
         "call",
         "thought",
-        "talk",
         "money",
         "guy",
         "lot",
-        "name"
+        "name",
+        "place"
       ]
     },
     {
-      "text": "I went out for a moment.",
-      "pl": "Wyszedłem na chwilę.",
+      "text": "Give us a moment.",
+      "pl": "Daj nam chwilę.",
       "luka": "moment",
       "band": 448,
       "src": "direct",
@@ -68,8 +68,8 @@
       ]
     },
     {
-      "text": "What a strange dog!",
-      "pl": "Co za dziwny pies!",
+      "text": "There were strange things happening there.",
+      "pl": "Działy się tam dziwne rzeczy.",
       "luka": "strange",
       "band": 734,
       "src": "direct",
@@ -85,8 +85,8 @@
       ]
     },
     {
-      "text": "Close the window before going to bed.",
-      "pl": "Zamknij okno zanim pójdziesz spać.",
+      "text": "Please close the window.",
+      "pl": "Proszę, zamknij okno.",
       "luka": "window",
       "band": 982,
       "src": "direct",
@@ -102,8 +102,8 @@
       ]
     },
     {
-      "text": "Everyone is very excited.",
-      "pl": "Każdy jest bardzo podekscytowany.",
+      "text": "Tom was so excited.",
+      "pl": "Tom był tak podeskcytowany.",
       "luka": "excited",
       "band": 1316,
       "src": "direct",
@@ -119,8 +119,8 @@
       ]
     },
     {
-      "text": "We have less snow than usual.",
-      "pl": "Mamy mniej śniegu niż zazwyczaj.",
+      "text": "The mountain is covered with snow.",
+      "pl": "Góra jest pokryta śniegiem.",
       "luka": "snow",
       "band": 1792,
       "src": "direct",
@@ -136,25 +136,25 @@
       ]
     },
     {
-      "text": "This vehicle is dangerous.",
-      "pl": "Ten pojazd jest niebezpieczny.",
-      "luka": "vehicle",
-      "band": 2263,
+      "text": "Tom tried to scream, but Mary covered his mouth with her hand.",
+      "pl": "Tom usiłował krzyczeć, ale Mary zasłoniła jego usta swoją dłonią.",
+      "luka": "scream",
+      "band": 2261,
       "src": "direct",
       "dystraktory": [
-        "desire",
-        "result",
-        "metal",
-        "bride",
+        "surface",
+        "ear",
+        "treatment",
         "treasure",
-        "pride",
-        "value",
-        "desert"
+        "suffering",
+        "stealing",
+        "desert",
+        "rate"
       ]
     },
     {
-      "text": "Tom is looking for his wallet.",
-      "pl": "Tom szuka swojej portmonetki.",
+      "text": "I left my wallet in the car.",
+      "pl": "Zostawiłem portfel w samochodzie.",
       "luka": "wallet",
       "band": 2925,
       "src": "direct",
@@ -170,25 +170,25 @@
       ]
     },
     {
-      "text": "Would you like to go to the mall with us?",
-      "pl": "Chcesz iść z nami do galerii handlowej?",
-      "luka": "mall",
-      "band": 4051,
+      "text": "I can afford no further delay.",
+      "pl": "Nie mogę sobie pozwolić na dalsze opóźnienia.",
+      "luka": "delay",
+      "band": 4046,
       "src": "direct",
       "dystraktory": [
-        "e-mail",
-        "motel",
-        "eagle",
-        "palm",
+        "lap",
+        "dessert",
+        "privacy",
+        "salary",
+        "complaint",
+        "mall",
         "satellite",
-        "manner",
-        "tale",
-        "lap"
+        "description"
       ]
     },
     {
-      "text": "I have to reply to this letter.",
-      "pl": "Muszę odpowiedzieć na ten list.",
+      "text": "Did you get a reply from Tom?",
+      "pl": "Dostałeś odpowiedź od Toma?",
       "luka": "reply",
       "band": 5462,
       "src": "direct",
@@ -204,20 +204,20 @@
       ]
     },
     {
-      "text": "The runner jumped over the hole in the ground.",
-      "pl": "Biegacz przeskoczył przez dziurę w ziemi.",
-      "luka": "runner",
-      "band": 7570,
+      "text": "Tom has started studying karate.",
+      "pl": "Tom zaczął uczyć się karate.",
+      "luka": "karate",
+      "band": 7576,
       "src": "direct",
       "dystraktory": [
-        "ruler",
-        "banker",
-        "bomber",
-        "mentor",
+        "parrot",
+        "ant",
         "raven",
-        "freezer",
-        "squirrel",
-        "semester"
+        "initiative",
+        "parish",
+        "fatty",
+        "semester",
+        "knot"
       ]
     },
     {

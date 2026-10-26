@@ -1,28 +1,28 @@
 {
   "lang": "es",
-  "zdań": 6419,
-  "kandydatów": 43142,
-  "odrzuconychNaJakości": 10619,
+  "zdań": 6421,
+  "kandydatów": 43212,
+  "odrzuconychNaJakości": 10645,
   "odsetekOdrzutówJakościowych": 25,
   "odsetekNieprzydatnychNaKartę": 61,
-  "pozaZasięgiem": 398091,
+  "pozaZasięgiem": 399759,
   "innyZapis": 0,
   "powodyJakość": {
-    "pasmo powyżej progu języka": 6034,
-    "nazwa własna": 2788,
-    "za dużo tokenów spoza listy częstości": 1640,
+    "pasmo powyżej progu języka": 6046,
+    "nazwa własna": 2798,
+    "za dużo tokenów spoza listy częstości": 1644,
     "wulgaryzm": 146,
     "znaki spoza zestawu języka": 11
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 11894,
-    "za krótkie": 9626,
-    "glosa bez oparcia w tłumaczeniu": 3621,
+    "brak tokenu nadającego się na lukę": 11916,
+    "za krótkie": 9640,
+    "glosa bez oparcia w tłumaczeniu": 3627,
     "ta sama rama, inna odpowiedź": 763,
     "za długie": 200
   },
   "tłumaczenia": {
-    "bezpośrednie": 1898,
+    "bezpośrednie": 1900,
     "przezAngielski": 4521
   },
   "pasma": {
@@ -47,8 +47,8 @@
       ]
     },
     {
-      "text": "Esa habitación no es tan grande.",
-      "pl": "Ten pokój nie jest duży.",
+      "text": "La habitación ya está lista para ti.",
+      "pl": "Pokój jest już dla ciebie przygotowany.",
       "luka": "habitación",
       "band": 496,
       "src": "pivot",
@@ -64,25 +64,25 @@
       ]
     },
     {
-      "text": "Hace un día bonito, ¡vamos a alguna parte!",
-      "pl": "Jest piękna pogoda, idźmy gdzieś!",
+      "text": "¡Qué día más bonito!",
+      "pl": "Jaki piękny dzień!",
       "luka": "bonito",
       "band": 805,
       "src": "direct",
       "dystraktory": [
         "tonto",
-        "estúpido",
         "propio",
         "salvo",
         "blanco",
         "oficial",
         "normal",
-        "tuyo"
+        "tuyo",
+        "pobre"
       ]
     },
     {
-      "text": "Me siento muy enfermo.",
-      "pl": "Czuję się bardzo chory.",
+      "text": "No tengo tiempo para estar enfermo.",
+      "pl": "Nie mam czasu na bycie chorym.",
       "luka": "enfermo",
       "band": 1184,
       "src": "pivot",
@@ -98,8 +98,8 @@
       ]
     },
     {
-      "text": "Yo veo televisión dos veces a la semana.",
-      "pl": "Oglądam telewizję dwa razy w tygodniu.",
+      "text": "Estaban viendo la televisión.",
+      "pl": "Oglądali telewizję.",
       "luka": "televisión",
       "band": 1561,
       "src": "pivot",
@@ -115,11 +115,11 @@
       ]
     },
     {
-      "text": "¿Qué lengua se habla en tu país?",
-      "pl": "Jakim językiem mówi się w Twoim kraju?",
+      "text": "La lengua se puede usar de diferentes formas.",
+      "pl": "Język może być użyty na rożne sposoby.",
       "luka": "lengua",
       "band": 2021,
-      "src": "direct",
+      "src": "pivot",
       "dystraktory": [
         "genio",
         "montaña",
@@ -132,8 +132,8 @@
       ]
     },
     {
-      "text": "Me gusta viajar por tren.",
-      "pl": "Lubię podróżować pociągiem.",
+      "text": "Hoy en día es fácil viajar.",
+      "pl": "W dzisiejszych czasach podróżowanie jest łatwe.",
       "luka": "viajar",
       "band": 2530,
       "src": "pivot",
@@ -149,54 +149,54 @@
       ]
     },
     {
-      "text": "¿El metro va al aeropuerto?",
-      "pl": "Czy metro jedzie na lotnisko?",
-      "luka": "metro",
-      "band": 3230,
+      "text": "La mujer habla español.",
+      "pl": "Ta kobieta mówi po hiszpańsku.",
+      "luka": "español",
+      "band": 3233,
       "src": "pivot",
       "dystraktory": [
-        "moto",
+        "emperador",
         "metal",
-        "museo",
-        "maleta",
-        "vecino",
+        "sabor",
+        "piano",
+        "metro",
         "refugio",
-        "nacimiento",
-        "emperador"
+        "templo",
+        "reacción"
       ]
     },
     {
-      "text": "Para mí era incómodo.",
-      "pl": "Było mi niewygodnie.",
-      "luka": "incómodo",
-      "band": 4109,
+      "text": "¿Me permite ver su pasaporte?",
+      "pl": "Czy mogę obejrzeć twój paszport?",
+      "luka": "pasaporte",
+      "band": 4119,
       "src": "direct",
       "dystraktory": [
-        "agradecido",
-        "plástico",
-        "permitido",
-        "infantil",
-        "ideal",
-        "naranja",
-        "sano",
-        "inconsciente"
+        "deporte",
+        "barba",
+        "batería",
+        "ensalada",
+        "infancia",
+        "cantante",
+        "mediodía",
+        "sueldo"
       ]
     },
     {
-      "text": "Van a organizar una fiesta para Sam.",
-      "pl": "Zamierzają urządzić imprezę dla Sam.",
-      "luka": "organizar",
-      "band": 5354,
-      "src": "direct",
+      "text": "No existe una forma correcta de vivir el duelo.",
+      "pl": "Nie ma jednego, właściwego sposobu na przeżywanie żałoby.",
+      "luka": "duelo",
+      "band": 5351,
+      "src": "pivot",
       "dystraktory": [
-        "aclarar",
-        "alimentar",
-        "avisar",
-        "confesar",
-        "invitar",
-        "oler",
-        "encender",
-        "pasear"
+        "cuero",
+        "pañuelo",
+        "enero",
+        "boleto",
+        "huelga",
+        "ausencia",
+        "esclavo",
+        "dieta"
       ]
     },
     {

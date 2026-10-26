@@ -1,33 +1,33 @@
 {
   "lang": "zh",
-  "zdań": 1018,
-  "kandydatów": 6288,
-  "odrzuconychNaJakości": 1141,
+  "zdań": 1034,
+  "kandydatów": 6316,
+  "odrzuconychNaJakości": 1152,
   "odsetekOdrzutówJakościowych": 18,
-  "odsetekNieprzydatnychNaKartę": 66,
-  "pozaZasięgiem": 77105,
-  "innyZapis": 5219,
+  "odsetekNieprzydatnychNaKartę": 65,
+  "pozaZasięgiem": 77675,
+  "innyZapis": 5220,
   "powodyJakość": {
-    "pasmo powyżej progu języka": 888,
+    "pasmo powyżej progu języka": 899,
     "znaki spoza zestawu języka": 194,
     "za dużo tokenów spoza listy częstości": 53,
     "wulgaryzm": 6
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 2322,
-    "za krótkie": 1367,
-    "glosa bez oparcia w tłumaczeniu": 384,
-    "ta sama rama, inna odpowiedź": 41,
+    "brak tokenu nadającego się na lukę": 2316,
+    "za krótkie": 1374,
+    "glosa bez oparcia w tłumaczeniu": 382,
+    "ta sama rama, inna odpowiedź": 43,
     "za długie": 15
   },
   "tłumaczenia": {
-    "bezpośrednie": 82,
-    "przezAngielski": 936
+    "bezpośrednie": 85,
+    "przezAngielski": 949
   },
   "pasma": {
     "min": 155,
     "mediana": 2804,
-    "p90": 8439,
+    "p90": 8392,
     "max": 11983
   },
   "quizNiedostępny": 0,
@@ -50,76 +50,76 @@
       ]
     },
     {
-      "text": "这男人很高。",
-      "pl": "Mężczyzna jest wysoki.",
-      "luka": "男人",
-      "band": 681,
+      "text": "不好意思，你叫什么名字？",
+      "pl": "Przepraszam, jak masz na imię?",
+      "luka": "名字",
+      "band": 627,
       "src": "pivot",
       "dystraktory": [
-        "女人",
-        "世界",
         "生活",
-        "名字",
+        "世界",
+        "警察",
+        "男人",
+        "女孩",
         "父亲",
-        "天",
         "明天",
-        "警察"
+        "月"
       ]
     },
     {
-      "text": "如果你离开日本，我会非常想你的。",
-      "pl": "Będzie mi cię brakowało, jeśli wyjedziesz z Japonii.",
-      "luka": "日本",
-      "band": 1007,
+      "text": "啊，我忘了带手机了。",
+      "pl": "Ojej, zapomniałam komórki.",
+      "luka": "手机",
+      "band": 999,
       "src": "pivot",
       "dystraktory": [
-        "手机",
-        "钥匙",
-        "笨蛋",
-        "昨天",
+        "飞机",
+        "日本",
+        "机场",
         "妹妹",
         "错误",
+        "钥匙",
         "信息",
-        "女朋友"
+        "笨蛋"
       ]
     },
     {
-      "text": "留着你的钱吧，我不想要它。",
-      "pl": "Zatrzymaj swoje pieniądze. Nie chcę ich.",
-      "luka": "钱",
-      "band": 1365,
-      "src": "pivot",
+      "text": "今天是美好的一天。",
+      "pl": "Dziś jest piękny dzień.",
+      "luka": "天",
+      "band": 1343,
+      "src": "direct",
       "dystraktory": [
+        "明天",
+        "钱",
         "点",
-        "时间",
-        "天",
-        "爸爸",
         "女人",
         "事情",
-        "朋友",
-        "生活"
+        "时间",
+        "爸爸",
+        "世界"
       ]
     },
     {
-      "text": "爸爸恢复了健康。",
-      "pl": "Ojciec wrócił do zdrowia.",
-      "luka": "健康",
-      "band": 1903,
+      "text": "她假装是学生。",
+      "pl": "Udawała studentkę.",
+      "luka": "学生",
+      "band": 1885,
       "src": "pivot",
       "dystraktory": [
-        "酒店",
-        "啤酒",
-        "天使",
-        "包",
-        "命",
-        "蛋糕",
-        "宇宙",
-        "爱情"
+        "大学",
+        "教授",
+        "教堂",
+        "书",
+        "米",
+        "科学",
+        "学校",
+        "礼物"
       ]
     },
     {
-      "text": "她在忙着学英语。",
-      "pl": "Jest zajęta nauką angielskiego.",
+      "text": "你什么时候开始学英语的？",
+      "pl": "Kiedy zacząłeś uczyć się angielskiego?",
       "luka": "英语",
       "band": 2511,
       "src": "pivot",
@@ -135,20 +135,20 @@
       ]
     },
     {
-      "text": "把灯关了。我睡不着。",
-      "pl": "Zgaś światło. Nie mogę zasnąć.",
-      "luka": "灯",
-      "band": 3264,
+      "text": "他昨天到了东京。",
+      "pl": "Wczoraj przybył do Tokio.",
+      "luka": "昨天",
+      "band": 3222,
       "src": "pivot",
       "dystraktory": [
-        "三明治",
-        "河",
-        "椅子",
-        "出租车",
-        "救护车",
-        "观点",
-        "卧室",
-        "宗教"
+        "未来",
+        "城市",
+        "男孩",
+        "音乐",
+        "妹妹",
+        "日本",
+        "自由",
+        "弟弟"
       ]
     },
     {
@@ -169,8 +169,8 @@
       ]
     },
     {
-      "text": "我吃水果、喝水。",
-      "pl": "Jem owoc i piję wodę.",
+      "text": "我们晚饭后吃新鲜水果。",
+      "pl": "Po obiedzie zjedliśmy świeże owoce.",
       "luka": "水果",
       "band": 5192,
       "src": "pivot",
@@ -186,37 +186,37 @@
       ]
     },
     {
-      "text": "他的化学很差。",
-      "pl": "On jest słaby w chemii.",
-      "luka": "化学",
-      "band": 6483,
+      "text": "南男北女。",
+      "pl": "Południowi mężczyźni, północne kobiety.",
+      "luka": "北",
+      "band": 6397,
       "src": "pivot",
       "dystraktory": [
-        "大学生",
-        "北",
-        "例子",
-        "季节",
-        "数学",
+        "化学",
         "教师",
-        "信封",
-        "计算机"
+        "地铁",
+        "公斤",
+        "蔬菜",
+        "计算机",
+        "小费",
+        "季节"
       ]
     },
     {
-      "text": "“谢谢你的帮助。”　“不用谢。”",
-      "pl": "„Dziękuję za pomoc.” „Nie ma za co.”",
-      "luka": "帮助",
-      "band": 8672,
+      "text": "球是圆的。",
+      "pl": "Kulki są okrągłe.",
+      "luka": "圆",
+      "band": 8632,
       "src": "pivot",
       "dystraktory": [
-        "公司",
-        "安全",
-        "计划",
-        "机会",
-        "女儿",
-        "兄弟",
-        "故事",
-        "手"
+        "天主教",
+        "星期三",
+        "毛衣",
+        "改革",
+        "角",
+        "句",
+        "大学生",
+        "小提琴"
       ]
     },
     {

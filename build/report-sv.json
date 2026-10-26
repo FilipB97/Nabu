@@ -1,11 +1,11 @@
 {
   "lang": "sv",
   "zdań": 1190,
-  "kandydatów": 8080,
+  "kandydatów": 8082,
   "odrzuconychNaJakości": 1206,
   "odsetekOdrzutówJakościowych": 15,
   "odsetekNieprzydatnychNaKartę": 70,
-  "pozaZasięgiem": 48738,
+  "pozaZasięgiem": 48776,
   "innyZapis": 0,
   "powodyJakość": {
     "pasmo powyżej progu języka": 727,
@@ -15,9 +15,9 @@
     "znaki spoza zestawu języka": 2
   },
   "powodyPrzydatność": {
-    "za krótkie": 2375,
+    "za krótkie": 2373,
     "brak tokenu nadającego się na lukę": 2218,
-    "glosa bez oparcia w tłumaczeniu": 900,
+    "glosa bez oparcia w tłumaczeniu": 904,
     "ta sama rama, inna odpowiedź": 176,
     "za długie": 15
   },
@@ -143,13 +143,13 @@
       "src": "pivot",
       "dystraktory": [
         "personligen",
-        "personligt",
         "hittills",
         "fullständigt",
         "sällan",
         "senast",
         "dyrt",
-        "kallt"
+        "kallt",
+        "endast"
       ]
     },
     {

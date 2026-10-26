@@ -1,29 +1,29 @@
 {
   "lang": "pt",
-  "zdań": 4273,
-  "kandydatów": 32186,
-  "odrzuconychNaJakości": 7667,
+  "zdań": 4279,
+  "kandydatów": 32227,
+  "odrzuconychNaJakości": 7677,
   "odsetekOdrzutówJakościowych": 24,
   "odsetekNieprzydatnychNaKartę": 63,
-  "pozaZasięgiem": 411309,
+  "pozaZasięgiem": 413294,
   "innyZapis": 0,
   "powodyJakość": {
-    "pasmo powyżej progu języka": 4673,
-    "nazwa własna": 1497,
-    "za dużo tokenów spoza listy częstości": 1403,
+    "pasmo powyżej progu języka": 4680,
+    "nazwa własna": 1499,
+    "za dużo tokenów spoza listy częstości": 1404,
     "wulgaryzm": 85,
     "znaki spoza zestawu języka": 9
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 9235,
+    "brak tokenu nadającego się na lukę": 9253,
     "za krótkie": 6927,
-    "glosa bez oparcia w tłumaczeniu": 3361,
+    "glosa bez oparcia w tłumaczeniu": 3367,
     "ta sama rama, inna odpowiedź": 580,
-    "za długie": 143
+    "za długie": 144
   },
   "tłumaczenia": {
     "bezpośrednie": 229,
-    "przezAngielski": 4044
+    "przezAngielski": 4050
   },
   "pasma": {
     "min": 150,
@@ -68,8 +68,8 @@
       ]
     },
     {
-      "text": "Quero um quarto com vista.",
-      "pl": "Chcę pokój z widokiem.",
+      "text": "Olhe para a vista.",
+      "pl": "Spójrz na ten widok.",
       "luka": "vista",
       "band": 749,
       "src": "pivot",
@@ -85,28 +85,28 @@
       ]
     },
     {
-      "text": "Este quarto está frio.",
-      "pl": "Ten pokój jest zimny.",
-      "luka": "frio",
-      "band": 1047,
+      "text": "Aonde você quer ir?",
+      "pl": "Gdzie chcesz iść?",
+      "luka": "Aonde",
+      "band": 1054,
       "src": "pivot",
       "dystraktory": [
-        "triste",
-        "cheio",
-        "ótimo",
-        "branco",
-        "perigoso",
-        "belo",
-        "contente",
-        "público"
+        "abaixo",
+        "imediatamente",
+        "simplesmente",
+        "infelizmente",
+        "completamente",
+        "exatamente",
+        "devagar",
+        "rapidamente"
       ]
     },
     {
-      "text": "Espero cantar melhor na próxima vez.",
-      "pl": "Spodziewam się śpiewać lepiej następnym razem.",
-      "luka": "cantar",
+      "text": "Cantar faz bem ao coração.",
+      "pl": "Śpiewanie jest dobre na serce.",
+      "luka": "Cantar",
       "band": 1420,
-      "src": "pivot",
+      "src": "direct",
       "dystraktory": [
         "cuidar",
         "evitar",
@@ -153,71 +153,71 @@
       ]
     },
     {
-      "text": "Eu posso te ensinar a rezar.",
-      "pl": "Mogę cię nauczyć się modlić.",
-      "luka": "rezar",
-      "band": 3116,
+      "text": "Este papel é mágico; pode virar qualquer coisa que você quiser.",
+      "pl": "Ten papier jest magiczny, może się zmienić w co tylko chcesz.",
+      "luka": "mágico",
+      "band": 3129,
       "src": "pivot",
       "dystraktory": [
-        "caçar",
-        "abandonar",
-        "nadar",
-        "celebrar",
-        "almoçar",
-        "repetir",
-        "participar",
-        "cozinhar"
+        "significado",
+        "comunicação",
+        "comissário",
+        "ódio",
+        "física",
+        "império",
+        "museu",
+        "dragão"
       ]
     },
     {
-      "text": "Isso é novidade para mim.",
-      "pl": "To dla mnie nowość.",
-      "luka": "novidade",
-      "band": 4049,
+      "text": "Você pode convidar quem você quiser.",
+      "pl": "Możesz zaprosić kogo chcesz.",
+      "luka": "convidar",
+      "band": 4074,
       "src": "pivot",
       "dystraktory": [
-        "personalidade",
-        "dificuldade",
-        "equipe",
-        "dúzia",
-        "piano",
-        "tatuagem",
-        "estupidez",
-        "salada"
+        "reconhecer",
+        "dividir",
+        "perdoar",
+        "culpar",
+        "alcançar",
+        "baixar",
+        "sugerir",
+        "morar"
       ]
     },
     {
-      "text": "Nada é mais valioso do que a saúde.",
-      "pl": "Nie ma nic cenniejszego niż zdrowie.",
-      "luka": "valioso",
-      "band": 5689,
+      "text": "Parece que o diamante é real.",
+      "pl": "Wygląda na to, że ten diament jest prawdziwy.",
+      "luka": "diamante",
+      "band": 5690,
       "src": "pivot",
       "dystraktory": [
-        "sortudo",
-        "exato",
-        "inferior",
-        "direto",
-        "diagnóstico",
-        "adequado",
-        "submarino",
-        "falecido"
+        "elefante",
+        "desconto",
+        "aranha",
+        "covarde",
+        "gaveta",
+        "japonês",
+        "clima",
+        "quarta-feira"
       ]
     },
     {
-      "text": "Eu comecei a suar.",
-      "pl": "Zacząłem się pocić.",
-      "luka": "suar",
-      "band": 7777,
+      "text": "A necessidade é a mãe da invenção.",
+      "pl": "Potrzeba jest matką wynalazku.",
+      "luka": "invenção",
+      "band": 7779,
       "src": "pivot",
       "dystraktory": [
-        "flutuar",
-        "colaborar",
-        "misturar",
-        "emprestar",
-        "admirar",
-        "prevenir",
-        "alugar",
-        "adiar"
+        "reação",
+        "cimento",
+        "calendário",
+        "expedição",
+        "porão",
+        "banheiro",
+        "recordação",
+        "piquenique"
       ]
     },
     {

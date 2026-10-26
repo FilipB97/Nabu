@@ -1,8 +1,8 @@
 {
   "lang": "es",
-  "version": "2026-08-13",
+  "version": "2026-10-26",
   "license": "Tatoeba CC BY 2.0 FR; FrequencyWords CC BY-SA 3.0; Wikisłownik (plwiktionary) CC BY-SA 3.0",
-  "sentences": 6419,
+  "sentences": 6421,
   "lexicon": 1700,
   "script": 0,
   "core": 100,
@@ -15,31 +15,31 @@
     },
     {
       "file": "sentences-001.json",
-      "from": 463,
+      "from": 465,
       "to": 704,
       "count": 500
     },
     {
       "file": "sentences-002.json",
       "from": 704,
-      "to": 1032,
+      "to": 1035,
       "count": 500
     },
     {
       "file": "sentences-003.json",
-      "from": 1035,
+      "from": 1036,
       "to": 1396,
       "count": 500
     },
     {
       "file": "sentences-004.json",
       "from": 1396,
-      "to": 1658,
+      "to": 1666,
       "count": 500
     },
     {
       "file": "sentences-005.json",
-      "from": 1666,
+      "from": 1670,
       "to": 2069,
       "count": 500
     },
@@ -63,27 +63,27 @@
     },
     {
       "file": "sentences-009.json",
-      "from": 3837,
-      "to": 4950,
+      "from": 3832,
+      "to": 4948,
       "count": 500
     },
     {
       "file": "sentences-010.json",
-      "from": 4969,
-      "to": 6252,
+      "from": 4950,
+      "to": 6238,
       "count": 500
     },
     {
       "file": "sentences-011.json",
-      "from": 6252,
-      "to": 8723,
+      "from": 6238,
+      "to": 8706,
       "count": 500
     },
     {
       "file": "sentences-012.json",
-      "from": 8741,
+      "from": 8723,
       "to": 11998,
-      "count": 419
+      "count": 421
     }
   ]
 }
