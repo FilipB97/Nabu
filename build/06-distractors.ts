@@ -225,18 +225,25 @@ export async function assignDistractors(items: Item[], lang: string): Promise<vo
       continue
     }
 
-    // Ten sam lemat bywa luką w wielu zdaniach — liczymy raz.
-    const known = cache.get(lemma)
-    if (known) {
-      item.distractors = known
-      item.quiz = known.length >= needed
-      continue
+    // Ten sam lemat bywa luką w wielu zdaniach — kosztowne punktowanie liczymy raz.
+    let scored = cache.get(lemma)
+    if (!scored) {
+      scored = candidatesFor(target, byPos, adapter.quiz.shape)
+      cache.set(lemma, scored)
     }
 
-    const scored = candidatesFor(target, byPos, adapter.quiz.shape)
+    // Sito kontekstowe, już per zdanie. `candidatesFor` odsiewa kandydatów kolidujących
+    // z GŁÓWNYM znaczeniem lematu, a na karcie stoi glosa z TEGO zdania — bywa inna.
+    // Stąd zestawy `dziwny / dziwny / ogólny / doskonały`: `raro` ma w puli znaczenie
+    // „rzadki", więc dystraktor „dziwny" przechodził, a w tym akurat zdaniu `raro` znaczy
+    // właśnie „dziwny" i karta miała dwie poprawne odpowiedzi.
+    const here = token.gloss
+    const fitting = scored.filter((id) => {
+      const other = pool.get(id)
+      return !other || !glossesCollide(here, other.pl)
+    })
 
-    cache.set(lemma, scored)
-    item.distractors = scored
-    item.quiz = scored.length >= needed
+    item.distractors = fitting
+    item.quiz = fitting.length >= needed
   }
 }
