@@ -38,6 +38,7 @@ import {
 } from '@/store/decks'
 import { hasVoice } from '@/audio/speak'
 import { canRecognize } from '@/audio/listen'
+import { knownFrontier } from './calibration.ts'
 import { currentStage, type GatedStage } from './stages.ts'
 import { checkProduction, productionFor, type Production } from './produce.ts'
 import {
@@ -371,7 +372,7 @@ export function useSession(lang: string) {
         seen,
         freshLimit,
         cardedLemmas(allCards, dueItems),
-        config.knownBand,
+        knownFrontier(config),
       )
 
       const log = await db.log.where('lang').equals(lang).reverse().limit(400).toArray()

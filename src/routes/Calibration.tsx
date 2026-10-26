@@ -5,10 +5,11 @@ import {
   PROBE_COUNT,
   estimateKnownBand,
   pickProbes,
+  planAfter,
   type Answer,
   type Probe,
 } from '@/session/calibration'
-import { loadLexicon } from '@/store/decks'
+import { loadLexicon, loadMeta, loadStage } from '@/store/decks'
 import { settingsFor, updateSettings } from '@/store/db'
 import { Button } from '@/ui/Button'
 import { Mono } from '@/ui/Mono'
@@ -50,14 +51,17 @@ export function Calibration() {
     async (collected: { probe: Probe; answer: Answer }[]) => {
       const knownBand = estimateKnownBand(collected)
       const settings = await settingsFor(lang)
-      await updateSettings(lang, {
-        knownBand,
-        calibrated: true,
-        // Pasmo doboru startuje od granicy znajomości: uczyć trzeba tego, czego
-        // użytkownik jeszcze nie zna, a nie tego, co już umie.
-        bandFrom: Math.max(settings.bandFrom, knownBand + 1),
-        bandTo: Math.max(settings.bandTo, knownBand + 1500),
+
+      // Zasięg talii czytamy z niej samej, a nie z progów poziomu: granica znajomości
+      // powyżej ostatniego pasma dawała pustą pulę i sesję bez ani jednej karty.
+      const meta = await loadMeta(lang)
+      const core = await loadStage(lang, 'core')
+      const plan = planAfter(settings.level, knownBand, {
+        top: meta.packs.at(-1)?.to ?? knownBand + 1,
+        coreTop: core.items.reduce((top, item) => Math.max(top, item.band), 0),
       })
+
+      await updateSettings(lang, { knownBand, calibrated: true, ...plan })
       navigate('/start', { replace: true })
     },
     [lang, navigate],

@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import type { Lexicon } from '@/store/decks'
-import { PROBE_COUNT, estimateKnownBand, pickProbes, type Probe } from './calibration.ts'
+import {
+  PROBE_COUNT,
+  estimateKnownBand,
+  pickProbes,
+  knownFrontier,
+  planAfter,
+  type Probe,
+} from './calibration.ts'
 
 /**
  * Kalibracja — sekcja 3.1 planu, M7.
@@ -98,5 +105,59 @@ describe('oszacowanie granicy znajomości', () => {
       { probe: probe(400), answer: 'known' as const },
     ]
     expect(estimateKnownBand(mixed)).toBe(400)
+  })
+})
+
+
+describe('pomiar bije deklarację poziomu', () => {
+  // Talia włoska: zdania sięgają pasma 11967, rdzeń kończy się na 496.
+  const DECK = { top: 11967, coreTop: 496 }
+
+  it('obniża dolną granicę poniżej progu poziomu', () => {
+    // To jest usterka, od której się zaczęło. „Zaawansowany" ma próg 2000, a realna
+    // kalibracja wypada niżej; `Math.max` wyrzucał pomiar i pasmo stało na 2000–12000
+    // niezależnie od odpowiedzi. Pierwsze karty były co do słowa te same.
+    const plan = planAfter('advanced', 1121, DECK)
+    expect(plan.bandFrom).toBe(1122)
+    expect(plan.bandFrom).toBeLessThan(2000)
+  })
+
+  it('zachowuje zasięg poziomu, przesuwając tylko kotwicę', () => {
+    // „Radzę sobie" sięga 3500 pasm poza granicę, „Zaawansowany" 10000 — i to zostaje.
+    expect(planAfter('ok', 1000, DECK)).toMatchObject({ bandFrom: 1001, bandTo: 4501 })
+    expect(planAfter('advanced', 1000, DECK)).toMatchObject({ bandFrom: 1001, bandTo: 11001 })
+  })
+
+  it('nie zostawia pustej puli, gdy użytkownik zna wszystko', () => {
+    // Dwadzieścia pięć razy „tak" dawało granicę powyżej całej talii, pustą pulę
+    // i sesję bez ani jednej karty — przy pierwszym uruchomieniu.
+    const plan = planAfter('advanced', DECK.top, DECK)
+    expect(plan.bandFrom).toBeLessThanOrEqual(DECK.top)
+    expect(plan.bandTo).toBeGreaterThanOrEqual(DECK.top)
+  })
+
+  it('przepuszcza rdzeń, gdy granica sięga poza sto najczęstszych słów', () => {
+    // Inaczej „Znam podstawy" zostaje na etapie, z którego filtr znajomości wycina
+    // wszystkie sto pozycji — sesja jest pusta, a etap nie ma jak się domknąć.
+    expect(planAfter('basics', 1937, DECK).startStage).toBe('sentences')
+    expect(planAfter('basics', 300, DECK).startStage).toBe('core')
+  })
+
+  it('zostawia deklarację, gdy nie ma czego zmierzyć', () => {
+    // Zero wypada i przy samych „nie", i przy samych „niepewnie". Deklaracja poziomu
+    // jest wtedy jedyną informacją, jaką mamy.
+    expect(planAfter('advanced', 0, DECK)).toMatchObject({ bandFrom: 2000, bandTo: 12000 })
+  })
+})
+
+describe('granica znajomości przy budowie sesji', () => {
+  it('zwykle równa się wynikowi kalibracji', () => {
+    expect(knownFrontier({ knownBand: 1937, bandFrom: 1938 })).toBe(1937)
+  })
+
+  it('cofa się razem z oknem, gdy talia nie sięga tak wysoko', () => {
+    // Bez tego „znam wszystkie dwadzieścia pięć słów" dawało pustą sesję: okno było
+    // cofnięte i miało materiał, a filtr wycinał go co do pozycji.
+    expect(knownFrontier({ knownBand: 11967, bandFrom: 10468 })).toBe(10467)
   })
 })
