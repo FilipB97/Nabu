@@ -38,6 +38,7 @@ import {
 } from '@/store/decks'
 import { hasVoice } from '@/audio/speak'
 import { canRecognize } from '@/audio/listen'
+import { knownFrontier } from './calibration.ts'
 import { currentStage, type GatedStage } from './stages.ts'
 import { checkProduction, productionFor, type Production } from './produce.ts'
 import {
@@ -252,7 +253,12 @@ export function useSession(lang: string) {
       // Pozycja widziana pierwszy raz idzie przez wprowadzenie. Opcji wtedy nie budujemy:
       // zestaw dystraktorów ma powstać dla PYTANIA, które padnie za chwilę, a nie dla
       // ekranu, na którym nie ma czego wybierać.
-      if (entry.fresh && !introduced.current.has(entry.card.id)) {
+      // Etapu pisma nie wolno pytać bez pokazania, nawet przy ustawieniu „od razu".
+      // Słowa da się domyślić z kontekstu zdania i z odsłonięcia po odpowiedzi; znaku,
+      // którego użytkownik nigdy nie widział, nie da się — zostaje klikanie na oślep,
+      // czyli dokładnie to, od czego etap 0 miał uchronić.
+      const introduces = config.introBatch > 0 || entry.card.stage === 'script'
+      if (entry.fresh && introduces && !introduced.current.has(entry.card.id)) {
         shownAt.current = Date.now()
         return {
           entry,
@@ -322,12 +328,28 @@ export function useSession(lang: string) {
     // Dwa kroki, nie jeden: najpierw znika ekran porcji (cały rząd i reguła), dopiero
     // potem sam znak. Zwinięcie ich w jedno kazałoby czytać regułę i pojedynczy znak
     // na raz, a to są dwie różne rzeczy do zapamiętania.
+    // Ekran porcji pisma (cały rząd kany i reguła) nie jest jeszcze poznaniem znaku:
+    // po nim pokazujemy ten jeden znak, dopiero potem odkładamy go na później.
     if (card.batch) {
       batches.current.add(card.batch.id)
-    } else {
-      introduced.current.add(card.entry.card.id)
-      met.current.add(card.entry.card.id)
+      setCurrent(prepare(card.entry, settings))
+      return
     }
+
+    introduced.current.add(card.entry.card.id)
+    met.current.add(card.entry.card.id)
+
+    // Pytanie nie pada teraz, tylko gdy pozycja wróci na czoło kolejki — po tylu
+    // innych, ile liczy porcja. Przez pierwsze dwa lata projektu pytaliśmy natychmiast,
+    // czyli sprawdzaliśmy, czy użytkownik pamięta zdanie sprzed sekundy.
+    const active = queue.current
+    if (active && settings.introBatch > 1) {
+      active.defer(settings.introBatch - 1)
+      const next = active.peek()
+      setCurrent(next ? prepare(next, settings) : null)
+      return
+    }
+
     setCurrent(prepare(card.entry, settings))
   }, [current, prepare, settings])
 
@@ -371,7 +393,7 @@ export function useSession(lang: string) {
         seen,
         freshLimit,
         cardedLemmas(allCards, dueItems),
-        config.knownBand,
+        knownFrontier(config),
       )
 
       const log = await db.log.where('lang').equals(lang).reverse().limit(400).toArray()

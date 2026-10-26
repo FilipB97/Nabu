@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router'
 import { adapterFor } from '@/langs'
 import { useLangs } from '@/app/lang'
+import { INTRO_BATCHES } from '@/session/calibration'
 import { gatedStages, stageLabel } from '@/session/stages'
 import { MODES, PRESETS, PRESETS_IDS, useTheme } from '@/theme/ThemeProvider'
 import { paletteOf, type Mode } from '@/theme/presets'
@@ -213,6 +214,23 @@ export function Settings() {
                   { value: 6, label: '6' },
                 ]}
                 onChange={(quizOptions) => change({ quizOptions })}
+              />
+            </ControlRow>
+
+            <ControlRow
+              label="Pytanie o nowe słowo"
+              description={
+                INTRO_BATCHES.find((b) => b.value === current.settings.introBatch)?.hint ??
+                'Ile nowych słów pokazujemy, zanim padnie pierwsze pytanie.'
+              }
+            >
+              <Choice
+                value={current.settings.introBatch}
+                options={INTRO_BATCHES.map((batch) => ({
+                  value: batch.value,
+                  label: batch.label,
+                }))}
+                onChange={(introBatch) => change({ introBatch })}
               />
             </ControlRow>
 

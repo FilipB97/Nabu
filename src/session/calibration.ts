@@ -194,3 +194,107 @@ export const LEVELS: ReadonlyArray<{
 export function levelById(id: Level): (typeof LEVELS)[number] {
   return LEVELS.find((level) => level.id === id) ?? LEVELS[0]!
 }
+
+/** Co kalibracja wie o talii: dokąd sięgają zdania i dokąd sięga etap „rdzeń". */
+export type DeckReach = {
+  /** Najwyższe pasmo, dla którego talia ma jeszcze zdania. */
+  top: number
+  /** Najwyższe pasmo etapu „rdzeń" — po polsku: dokąd sięga sto najczęstszych słów. */
+  coreTop: number
+}
+
+/** Co ustawiamy po kalibracji: skąd dobierać zdania i od którego etapu zacząć. */
+export type Plan = {
+  bandFrom: number
+  bandTo: number
+  startStage: GatedStage
+}
+
+/**
+ * Przełożenie wyniku kalibracji na ustawienia doboru.
+ *
+ * **Pomiar bije deklarację.** Poziom wejściowy jest zgadywany przez kogoś, kto dopiero
+ * dodaje język; kalibracja jest zmierzona na dwudziestu pięciu słowach z tej konkretnej
+ * talii. Wcześniej stało tu `Math.max(poziom.bandFrom, knownBand + 1)`, czyli pomiar mógł
+ * dolną granicę wyłącznie PODNIEŚĆ. Dla „Zaawansowanego" (próg 2000) realne oszacowanie
+ * wypada zwykle niżej, więc `Math.max` wyrzucał je do kosza i pasmo stało na 2000–12000
+ * niezależnie od odpowiedzi. To jest usterka, którą widać na ekranie jako „poziom startowy
+ * jest taki sam, cokolwiek zaznaczę".
+ *
+ * Z poziomu bierzemy więc nie granice, tylko ZASIĘG — jak daleko poza granicę znajomości
+ * ten poziom chce sięgać. Zasięg zakotwiczamy na pomiarze.
+ */
+export function planAfter(level: Level, knownBand: number, deck: DeckReach): Plan {
+  const { bandFrom, bandTo, startStage } = levelById(level)
+
+  // Zero znaczy „nie da się nic wywnioskować" — tak wypada i przy samych „nie",
+  // i przy samych „niepewnie". Deklaracja poziomu zostaje wtedy jedyną informacją,
+  // jaką mamy, więc jej nie nadpisujemy.
+  if (knownBand <= 0) return { bandFrom, bandTo, startStage }
+
+  const reach = Math.max(1, bandTo - bandFrom)
+
+  // Granica powyżej całej talii dałaby pustą pulę i sesję bez ani jednej karty —
+  // „znam wszystkie dwadzieścia pięć słów" kończyło się komunikatem „na dziś gotowe"
+  // przy pierwszym uruchomieniu. Cofamy okno tak, żeby zawsze coś w nim zostało.
+  const from = Math.min(knownBand + 1, Math.max(1, deck.top - reach))
+
+  return {
+    bandFrom: from,
+    bandTo: from + reach,
+    // Etap „rdzeń" to sto najczęstszych słów. Kto zmierzył granicę powyżej nich,
+    // nie ma tam czego robić: filtr znajomości wycina wtedy całą setkę i etap
+    // zostaje pusty. Przepuszczamy go dalej, zamiast trzymać na zablokowanym etapie.
+    startStage: knownBand >= deck.coreTop && startStage !== 'sentences' ? 'sentences' : startStage,
+  }
+}
+
+
+/**
+ * Granica, poniżej której nie podajemy nowych słów — już przy budowie sesji.
+ *
+ * Nie jest to po prostu `knownBand`: gdy kalibracja wypadnie powyżej całej talii,
+ * `planAfter` cofa okno doboru, żeby cokolwiek w nim zostało. Nietknięty filtr wycinał
+ * wtedy tę resztę co do pozycji i sesja była pusta mimo niepustej puli. Nie ma już czego
+ * uczyć poza najrzadszym materiałem, więc podajemy właśnie ten, zamiast nie podawać nic.
+ */
+export function knownFrontier(settings: { knownBand: number; bandFrom: number }): number {
+  return Math.min(settings.knownBand, settings.bandFrom - 1)
+}
+
+
+/**
+ * Ile nowych pozycji pokazujemy, zanim padnie pierwsze pytanie — sekcja 6.2.
+ *
+ * **Pokazać słowo z glosą i w następnym kroku zapytać o to samo słowo to sprawdzenie
+ * echa, nie pamięci.** Odpowiedź daje się wtedy odczytać z pamięci świeżej, karta
+ * dostaje ocenę „trafione", harmonogram odsuwa ją o kilka dni i wraca ona wtedy,
+ * gdy po tej odpowiedzi nie zostało nic. Tak wyglądało pierwsze spotkanie z każdą
+ * nową pozycją, od początku projektu.
+ *
+ * Porcja wstawia między pokazanie a pytanie inne pozycje. Nie musi być duża: przypomnienie
+ * ma być TRUDNE, ale wykonalne, a kilka pozycji odstępu wystarcza, żeby odpowiedź trzeba
+ * było wydobyć, a nie odczytać.
+ *
+ * Zero jest osobnym trybem, nie najmniejszą porcją: znaczy „nie pokazuj wcale, pytaj
+ * od razu". Dla kogoś, kto słowo zna, ekran wprowadzenia jest zdradzeniem odpowiedzi,
+ * a odsłonięcie po odpowiedzi uczy go tego, czego faktycznie nie wiedział.
+ */
+export const INTRO_BATCHES = [
+  { value: 0, label: 'od razu', hint: 'Pytanie bez pokazywania. Znaczenie poznajesz po odpowiedzi.' },
+  { value: 5, label: 'po pięciu', hint: 'Pięć nowych słów, potem pytania o nie.' },
+  { value: 15, label: 'cała porcja', hint: 'Najpierw wszystkie nowe słowa sesji, potem pytania.' },
+] as const
+
+export const DEFAULT_INTRO_BATCH = 5
+
+/**
+ * Porcja domyślna dla poziomu wejściowego.
+ *
+ * „Zaawansowany" dostaje zero, bo dla niego wprowadzenie jest spoilerem: duża część
+ * pozycji w jego paśmie to słowa, które rozpozna albo odgadnie z kontekstu, a pokazanie
+ * glosy przed pytaniem odbiera jedyną okazję, żeby to sprawdzić.
+ */
+export function introBatchFor(level: Level): number {
+  return level === 'advanced' ? 0 : DEFAULT_INTRO_BATCH
+}
