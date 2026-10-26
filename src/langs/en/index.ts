@@ -38,5 +38,5 @@ export const en: LangAdapter = {
   sentence: { minTokens: 4, maxTokens: 18, maxUnknown: 0, clozeSlack: 0 },
   maxBand: 12000,
   quiz: { shape: 'edit', minOptions: 4 },
-  production: ['type'],
+  production: ['type', 'speak'],
 }

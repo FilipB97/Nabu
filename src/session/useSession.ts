@@ -37,6 +37,7 @@ import {
   type Lexicon,
 } from '@/store/decks'
 import { hasVoice } from '@/audio/speak'
+import { canRecognize } from '@/audio/listen'
 import { currentStage, type GatedStage } from './stages.ts'
 import { checkProduction, productionFor, type Production } from './produce.ts'
 import {
@@ -270,6 +271,7 @@ export function useSession(lang: string) {
         entry.card,
         entry.item,
         config.production,
+        canRecognize(),
       )
       if (production) {
         shownAt.current = Date.now()
@@ -348,7 +350,7 @@ export function useSession(lang: string) {
       // Etap decyduje, skąd biorą się NOWE pozycje. Powtórki przychodzą ze wszystkich
       // etapów naraz — kana opanowana miesiąc temu ma wracać także wtedy, gdy użytkownik
       // jest już przy zdaniach (sekcja 2a).
-      const stage = currentStage(adapter, allCards, meta, config.stageOverride)
+      const stage = currentStage(adapter, allCards, meta, config.stageOverride, config.startStage)
       setStage(stage)
       canListen.current = hasVoice(adapter.tts.locale)
 

@@ -1,33 +1,33 @@
 {
   "lang": "ja",
-  "zdań": 11021,
-  "kandydatów": 49453,
-  "odrzuconychNaJakości": 4005,
+  "zdań": 11029,
+  "kandydatów": 49483,
+  "odrzuconychNaJakości": 4006,
   "odsetekOdrzutówJakościowych": 8,
   "odsetekNieprzydatnychNaKartę": 70,
-  "pozaZasięgiem": 199396,
+  "pozaZasięgiem": 199458,
   "innyZapis": 0,
   "powodyJakość": {
-    "znaki spoza zestawu języka": 2276,
+    "znaki spoza zestawu języka": 2277,
     "pasmo powyżej progu języka": 1714,
     "wulgaryzm": 15
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 24973,
-    "glosa bez oparcia w tłumaczeniu": 4977,
-    "za krótkie": 3954,
-    "ta sama rama, inna odpowiedź": 351,
+    "brak tokenu nadającego się na lukę": 24991,
+    "glosa bez oparcia w tłumaczeniu": 4980,
+    "za krótkie": 3956,
+    "ta sama rama, inna odpowiedź": 349,
     "za długie": 172
   },
   "tłumaczenia": {
-    "bezpośrednie": 5455,
-    "przezAngielski": 5566
+    "bezpośrednie": 5457,
+    "przezAngielski": 5572
   },
   "pasma": {
     "min": 152,
-    "mediana": 1513,
+    "mediana": 1512,
     "p90": 7397,
-    "max": 19998
+    "max": 20000
   },
   "quizNiedostępny": 0,
   "próbka": [
@@ -49,11 +49,11 @@
       ]
     },
     {
-      "text": "その試合、見ました？",
-      "pl": "Czy oglądałeś ten mecz?",
+      "text": "私はあなたの次の試合を見る事が出来ますか。",
+      "pl": "Czy mogę zobaczyć pański następny mecz?",
       "luka": "試合",
-      "band": 373,
-      "src": "pivot",
+      "band": 372,
+      "src": "direct",
       "dystraktory": [
         "日本語",
         "試験",
@@ -83,27 +83,27 @@
       ]
     },
     {
-      "text": "「タクシーが使われていますか？」「はい、使われています」",
-      "pl": "Jeździ się tu taksówkami? Tak, jeździ się.",
-      "luka": "タクシー",
-      "band": 763,
-      "src": "direct",
+      "text": "赤ん坊は泣くのをやめた。",
+      "pl": "Dziecko przestało płakać.",
+      "luka": "赤ん坊",
+      "band": 762,
+      "src": "pivot",
       "dystraktory": [
-        "ニューヨーク",
-        "コンピューター",
-        "ビール",
-        "スポーツ",
-        "シャツ",
-        "ギター",
-        "コート",
-        "サッカー"
+        "現在",
+        "習慣",
+        "タクシー",
+        "肉",
+        "買い物",
+        "番号",
+        "翻訳",
+        "イギリス"
       ]
     },
     {
-      "text": "この部屋の中でボール遊びをしてはいけません。",
-      "pl": "W tym pokoju nie wolno grać w piłkę.",
+      "text": "月から見ると、地球はボールのように見える。",
+      "pl": "Patrząc z Księżyca, Ziemia wygląda jak piłka.",
       "luka": "ボール",
-      "band": 1012,
+      "band": 1013,
       "src": "direct",
       "dystraktory": [
         "メール",
@@ -117,45 +117,45 @@
       ]
     },
     {
-      "text": "この湖はその国でもっとも深いものの一つだ。",
-      "pl": "To jezioro jest wśród najgłębszych w kraju.",
-      "luka": "湖",
-      "band": 1335,
-      "src": "pivot",
-      "dystraktory": [
-        "敵",
-        "客",
-        "腕",
-        "橋",
-        "お腹",
-        "京都",
-        "中国",
-        "単語"
-      ]
-    },
-    {
-      "text": "いつも記事を書いています。",
-      "pl": "Stale piszę artykuły.",
-      "luka": "記事",
-      "band": 1742,
+      "text": "あなたは彼の病気を考慮に入れるべきだ。",
+      "pl": "Musisz brać pod uwagę jej chorobę.",
+      "luka": "病気",
+      "band": 1334,
       "src": "direct",
       "dystraktory": [
-        "火事",
-        "世紀",
-        "喧嘩",
-        "運命",
-        "知り合い",
-        "喉",
-        "否定",
-        "石油"
+        "少年",
+        "旅行",
+        "映画",
+        "国",
+        "天気",
+        "駅",
+        "事故",
+        "世界"
       ]
     },
     {
-      "text": "私は彼女がメキシコへ行ったことがあるかどうかたずねた。",
-      "pl": "Zapytałem ją, czy była kiedyś w Meksyku.",
+      "text": "月曜日は日曜日の次にくる。",
+      "pl": "Poniedziałek przychodzi po niedzieli.",
+      "luka": "月曜日",
+      "band": 1741,
+      "src": "pivot",
+      "dystraktory": [
+        "日曜日",
+        "土曜日",
+        "朝食",
+        "腹",
+        "ニューヨーク",
+        "春",
+        "星",
+        "急"
+      ]
+    },
+    {
+      "text": "彼女はメキシコ行きを延期した。",
+      "pl": "Przełożyła swój wyjazd do Meksyku.",
       "luka": "メキシコ",
       "band": 2367,
-      "src": "pivot",
+      "src": "direct",
       "dystraktory": [
         "コメント",
         "システム",
@@ -168,61 +168,61 @@
       ]
     },
     {
-      "text": "トムはまだ、彼の両親に依存しているのですか。",
-      "pl": "Czy Tom jest wciąż zależny od rodziców?",
-      "luka": "両親",
-      "band": 3338,
-      "src": "direct",
-      "dystraktory": [
-        "東京",
-        "意味",
-        "約束",
-        "音楽",
-        "木",
-        "大変",
-        "写真",
-        "本当"
-      ]
-    },
-    {
-      "text": "彼らは広島に原子爆弾を落とした。",
-      "pl": "Zrzucili bombę atomową na Hiroszimę.",
-      "luka": "原子",
-      "band": 4737,
+      "text": "その物音で赤ん坊は目を覚ますだろう。",
+      "pl": "Hałas obudzi dziecko.",
+      "luka": "物音",
+      "band": 3335,
       "src": "pivot",
       "dystraktory": [
-        "石炭",
-        "天文学",
-        "小麦",
-        "組合",
-        "子犬",
-        "小麦粉",
-        "虎",
-        "縁"
+        "意思",
+        "物質",
+        "生物",
+        "自動",
+        "砂漠",
+        "明後日",
+        "象",
+        "現象"
       ]
     },
     {
-      "text": "銅は電気をよく伝える。",
-      "pl": "Miedź dobrze przewodzi prąd.",
-      "luka": "銅",
-      "band": 7842,
+      "text": "その列車はなんてはやく走るんだろう。",
+      "pl": "Ależ ten pociąg szybko jedzie!",
+      "luka": "列車",
+      "band": 4734,
       "src": "direct",
       "dystraktory": [
-        "同級生",
-        "河",
-        "奇麗",
-        "銀河",
-        "南極",
-        "同性愛",
-        "家内",
-        "不眠症"
+        "自転車",
+        "声",
+        "天気",
+        "関係",
+        "外国",
+        "動物",
+        "一つ",
+        "女の子"
+      ]
+    },
+    {
+      "text": "ドアはどうしてもしまらない。",
+      "pl": "Drzwi nie chcą się zamknąć.",
+      "luka": "ドア",
+      "band": 7828,
+      "src": "direct",
+      "dystraktory": [
+        "学生",
+        "顔",
+        "毎日",
+        "運転",
+        "コーヒー",
+        "通り",
+        "頭",
+        "試験"
       ]
     },
     {
       "text": "彼はペンをとり上げて書き始めた。",
       "pl": "Wziął długopis i zaczął pisać.",
       "luka": "ペン",
-      "band": 19998,
+      "band": 20000,
       "src": "direct",
       "dystraktory": [
         "ワイン",

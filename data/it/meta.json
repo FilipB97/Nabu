@@ -1,0 +1,113 @@
+{
+  "lang": "it",
+  "version": "2026-10-26",
+  "license": "Tatoeba CC BY 2.0 FR; FrequencyWords CC BY-SA 3.0; Wikisłownik (plwiktionary) CC BY-SA 3.0",
+  "sentences": 8174,
+  "lexicon": 1550,
+  "script": 0,
+  "core": 100,
+  "packs": [
+    {
+      "file": "sentences-000.json",
+      "from": 151,
+      "to": 409,
+      "count": 500
+    },
+    {
+      "file": "sentences-001.json",
+      "from": 417,
+      "to": 639,
+      "count": 500
+    },
+    {
+      "file": "sentences-002.json",
+      "from": 639,
+      "to": 775,
+      "count": 500
+    },
+    {
+      "file": "sentences-003.json",
+      "from": 775,
+      "to": 1024,
+      "count": 500
+    },
+    {
+      "file": "sentences-004.json",
+      "from": 1024,
+      "to": 1272,
+      "count": 500
+    },
+    {
+      "file": "sentences-005.json",
+      "from": 1272,
+      "to": 1547,
+      "count": 500
+    },
+    {
+      "file": "sentences-006.json",
+      "from": 1549,
+      "to": 1863,
+      "count": 500
+    },
+    {
+      "file": "sentences-007.json",
+      "from": 1863,
+      "to": 2170,
+      "count": 500
+    },
+    {
+      "file": "sentences-008.json",
+      "from": 2170,
+      "to": 2492,
+      "count": 500
+    },
+    {
+      "file": "sentences-009.json",
+      "from": 2492,
+      "to": 3038,
+      "count": 500
+    },
+    {
+      "file": "sentences-010.json",
+      "from": 3038,
+      "to": 3679,
+      "count": 500
+    },
+    {
+      "file": "sentences-011.json",
+      "from": 3680,
+      "to": 4486,
+      "count": 500
+    },
+    {
+      "file": "sentences-012.json",
+      "from": 4486,
+      "to": 5516,
+      "count": 500
+    },
+    {
+      "file": "sentences-013.json",
+      "from": 5522,
+      "to": 6657,
+      "count": 500
+    },
+    {
+      "file": "sentences-014.json",
+      "from": 6658,
+      "to": 8493,
+      "count": 500
+    },
+    {
+      "file": "sentences-015.json",
+      "from": 8493,
+      "to": 10345,
+      "count": 500
+    },
+    {
+      "file": "sentences-016.json",
+      "from": 10345,
+      "to": 11967,
+      "count": 174
+    }
+  ]
+}

@@ -1,9 +1,9 @@
 {
   "lang": "en",
-  "version": "2026-08-14",
+  "version": "2026-10-26",
   "license": "Tatoeba CC BY 2.0 FR; FrequencyWords CC BY-SA 3.0; Wikisłownik (plwiktionary) CC BY-SA 3.0",
-  "sentences": 13902,
-  "lexicon": 3105,
+  "sentences": 13927,
+  "lexicon": 3106,
   "script": 0,
   "core": 100,
   "packs": [
@@ -22,158 +22,158 @@
     {
       "file": "sentences-002.json",
       "from": 382,
-      "to": 498,
+      "to": 495,
       "count": 500
     },
     {
       "file": "sentences-003.json",
-      "from": 498,
+      "from": 495,
       "to": 607,
       "count": 500
     },
     {
       "file": "sentences-004.json",
       "from": 607,
-      "to": 730,
+      "to": 725,
       "count": 500
     },
     {
       "file": "sentences-005.json",
-      "from": 730,
-      "to": 834,
+      "from": 725,
+      "to": 833,
       "count": 500
     },
     {
       "file": "sentences-006.json",
-      "from": 834,
+      "from": 833,
       "to": 933,
       "count": 500
     },
     {
       "file": "sentences-007.json",
       "from": 933,
-      "to": 1012,
+      "to": 1008,
       "count": 500
     },
     {
       "file": "sentences-008.json",
-      "from": 1012,
-      "to": 1117,
+      "from": 1008,
+      "to": 1112,
       "count": 500
     },
     {
       "file": "sentences-009.json",
-      "from": 1120,
-      "to": 1299,
+      "from": 1112,
+      "to": 1298,
       "count": 500
     },
     {
       "file": "sentences-010.json",
-      "from": 1299,
-      "to": 1464,
+      "from": 1298,
+      "to": 1462,
       "count": 500
     },
     {
       "file": "sentences-011.json",
-      "from": 1464,
+      "from": 1462,
       "to": 1639,
       "count": 500
     },
     {
       "file": "sentences-012.json",
       "from": 1639,
-      "to": 1853,
+      "to": 1849,
       "count": 500
     },
     {
       "file": "sentences-013.json",
-      "from": 1853,
-      "to": 2003,
+      "from": 1849,
+      "to": 1993,
       "count": 500
     },
     {
       "file": "sentences-014.json",
-      "from": 2003,
-      "to": 2225,
+      "from": 1993,
+      "to": 2215,
       "count": 500
     },
     {
       "file": "sentences-015.json",
-      "from": 2225,
-      "to": 2476,
+      "from": 2221,
+      "to": 2463,
       "count": 500
     },
     {
       "file": "sentences-016.json",
-      "from": 2476,
-      "to": 2721,
+      "from": 2463,
+      "to": 2708,
       "count": 500
     },
     {
       "file": "sentences-017.json",
-      "from": 2721,
-      "to": 3011,
+      "from": 2708,
+      "to": 3000,
       "count": 500
     },
     {
       "file": "sentences-018.json",
-      "from": 3011,
-      "to": 3388,
+      "from": 3000,
+      "to": 3381,
       "count": 500
     },
     {
       "file": "sentences-019.json",
-      "from": 3392,
-      "to": 3955,
+      "from": 3381,
+      "to": 3891,
       "count": 500
     },
     {
       "file": "sentences-020.json",
-      "from": 3955,
-      "to": 4340,
+      "from": 3891,
+      "to": 4328,
       "count": 500
     },
     {
       "file": "sentences-021.json",
-      "from": 4341,
-      "to": 4956,
+      "from": 4329,
+      "to": 4919,
       "count": 500
     },
     {
       "file": "sentences-022.json",
-      "from": 4956,
-      "to": 5633,
+      "from": 4929,
+      "to": 5621,
       "count": 500
     },
     {
       "file": "sentences-023.json",
-      "from": 5633,
-      "to": 6296,
+      "from": 5629,
+      "to": 6252,
       "count": 500
     },
     {
       "file": "sentences-024.json",
-      "from": 6296,
-      "to": 7235,
+      "from": 6261,
+      "to": 7216,
       "count": 500
     },
     {
       "file": "sentences-025.json",
-      "from": 7236,
-      "to": 8555,
+      "from": 7216,
+      "to": 8531,
       "count": 500
     },
     {
       "file": "sentences-026.json",
-      "from": 8557,
-      "to": 10048,
+      "from": 8531,
+      "to": 9942,
       "count": 500
     },
     {
       "file": "sentences-027.json",
-      "from": 10056,
+      "from": 9942,
       "to": 11984,
-      "count": 402
+      "count": 427
     }
   ]
 }

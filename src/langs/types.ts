@@ -24,8 +24,12 @@ export type ShapeSimilarity = 'edit' | 'kanji-components' | 'jamo'
  *
  * Japoński celowo nie ma `type`: wpisywanie kanji przez systemowy IME jest testem
  * pozornym, bo listę kandydatów podaje IME (sekcja 7.2).
+ *
+ * `speak` stoi zawsze na końcu listy, bo jest trybem WARUNKOWYM: wymaga rozpoznawania
+ * mowy i sieci, a gdy ich nie ma, karta musi po cichu spaść na tryb wcześniejszy.
+ * Sprawdza zrozumiałość, nie akcent — patrz ADR-003.
  */
-export type ProductionMode = 'type' | 'kana' | 'jamo' | 'draw'
+export type ProductionMode = 'type' | 'kana' | 'jamo' | 'draw' | 'speak'
 
 /** Etapy nauki — sekcja 2a. */
 export type Stage = 'script' | 'core' | 'sentences' | 'production'
@@ -79,6 +83,16 @@ export type LangAdapter = {
   tatoeba: string
   /** Kod listy częstości FrequencyWords, do kroku `03-frequency`. */
   freq: string
+  /**
+   * Kod języka w zrzucie Wikisłownika, gdy różni się od `code` — do kroku `04-glosses`.
+   *
+   * Trzeci kod obok `tatoeba` i `freq`, i z tego samego powodu: każde źródło nazywa
+   * języki po swojemu. Norweski jest tu wyraźnym przypadkiem — aplikacja zna go jako
+   * `no`, Tatoeba jako `nob`, a Wikisłownik rozdziela bokmål (`nb`) od nynorsku (`nn`)
+   * i pod samym `no` nie ma praktycznie nic. Brak tego pola kosztował pustą talię:
+   * pipeline przeszedł bez błędu, zbudował zero haseł i zero zdań.
+   */
+  wiktionary?: string
 
   /**
    * Skąd biorą się rangi częstości.

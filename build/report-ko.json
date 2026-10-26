@@ -1,28 +1,28 @@
 {
   "lang": "ko",
-  "zdań": 375,
-  "kandydatów": 2300,
-  "odrzuconychNaJakości": 360,
+  "zdań": 376,
+  "kandydatów": 2297,
+  "odrzuconychNaJakości": 359,
   "odsetekOdrzutówJakościowych": 16,
   "odsetekNieprzydatnychNaKartę": 68,
-  "pozaZasięgiem": 13573,
+  "pozaZasięgiem": 13649,
   "innyZapis": 0,
   "powodyJakość": {
-    "pasmo powyżej progu języka": 243,
+    "pasmo powyżej progu języka": 242,
     "za dużo tokenów spoza listy częstości": 104,
     "znaki spoza zestawu języka": 9,
     "wulgaryzm": 4
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 713,
+    "brak tokenu nadającego się na lukę": 712,
     "za krótkie": 579,
-    "glosa bez oparcia w tłumaczeniu": 255,
+    "glosa bez oparcia w tłumaczeniu": 253,
     "za długie": 14,
     "ta sama rama, inna odpowiedź": 4
   },
   "tłumaczenia": {
     "bezpośrednie": 11,
-    "przezAngielski": 364
+    "przezAngielski": 365
   },
   "pasma": {
     "min": 324,
@@ -79,11 +79,11 @@
       ]
     },
     {
-      "text": "그는 하루 종일 편지를 찾고 있었다.",
-      "pl": "Przez cały dzień szukał listu.",
+      "text": "나는 편지를 쓰고 있다.",
+      "pl": "Piszę list.",
       "luka": "편지",
       "band": 3145,
-      "src": "direct",
+      "src": "pivot",
       "dystraktory": [
         "은행",
         "비",
@@ -130,20 +130,20 @@
       ]
     },
     {
-      "text": "굴을 먹지마세요.",
-      "pl": "Nie jedz ostryg.",
-      "luka": "굴",
-      "band": 8471,
+      "text": "그는 흰 옷을 입고 있다.",
+      "pl": "Jest ubrana na biało.",
+      "luka": "흰",
+      "band": 8648,
       "src": "pivot",
       "dystraktory": [
-        "금",
-        "야구",
-        "감기",
-        "극장",
+        "희망",
+        "전화번호",
         "공항",
-        "월요일",
-        "가수",
-        "날씨"
+        "수학",
+        "언어",
+        "지하철",
+        "굴",
+        "극장"
       ]
     },
     {
@@ -181,37 +181,37 @@
       ]
     },
     {
-      "text": "나는 가족과 함께 오스트레일리아로 가고 싶다.",
-      "pl": "Chcę pojechać do Australii z rodziną.",
-      "luka": "가족",
+      "text": "그녀는 어제 병원에 갔다.",
+      "pl": "Poszła wczoraj do szpitala.",
+      "luka": "병원",
       "band": 19326,
       "src": "pivot",
       "dystraktory": [
-        "사진",
-        "바보",
-        "딸",
-        "거짓말",
-        "학교",
-        "달",
-        "약",
-        "길"
+        "방",
+        "산",
+        "음악",
+        "영화",
+        "별",
+        "할아버지",
+        "팀",
+        "질문"
       ]
     },
     {
-      "text": "1939년에 전쟁이 일어났다.",
-      "pl": "Wojna wybuchła w roku 1939.",
-      "luka": "전쟁",
-      "band": 23448,
+      "text": "그 가격에는 세금이 포함되어 있다.",
+      "pl": "Cena zawiera podatek.",
+      "luka": "세금",
+      "band": 23400,
       "src": "pivot",
       "dystraktory": [
-        "점심",
-        "담배",
-        "건물",
-        "은행",
-        "맥주",
-        "화장실",
-        "질문",
-        "쿠키"
+        "금",
+        "사기",
+        "스페인어",
+        "섬",
+        "하늘",
+        "수학",
+        "안경",
+        "샤워"
       ]
     },
     {

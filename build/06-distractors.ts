@@ -167,7 +167,7 @@ export function candidatesFor(
   byPos: ReadonlyMap<string, Candidate[]>,
   shape: ShapeSimilarity,
 ): string[] {
-  return (byPos.get(target.pos) ?? [])
+  const ranked = (byPos.get(target.pos) ?? [])
     .filter((other) => {
       if (other.lemma === target.lemma) return false
       if (!bandsClose(target.band, other.band)) return false
@@ -175,8 +175,21 @@ export function candidatesFor(
     })
     .map((other) => ({ other, score: scoreOf(target, other, shape) }))
     .sort((a, b) => b.score - a.score)
-    .slice(0, CANDIDATES)
-    .map((entry) => entry.other.lemma)
+
+  // Dystraktory muszą się różnić nie tylko od celu, ale i MIĘDZY SOBĄ. Bez tego kroku
+  // na kartę trafiały zestawy typu `pierwszy / piękny / miły / miły`: każda z opcji
+  // z osobna przechodziła test wobec celu, a obok siebie dwie z nich znaczyły to samo.
+  // Użytkownik widzi wtedy powtórzoną odpowiedź i nie wie, czy to usterka, czy podchwytliwość.
+  // Runtime losuje `n − 1` z całej ósemki, więc przeglądamy ją w całości, a nie trzy pierwsze.
+  const taken: string[] = []
+  const picked: string[] = []
+  for (const { other } of ranked) {
+    if (taken.some((gloss) => glossesCollide(gloss, other.pl))) continue
+    taken.push(other.pl)
+    picked.push(other.lemma)
+    if (picked.length === CANDIDATES) break
+  }
+  return picked
 }
 
 /** Grupuje pulę po części mowy — dystraktor musi być tą samą częścią mowy co cel. */
@@ -212,18 +225,25 @@ export async function assignDistractors(items: Item[], lang: string): Promise<vo
       continue
     }
 
-    // Ten sam lemat bywa luką w wielu zdaniach — liczymy raz.
-    const known = cache.get(lemma)
-    if (known) {
-      item.distractors = known
-      item.quiz = known.length >= needed
-      continue
+    // Ten sam lemat bywa luką w wielu zdaniach — kosztowne punktowanie liczymy raz.
+    let scored = cache.get(lemma)
+    if (!scored) {
+      scored = candidatesFor(target, byPos, adapter.quiz.shape)
+      cache.set(lemma, scored)
     }
 
-    const scored = candidatesFor(target, byPos, adapter.quiz.shape)
+    // Sito kontekstowe, już per zdanie. `candidatesFor` odsiewa kandydatów kolidujących
+    // z GŁÓWNYM znaczeniem lematu, a na karcie stoi glosa z TEGO zdania — bywa inna.
+    // Stąd zestawy `dziwny / dziwny / ogólny / doskonały`: `raro` ma w puli znaczenie
+    // „rzadki", więc dystraktor „dziwny" przechodził, a w tym akurat zdaniu `raro` znaczy
+    // właśnie „dziwny" i karta miała dwie poprawne odpowiedzi.
+    const here = token.gloss
+    const fitting = scored.filter((id) => {
+      const other = pool.get(id)
+      return !other || !glossesCollide(here, other.pl)
+    })
 
-    cache.set(lemma, scored)
-    item.distractors = scored
-    item.quiz = scored.length >= needed
+    item.distractors = fitting
+    item.quiz = fitting.length >= needed
   }
 }

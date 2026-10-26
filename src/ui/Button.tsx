@@ -24,7 +24,7 @@ type ButtonProps = {
 }
 
 const VARIANT: Record<NonNullable<ButtonProps['variant']>, string> = {
-  primary: 'nabu-accent-fill text-[16px]',
+  primary: 'nabu-accent-fill rounded-[16px] text-[16px]',
   quiet: 'nabu-card text-text text-[15px]',
   ghost: 'text-text-2 text-[14px] rounded-[14px]',
 }

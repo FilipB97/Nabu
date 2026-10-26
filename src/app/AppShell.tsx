@@ -142,6 +142,7 @@ function titleOf(pathname: string): string {
   if (pathname.startsWith('/dodaj')) return 'dodaj język'
   if (pathname.startsWith('/koniec')) return 'sesja zakończona'
   if (pathname.startsWith('/audio')) return 'test dźwięku'
+  if (pathname.startsWith('/mowa')) return 'sonda mowy'
   if (pathname.startsWith('/demo')) return 'demo'
   return 'nauka'
 }

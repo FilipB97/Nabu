@@ -1,4 +1,5 @@
 import type { Lexicon } from '@/store/decks'
+import type { GatedStage } from './stages'
 
 /**
  * Kalibracja zasięgu słownictwa — sekcja 3.1 planu.
@@ -125,10 +126,28 @@ export const LEVELS: ReadonlyArray<{
   description: string
   bandFrom: number
   bandTo: number
-  /** Czy pomijamy etap 0 (alfabet, kana, hangul). */
-  skipScript: boolean
+  /**
+   * Od którego etapu zaczynamy. NIE jest to blokada — etapy wcześniejsze uznajemy
+   * za zaliczone, a późniejsze odblokowują się normalnie, bramą opanowania.
+   *
+   * Wcześniej stało tu `skipScript: boolean`, tłumaczone w kodzie ekranu na
+   * `stageOverride: 'core'`. To był błąd o dwie warstwy głębszy, niż wyglądał:
+   * `stageOverride` jest RĘCZNYM PRZYPIĘCIEM etapu, więc „Zaawansowany" nie tyle
+   * pomijał pismo, ile przykuwał użytkownika na stałe do stu najczęstszych słów —
+   * czyli do dokładnie tego materiału, którego ten poziom miał nie pokazywać.
+   */
+  startStage: GatedStage
   /** Czy uruchamiamy kalibrację. Przy „od zera" nie ma czego kalibrować. */
   calibrate: boolean
+  /**
+   * Domyślny tryb produkcji dla tego poziomu.
+   *
+   * Wybór jednej z czterech opcji sprawdza wiedzę BIERNĄ i da się go wyćwiczyć, nie
+   * znając słowa — dla kogoś, kto zna język, jest to test zbyt łatwy, żeby czegokolwiek
+   * uczyć. Konto zaawansowane odtwarza więc słowo z pamięci od razu, a nie dopiero
+   * wtedy, gdy karta dojrzeje po trzech tygodniach.
+   */
+  production: 'mature' | 'always'
 }> = [
   {
     id: 'zero',
@@ -136,8 +155,9 @@ export const LEVELS: ReadonlyArray<{
     description: 'Od pisma i stu najczęstszych słów.',
     bandFrom: 1,
     bandTo: 500,
-    skipScript: false,
+    startStage: 'script',
     calibrate: false,
+    production: 'mature',
   },
   {
     id: 'basics',
@@ -145,8 +165,9 @@ export const LEVELS: ReadonlyArray<{
     description: 'Pismo znam, słownictwa mam mało.',
     bandFrom: 1,
     bandTo: 1500,
-    skipScript: true,
+    startStage: 'core',
     calibrate: true,
+    production: 'mature',
   },
   {
     id: 'ok',
@@ -154,17 +175,19 @@ export const LEVELS: ReadonlyArray<{
     description: 'Rozumiem proste zdania, brakuje mi zasięgu.',
     bandFrom: 500,
     bandTo: 4000,
-    skipScript: true,
+    startStage: 'sentences',
     calibrate: true,
+    production: 'mature',
   },
   {
     id: 'advanced',
     label: 'Zaawansowany',
-    description: 'Szukam słów rzadkich, nie podstaw.',
+    description: 'Szukam słów rzadkich. Odpowiadasz z pamięci, nie z listy.',
     bandFrom: 2000,
     bandTo: 12000,
-    skipScript: true,
+    startStage: 'sentences',
     calibrate: true,
+    production: 'always',
   },
 ]
 

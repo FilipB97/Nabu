@@ -30,8 +30,18 @@ export type LangSettings = {
   /**
    * Ręcznie wybrany etap — sekcja 2a: „etapy nie blokują sztywno". `null` znaczy,
    * że etap wyznacza brama opanowania, i tak jest domyślnie.
+   *
+   * To jest PRZYPIĘCIE: dopóki jest ustawione, etap się nie zmienia. Do wskazania
+   * miejsca startu służy `startStage` — pomylenie tych dwóch rzeczy było usterką,
+   * przez którą poziom „Zaawansowany" zostawał na stu najczęstszych słowach na zawsze.
    */
   stageOverride: 'script' | 'core' | 'sentences' | null
+  /**
+   * Etap, od którego zaczyna ten użytkownik — z poziomu wejściowego (sekcja 3.1).
+   * Wcześniejsze etapy uznajemy za zaliczone i nie wracamy do nich; późniejsze
+   * odblokowują się normalnie. `null` znaczy „od początku".
+   */
+  startStage: 'script' | 'core' | 'sentences' | null
   /** Liczba opcji w quizie: 3, 4 albo 6. */
   quizOptions: number
   /** Przejście dalej po trafieniu, bez dotykania „Dalej". Pudło zawsze czeka. */
@@ -84,6 +94,27 @@ class NabuDb extends Dexie {
           row.autoAdvance = false
         }),
     )
+
+    /**
+     * Wersja 3 rozdziela „od czego zaczynam" od „na czym stoję na stałe".
+     *
+     * Poziomy „Znam podstawy", „Radzę sobie" i „Zaawansowany" zapisywały
+     * `stageOverride: 'core'`, czyli twarde przypięcie do stu najczęstszych słów.
+     * Użytkownik, który zadeklarował, że szuka słów rzadkich, dostawał w kółko
+     * pytania o słowa, które zna, i nie miał jak z tego wyjść inaczej niż przez
+     * ustawienia. Przenosimy tę wartość tam, gdzie jej miejsce, i zdejmujemy przypięcie.
+     */
+    this.version(3).upgrade((tx) =>
+      tx
+        .table<LangSettings>('settings')
+        .toCollection()
+        .modify((row) => {
+          if (row.startStage === undefined) row.startStage = null
+          if (row.stageOverride !== 'core' || row.level === 'zero') return
+          row.startStage = row.level === 'basics' ? 'core' : 'sentences'
+          row.stageOverride = null
+        }),
+    )
   }
 }
 
@@ -96,6 +127,7 @@ const DEFAULTS: Omit<LangSettings, 'lang' | 'addedAt'> = {
   knownBand: 0,
   calibrated: false,
   stageOverride: null,
+  startStage: null,
   quizOptions: 4,
   // Domyślnie czekamy na dotknięcie. Odsłonięcie niesie treść do nauczenia się —
   // poprawne słowo, jego czytanie i glosę — więc nie może znikać samo.

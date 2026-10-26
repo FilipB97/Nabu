@@ -1,33 +1,33 @@
 {
   "lang": "ar",
-  "zdań": 909,
-  "kandydatów": 5554,
-  "odrzuconychNaJakości": 1373,
+  "zdań": 916,
+  "kandydatów": 5568,
+  "odrzuconychNaJakości": 1378,
   "odsetekOdrzutówJakościowych": 25,
   "odsetekNieprzydatnychNaKartę": 59,
-  "pozaZasięgiem": 62919,
+  "pozaZasięgiem": 63061,
   "innyZapis": 0,
   "powodyJakość": {
-    "znaki spoza zestawu języka": 1224,
+    "znaki spoza zestawu języka": 1229,
     "za dużo tokenów spoza listy częstości": 76,
     "pasmo powyżej progu języka": 68,
     "wulgaryzm": 5
   },
   "powodyPrzydatność": {
-    "brak tokenu nadającego się na lukę": 1624,
-    "za krótkie": 857,
+    "brak tokenu nadającego się na lukę": 1630,
+    "za krótkie": 853,
     "glosa bez oparcia w tłumaczeniu": 697,
     "ta sama rama, inna odpowiedź": 83,
     "za długie": 11
   },
   "tłumaczenia": {
     "bezpośrednie": 60,
-    "przezAngielski": 849
+    "przezAngielski": 856
   },
   "pasma": {
     "min": 236,
     "mediana": 9974,
-    "p90": 28101,
+    "p90": 28059,
     "max": 43988
   },
   "quizNiedostępny": 0,
@@ -67,76 +67,76 @@
       ]
     },
     {
-      "text": "هذا اجتماع مهم.",
-      "pl": "To jest bardzo ważne spotkanie.",
-      "luka": "اجتماع",
-      "band": 3067,
+      "text": "كان ذلك أجمل يوم في حياتي.",
+      "pl": "To był najlepszy dzień mojego życia.",
+      "luka": "يوم",
+      "band": 3030,
       "src": "pivot",
       "dystraktory": [
-        "كتابة",
-        "مستشفى",
-        "مالك",
-        "مناسبة",
-        "فوضى",
-        "أصغر",
-        "جزيرة",
-        "صعوبة"
+        "فكرة",
+        "عمل",
+        "ليلة",
+        "مشكلة",
+        "فتاة",
+        "دولار",
+        "سبب",
+        "لحظة"
       ]
     },
     {
-      "text": "لماذا اشتريت سيارة؟",
-      "pl": "Dlaczego kupiłeś samochód?",
-      "luka": "سيارة",
+      "text": "اشتريت لها ساعة.",
+      "pl": "Kupiłem jej zegarek.",
+      "luka": "ساعة",
       "band": 4494,
       "src": "pivot",
       "dystraktory": [
-        "ساعة",
+        "سيارة",
         "رقم",
-        "صباح",
-        "فرصة",
-        "طريق",
-        "نهاية",
         "غرفة",
-        "حياة"
+        "فرصة",
+        "لحظة",
+        "طريق",
+        "صباح",
+        "نهاية"
       ]
     },
     {
-      "text": "كم سعر هذا الفستان؟",
-      "pl": "Ile kosztuje ta suknia?",
-      "luka": "فستان",
-      "band": 6558,
+      "text": "أريد السيف!",
+      "pl": "Chcę miecz!",
+      "luka": "سيف",
+      "band": 6509,
       "src": "pivot",
       "dystraktory": [
         "سلة",
-        "سيف",
-        "سبتمبر",
         "مسرحية",
-        "سياسة",
         "بحيرة",
-        "مؤتمر",
+        "سياسة",
+        "فستان",
+        "خوف",
+        "سبتمبر",
         "خبز"
       ]
     },
     {
-      "text": "يحب أهل أوروبا شرب الخمر.",
-      "pl": "Europejczycy lubią pić wino.",
-      "luka": "خمر",
-      "band": 9126,
+      "text": "الكلمات لا يمكنها التعبير عن شكري بما يكفي.",
+      "pl": "Brak mi słów aby wyrazić moją wdzięczność.",
+      "luka": "تعبير",
+      "band": 9069,
       "src": "pivot",
       "dystraktory": [
-        "مصرف",
-        "تعبير",
-        "أسرة",
         "أكتوبر",
+        "خمر",
+        "تنس",
+        "زبون",
+        "ثانوية",
+        "طابق",
         "يمين",
-        "قمر",
-        "زجاج",
-        "تنس"
+        "زجاج"
       ]
     },
     {
-      "text": "إنه يحب مشاهدة التلفاز.",
-      "pl": "On lubi oglądać telewizję.",
+      "text": "أشاهد التلفاز في بعض الأحيان.",
+      "pl": "Czasami oglądam telewizję.",
       "luka": "تلفاز",
       "band": 11241,
       "src": "pivot",
@@ -169,8 +169,8 @@
       ]
     },
     {
-      "text": "آه ، هناك فراشة!",
-      "pl": "Och, tam jest motyl!",
+      "text": "أمسكت فراشة جميلة.",
+      "pl": "Złapałem pięknego motyla.",
       "luka": "فراشة",
       "band": 18783,
       "src": "pivot",
@@ -186,11 +186,11 @@
       ]
     },
     {
-      "text": "إنه يتكلم الإنجليزية.",
-      "pl": "On mówi po angielsku.",
+      "text": "أيمكنك كتابة رسالة بالإنجليزية؟",
+      "pl": "Czy wiesz, jak napisać list po angielsku?",
       "luka": "إنجليزية",
       "band": 24476,
-      "src": "direct",
+      "src": "pivot",
       "dystraktory": [
         "ضجيج",
         "نظارة",
@@ -203,20 +203,20 @@
       ]
     },
     {
-      "text": "يحب كل الخضر باستثناء الملفوف.",
-      "pl": "On lubi wszystkie warzywa z wyjątkiem kapusty.",
-      "luka": "ملفوف",
-      "band": 29413,
+      "text": "أحب ضوء الشموع.",
+      "pl": "Lubię światło świec.",
+      "luka": "ضوء",
+      "band": 29307,
       "src": "pivot",
       "dystraktory": [
-        "سفير",
-        "باص",
-        "موزة",
-        "مسبح",
-        "فضة",
-        "فاكس",
-        "جمل",
-        "سوشي"
+        "عنوان",
+        "مفتاح",
+        "أرض",
+        "كلمات",
+        "جامعة",
+        "ماء",
+        "قانون",
+        "بيع"
       ]
     },
     {

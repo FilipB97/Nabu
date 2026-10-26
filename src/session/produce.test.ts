@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { es, ja, ko } from '@/langs'
+import { en, es, ja, ko } from '@/langs'
 import { composeJamo } from '@/langs/ko/keyboard'
 import { composeKana, DAKUTEN, HANDAKUTEN } from '@/langs/ja/keyboard'
 import { newCard, type CardState } from '@/srs/types'
@@ -127,3 +127,65 @@ describe('klawiatura kany', () => {
     expect(composeKana([DAKUTEN, 'か'])).toBe('か')
   })
 })
+
+describe('kiedy karta idzie w produkcję', () => {
+  const zdanie = {
+    id: 'x',
+    text: 'They are pleased with your work.',
+    tokens: [{ s: 'pleased', b: 2500, gloss: 'zadowolony' }],
+    pl: 'Są zadowoleni z pracy.',
+    src: 'direct' as const,
+    band: 2500,
+    cloze: 0,
+    distractors: [],
+    quiz: true,
+  }
+  const card = (reps: number, interval: number) => ({
+    ...newCard('x', 'en', 'sentences', 0),
+    reps,
+    interval,
+  })
+
+  it('przy „zawsze" pierwsze spotkanie zostaje quizem — nie ma czego odtwarzać', () => {
+    // Karta wprowadzenia właśnie pokazała słowo. Wpisanie go sekundę później byłoby
+    // przepisaniem, nie przypomnieniem, a ocena z tego trafiłaby do harmonogramu.
+    expect(productionFor(en, card(0, 0), zdanie, 'always')).toBeNull()
+  })
+
+  it('przy „zawsze" pierwsza powtórka już jest produkcją', () => {
+    const production = productionFor(en, card(1, 0), zdanie, 'always')
+    expect(production?.mode).toBe('type')
+    expect(production?.expected).toBe('pleased')
+    expect(production?.prompt).toBe('zadowolony')
+  })
+
+  it('przy „od dojrzałych" powtórka młodej karty zostaje quizem', () => {
+    expect(productionFor(en, card(3, 5), zdanie, 'mature')).toBeNull()
+    expect(productionFor(en, card(9, 30), zdanie, 'mature')?.mode).toBe('type')
+  })
+
+  it('przy „wyłączonej" produkcji nie ma nigdy', () => {
+    expect(productionFor(en, card(9, 30), zdanie, 'off')).toBeNull()
+  })
+
+  it('mówienie bez rozpoznawania w ogóle się nie pojawia', () => {
+    // Domyślnie `canSpeak` jest fałszem, więc urządzenie bez rozpoznawania mowy
+    // dostaje wpisywanie — karta nie może zależeć od funkcji, której nie ma.
+    expect(productionFor(en, card(1, 0), zdanie, 'always')?.mode).toBe('type')
+  })
+
+  it('mówienie wchodzi co drugą powtórkę, żeby nie wyprzeć zapisu', () => {
+    expect(productionFor(en, card(1, 0), zdanie, 'always', true)?.mode).toBe('speak')
+    expect(productionFor(en, card(2, 0), zdanie, 'always', true)?.mode).toBe('type')
+    expect(productionFor(en, card(3, 0), zdanie, 'always', true)?.mode).toBe('speak')
+  })
+
+  it('mówienie pyta o słowo i podaje zdanie jako kontekst', () => {
+    const speak = productionFor(en, card(1, 0), zdanie, 'always', true)
+    expect(speak?.expected).toBe('pleased')
+    expect(speak?.prompt).toBe('zadowolony')
+    expect(speak?.context).toBe('Są zadowoleni z pracy.')
+  })
+})
+
+

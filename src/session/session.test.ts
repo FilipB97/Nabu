@@ -105,6 +105,15 @@ describe('dobór nowych pozycji metodą i+1', () => {
   it('nie zwraca nic, gdy limit to zero — to jest stan „zaległości powyżej progu"', () => {
     expect(selectFresh([item('a', 100, ['x'])], known, new Set(), 0)).toEqual([])
   })
+
+  it('nigdy nie robi luki ze słowa w paśmie znanym', () => {
+    // Konto zaawansowane deklaruje znajomość do pasma 2000. Zdanie, którego luka
+    // siedzi w tym paśmie, pyta o słowo, które użytkownik zna — i to jest dokładnie
+    // ta usterka, przez którą wyższe poziomy wyglądały na zepsute.
+    const pool = [item('znane', 900, ['stare', 'x']), item('nowe', 4000, ['świeże', 'y'])]
+    const picked = selectFresh(pool, new Set(), new Set(), 5, new Set(), 2000)
+    expect(picked.map((i) => i.id)).toEqual(['nowe'])
+  })
 })
 
 describe('zdanie wokół luki', () => {
@@ -343,6 +352,24 @@ describe('etapy i brama opanowania', () => {
 
   it('ręczne odblokowanie ma pierwszeństwo przed bramą', () => {
     expect(currentStage(ja, [], meta(), 'sentences')).toBe('sentences')
+  })
+
+  it('etap wejściowy przeskakuje wcześniejsze bramy, ale ich nie przypina', () => {
+    // Poziom „Zaawansowany" mówi „zaczynam od zdań". Wcześniej ekran dodawania
+    // tłumaczył to na `stageOverride: 'core'`, czyli PRZYPIĘCIE do stu najczęstszych
+    // słów — konto zaawansowane utykało na materiale, którego ten poziom miał unikać.
+    expect(currentStage(ja, [], meta(), null, 'sentences')).toBe('sentences')
+    expect(currentStage(ja, [], meta(), null, 'core')).toBe('core')
+  })
+
+  it('etap wejściowy nieobecny w języku nie przesuwa startu', () => {
+    // Angielski nie ma etapu 0, więc „zacznij od pisma" nie ma czego pominąć.
+    expect(currentStage(es, [], meta({ script: 0 }), null, 'script')).toBe('core')
+  })
+
+  it('etap wejściowy nie blokuje przejścia dalej, gdy brama padnie', () => {
+    const done = [...cards('core', 90, 30)]
+    expect(currentStage(es, done, meta({ script: 0 }), null, 'core')).toBe('sentences')
   })
 
   it('postęp etapu podaje mianownik, a nie sam procent', () => {

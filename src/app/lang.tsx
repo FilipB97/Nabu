@@ -53,7 +53,13 @@ export function LangProvider({ children }: { children: ReactNode }) {
       langs.map(async (settings): Promise<LangRow> => {
         const meta = await loadMeta(settings.lang)
         const cards = await db.cards.where('lang').equals(settings.lang).toArray()
-        const stage = currentStage(adapterFor(settings.lang), cards, meta, settings.stageOverride)
+        const stage = currentStage(
+          adapterFor(settings.lang),
+          cards,
+          meta,
+          settings.stageOverride,
+          settings.startStage,
+        )
         return {
           settings,
           meta,

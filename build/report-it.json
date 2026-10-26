@@ -1,0 +1,241 @@
+{
+  "lang": "it",
+  "zdań": 8174,
+  "kandydatów": 64617,
+  "odrzuconychNaJakości": 17100,
+  "odsetekOdrzutówJakościowych": 26,
+  "odsetekNieprzydatnychNaKartę": 61,
+  "pozaZasięgiem": 925849,
+  "innyZapis": 0,
+  "powodyJakość": {
+    "pasmo powyżej progu języka": 6840,
+    "za dużo tokenów spoza listy częstości": 5762,
+    "nazwa własna": 4425,
+    "wulgaryzm": 54,
+    "znaki spoza zestawu języka": 19
+  },
+  "powodyPrzydatność": {
+    "za krótkie": 17110,
+    "brak tokenu nadającego się na lukę": 15468,
+    "glosa bez oparcia w tłumaczeniu": 5055,
+    "ta sama rama, inna odpowiedź": 1558,
+    "za długie": 152
+  },
+  "tłumaczenia": {
+    "bezpośrednie": 457,
+    "przezAngielski": 7717
+  },
+  "pasma": {
+    "min": 151,
+    "mediana": 2242,
+    "p90": 7850,
+    "max": 11967
+  },
+  "quizNiedostępny": 0,
+  "próbka": [
+    {
+      "text": "Devo andare al lavoro.",
+      "pl": "Muszę iść do pracy.",
+      "luka": "lavoro",
+      "band": 151,
+      "src": "pivot",
+      "dystraktory": [
+        "padre",
+        "bisogno",
+        "amico",
+        "posto",
+        "nessuno",
+        "giorno",
+        "mamma",
+        "madre"
+      ]
+    },
+    {
+      "text": "Quale film ha visto?",
+      "pl": "Jaki film widziałeś?",
+      "luka": "film",
+      "band": 525,
+      "src": "pivot",
+      "dystraktory": [
+        "ufficio",
+        "attimo",
+        "sorella",
+        "vista",
+        "foto",
+        "domanda",
+        "guerra",
+        "dottore"
+      ]
+    },
+    {
+      "text": "Abbiamo bisogno di più cibo.",
+      "pl": "Potrzebujemy więcej jedzenia.",
+      "luka": "cibo",
+      "band": 770,
+      "src": "pivot",
+      "dystraktory": [
+        "odio",
+        "arrivo",
+        "incidente",
+        "minuto",
+        "viaggio",
+        "verità",
+        "passo",
+        "cerca"
+      ]
+    },
+    {
+      "text": "Ieri è stata una giornata triste.",
+      "pl": "Wczorajszy dzień był smutny.",
+      "luka": "triste",
+      "band": 1114,
+      "src": "pivot",
+      "dystraktory": [
+        "freddo",
+        "scelto",
+        "paziente",
+        "diritto",
+        "simile",
+        "cellulare",
+        "pubblico",
+        "necessario"
+      ]
+    },
+    {
+      "text": "La riunione è andata veramente bene.",
+      "pl": "Spotkanie poszło naprawdę dobrze.",
+      "luka": "riunione",
+      "band": 1524,
+      "src": "pivot",
+      "dystraktory": [
+        "rumore",
+        "stazione",
+        "lingua",
+        "giustizia",
+        "eroe",
+        "turno",
+        "colazione",
+        "ristorante"
+      ]
+    },
+    {
+      "text": "Lo so il nome di questo animale.",
+      "pl": "Znam nazwę tego zwierzęcia.",
+      "luka": "animale",
+      "band": 1996,
+      "src": "pivot",
+      "dystraktory": [
+        "nazionale",
+        "naturale",
+        "innamorato",
+        "occupato",
+        "privato",
+        "spaventato",
+        "ubriaco",
+        "principale"
+      ]
+    },
+    {
+      "text": "Tom non ha sorriso.",
+      "pl": "Tom się nie uśmiechnął.",
+      "luka": "sorriso",
+      "band": 2445,
+      "src": "pivot",
+      "dystraktory": [
+        "soccorso",
+        "prestito",
+        "traffico",
+        "virus",
+        "scrivania",
+        "divorzio",
+        "ladro",
+        "risultato"
+      ]
+    },
+    {
+      "text": "Il ferro è duro.",
+      "pl": "Żelazo jest twarde.",
+      "luka": "ferro",
+      "band": 3197,
+      "src": "pivot",
+      "dystraktory": [
+        "fegato",
+        "legno",
+        "vetro",
+        "fermata",
+        "deserto",
+        "febbre",
+        "orso",
+        "cerimonia"
+      ]
+    },
+    {
+      "text": "Tom ha detto qualcosa riguardo alla sparatoria?",
+      "pl": "Czy Tom mówił coś o strzelaninie?",
+      "luka": "sparatoria",
+      "band": 4296,
+      "src": "pivot",
+      "dystraktory": [
+        "segretaria",
+        "batteria",
+        "strategia",
+        "cravatta",
+        "impatto",
+        "insalata",
+        "corona",
+        "roccia"
+      ]
+    },
+    {
+      "text": "Ha giocato a tennis.",
+      "pl": "On grał w tenisa.",
+      "luka": "tennis",
+      "band": 5934,
+      "src": "pivot",
+      "dystraktory": [
+        "dentista",
+        "studentessa",
+        "satellite",
+        "autunno",
+        "concorso",
+        "jeans",
+        "divisa",
+        "gennaio"
+      ]
+    },
+    {
+      "text": "Tom non vuole pranzare adesso.",
+      "pl": "Tom nie chce teraz jeść lunchu.",
+      "luka": "pranzare",
+      "band": 8215,
+      "src": "pivot",
+      "dystraktory": [
+        "prestare",
+        "assicurare",
+        "soddisfare",
+        "promettere",
+        "svegliare",
+        "trascorrere",
+        "scusare",
+        "capitare"
+      ]
+    },
+    {
+      "text": "Tom trovò un uovo di dinosauro.",
+      "pl": "Tom znalazł jajo dinozaura.",
+      "luka": "dinosauro",
+      "band": 11967,
+      "src": "pivot",
+      "dystraktory": [
+        "cipolla",
+        "tappo",
+        "cenno",
+        "vela",
+        "aspirapolvere",
+        "panda",
+        "spagnola",
+        "manifestazione"
+      ]
+    }
+  ]
+}

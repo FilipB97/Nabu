@@ -11,6 +11,7 @@ import { Stats } from '@/routes/Stats'
 import { Settings } from '@/routes/Settings'
 import { Done } from '@/routes/Done'
 import { AudioTest } from '@/routes/AudioTest'
+import { SpeechTest } from '@/routes/SpeechTest'
 
 /**
  * Korzeń aplikacji.
@@ -43,6 +44,7 @@ export function App() {
               <Route path="/ustawienia" element={<Settings />} />
               <Route path="/demo" element={<Demo />} />
               <Route path="/audio" element={<AudioTest />} />
+              <Route path="/mowa" element={<SpeechTest />} />
               <Route path="*" element={<Navigate to="/start" replace />} />
             </Routes>
           </AppShell>

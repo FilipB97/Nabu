@@ -37,14 +37,48 @@ export function productionFor(
   card: CardState,
   item: DeckItem,
   setting: 'off' | 'mature' | 'always',
+  /**
+   * Czy da się teraz słuchać mikrofonu. Sprawdza to `canRecognize()` z warstwy dźwięku,
+   * a nie ten plik — funkcja ma zostać czysta i testowalna, a dostępność rozpoznawania
+   * zależy od przeglądarki, zgody na mikrofon i tego, czy jest sieć.
+   */
+  canSpeak = false,
 ): Production | null {
   if (setting === 'off') return null
   if (setting === 'mature' && !isMature(card)) return null
+  // Nawet przy „zawsze" pierwsze spotkanie nie jest produkcją. Pozycja właśnie została
+  // pokazana na karcie wprowadzenia, więc wpisanie jej z pamięci nie byłoby odtworzeniem,
+  // tylko przepisaniem tego, co widać było przed sekundą. Odtwarzanie zaczyna się przy
+  // pierwszej POWTÓRCE — a ta przy kartach nowych wraca jeszcze w tej samej sesji.
+  if (card.reps === 0) return null
 
   const target = item.tokens[item.cloze]
   if (!target?.gloss) return null
 
+  /**
+   * Mówienie wchodzi co drugą powtórkę i ma wtedy PIERWSZEŃSTWO nad zapisem.
+   *
+   * Kolejność w `adapter.production` opisuje priorytet trybów PISANIA — rysowanie przed
+   * kaną, kana przed wpisaniem. Mówienie nie jest kolejnym z nich, tylko przeplotem nad
+   * nimi: dlatego decyzja zapada przed pętlą, a nie w niej. Wewnątrz pętli `type`
+   * wygrywałoby zawsze i tryb mówienia nigdy by się nie pojawił.
+   *
+   * Parzystość, nie losowanie: ta sama karta zachowuje się przewidywalnie, a użytkownik
+   * wie, czego się po niej spodziewać.
+   */
+  if (canSpeak && adapter.production.includes('speak') && card.reps % 2 === 1) {
+    return {
+      mode: 'speak',
+      expected: target.s,
+      prompt: target.gloss,
+      ...(item.pl ? { context: item.pl } : {}),
+    }
+  }
+
   for (const mode of adapter.production) {
+    // Mówienie jest rozstrzygane wyżej; tutaj przechodzimy do trybów zapisu.
+    if (mode === 'speak') continue
+
     if (mode === 'kana') {
       if (!target.r) continue
       return {

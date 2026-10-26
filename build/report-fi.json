@@ -1,0 +1,241 @@
+{
+  "lang": "fi",
+  "zdań": 2109,
+  "kandydatów": 15638,
+  "odrzuconychNaJakości": 2949,
+  "odsetekOdrzutówJakościowych": 19,
+  "odsetekNieprzydatnychNaKartę": 68,
+  "pozaZasięgiem": 139327,
+  "innyZapis": 0,
+  "powodyJakość": {
+    "nazwa własna": 1157,
+    "pasmo powyżej progu języka": 1108,
+    "za dużo tokenów spoza listy częstości": 644,
+    "wulgaryzm": 36,
+    "znaki spoza zestawu języka": 4
+  },
+  "powodyPrzydatność": {
+    "brak tokenu nadającego się na lukę": 5775,
+    "za krótkie": 3046,
+    "glosa bez oparcia w tłumaczeniu": 1416,
+    "ta sama rama, inna odpowiedź": 296,
+    "za długie": 47
+  },
+  "tłumaczenia": {
+    "bezpośrednie": 117,
+    "przezAngielski": 1992
+  },
+  "pasma": {
+    "min": 165,
+    "mediana": 5768,
+    "p90": 20994,
+    "max": 29926
+  },
+  "quizNiedostępny": 6,
+  "próbka": [
+    {
+      "text": "Taas sinä pieraisit.",
+      "pl": "Znowu pierdnęłaś!",
+      "luka": "Taas",
+      "band": 165,
+      "src": "pivot",
+      "dystraktory": [
+        "ulos",
+        "myös",
+        "liian",
+        "varmasti",
+        "pian",
+        "enemmän",
+        "yhdessä",
+        "yhä"
+      ]
+    },
+    {
+      "text": "Oliko ovi auki?",
+      "pl": "Czy drzwi były otwarte?",
+      "luka": "auki",
+      "band": 759,
+      "src": "pivot",
+      "dystraktory": [
+        "usein",
+        "erittäin",
+        "tuskin",
+        "ulkona",
+        "luultavasti",
+        "melko",
+        "lähellä",
+        "valitettavasti"
+      ]
+    },
+    {
+      "text": "Voit käyttää tätä autoa.",
+      "pl": "Możesz używać tego samochodu.",
+      "luka": "käyttää",
+      "band": 1401,
+      "src": "pivot",
+      "dystraktory": [
+        "löytää",
+        "yrittää",
+        "riittää",
+        "soittaa",
+        "tarkoittaa",
+        "kuulla",
+        "jättää",
+        "alkaa"
+      ]
+    },
+    {
+      "text": "Voinko minä lainata sinun radiotasi?",
+      "pl": "Czy mogę pożyczyć twoje radio?",
+      "luka": "lainata",
+      "band": 2380,
+      "src": "pivot",
+      "dystraktory": [
+        "parantaa",
+        "liittyä",
+        "jakaa",
+        "laulaa",
+        "nostaa",
+        "tanssia",
+        "valehdella",
+        "herättää"
+      ]
+    },
+    {
+      "text": "Haluan suudella teitä.",
+      "pl": "Chcę cię pocałować.",
+      "luka": "suudella",
+      "band": 3483,
+      "src": "pivot",
+      "dystraktory": [
+        "ilmaista",
+        "juosta",
+        "kääntää",
+        "nauraa",
+        "sulkea",
+        "työskennellä",
+        "sataa",
+        "laskea"
+      ]
+    },
+    {
+      "text": "Ilo oli minun puolellani.",
+      "pl": "Cała przyjemność po mojej stronie.",
+      "luka": "Ilo",
+      "band": 4984,
+      "src": "pivot",
+      "dystraktory": [
+        "taivas",
+        "vesi",
+        "viikko",
+        "murhaaja",
+        "sydän",
+        "sankari",
+        "kirja",
+        "tunti"
+      ]
+    },
+    {
+      "text": "Haluan opiskella englantia.",
+      "pl": "Chcę uczyć się angielskiego.",
+      "luka": "opiskella",
+      "band": 6579,
+      "src": "pivot",
+      "dystraktory": [
+        "sisältää",
+        "kuvailla",
+        "vihata",
+        "teeskennellä",
+        "toistaa",
+        "laskeutua",
+        "oksentaa",
+        "uida"
+      ]
+    },
+    {
+      "text": "Vanhat ihmiset ansaitsevat kunnioitusta.",
+      "pl": "Starsi ludzie zasługują na szacunek.",
+      "luka": "ihmiset",
+      "band": 8732,
+      "src": "pivot",
+      "dystraktory": [
+        "nainen",
+        "tyttö",
+        "päivä",
+        "tohtori",
+        "asia",
+        "poika",
+        "paikka",
+        "hetki"
+      ]
+    },
+    {
+      "text": "Se vauva on itkenyt lähes kymmenen minuutin ajan.",
+      "pl": "Dziecko płakało przez prawie 10 minut.",
+      "luka": "vauva",
+      "band": 11896,
+      "src": "pivot",
+      "dystraktory": [
+        "rakkaus",
+        "sana",
+        "huone",
+        "sota",
+        "vastaus",
+        "henkilö",
+        "matka",
+        "puhelin"
+      ]
+    },
+    {
+      "text": "Järvi oli jo jäässä, joten kävelimme sen yli.",
+      "pl": "Jezioro zamarzło, więc przeszliśmy po lodzie.",
+      "luka": "Järvi",
+      "band": 15676,
+      "src": "pivot",
+      "dystraktory": [
+        "järki",
+        "jänis",
+        "konsertti",
+        "sisäänkäynti",
+        "poliitikko",
+        "alkoholi",
+        "kummitus",
+        "solmio"
+      ]
+    },
+    {
+      "text": "”Näytät ihan turistilta.” ”Mutta minähän olen turisti!”",
+      "pl": "\"Wyglądasz jak turysta\" \"Ja jestem turystą\"",
+      "luka": "turisti",
+      "band": 21590,
+      "src": "pivot",
+      "dystraktory": [
+        "torakka",
+        "tuotanto",
+        "ilmapiiri",
+        "kuorma-auto",
+        "pingviini",
+        "rauta",
+        "matkalaukku",
+        "luento"
+      ]
+    },
+    {
+      "text": "Ovi aukeaa painamalla tätä nappia.",
+      "pl": "Jak naciśniesz ten przycisk, drzwi się otworzą.",
+      "luka": "Ovi",
+      "band": 29926,
+      "src": "pivot",
+      "dystraktory": [
+        "kysymys",
+        "lapsi",
+        "ase",
+        "elämä",
+        "tilanne",
+        "ihminen",
+        "ystävä",
+        "syy"
+      ]
+    }
+  ]
+}

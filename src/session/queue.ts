@@ -101,6 +101,11 @@ export function selectFresh(
     const lemma = target.lemma ?? target.s.toLocaleLowerCase()
     if (covered.has(lemma)) continue
 
+    // Luka MUSI być słowem nieznanym. Kalibracja mówi, dokąd sięga słownictwo
+    // użytkownika — pytanie o słowo z tego pasma jest stratą sesji i dokładnie tym,
+    // na co skarży się każdy, kto zadeklarował poziom zaawansowany.
+    if (knownBand > 0 && target.b > 0 && target.b <= knownBand) continue
+
     // Słowo jest znane, gdy użytkownik ma na nie utrwaloną kartę ALBO gdy mieści się
     // w paśmie oszacowanym kalibracją (sekcja 3.1). Bez tego drugiego warunku konto
     // zaawansowane widzi w każdym zdaniu pięć nowych słów i i+1 nie ma czego wybierać.
