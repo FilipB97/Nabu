@@ -3,7 +3,13 @@ import { glossSupported } from './05-assemble.ts'
 import { es, ja, ko, LANG_CODES, adapterFor } from '../src/langs/index.ts'
 import { tokenize } from './02-tokenize.ts'
 import { senseInContext, type Entry } from './04-glosses.ts'
-import { editSimilarity, glossesCollide, jamoSimilarity } from './06-distractors.ts'
+import {
+  candidatesFor,
+  editSimilarity,
+  glossesCollide,
+  jamoSimilarity,
+  type Candidate,
+} from './06-distractors.ts'
 import { needsFurigana, toHiragana } from '../src/langs/ja/kana.ts'
 import { posFromIpadic } from '../src/langs/ja/pos.ts'
 import { splitParticle } from '../src/langs/ko/particles.ts'
@@ -128,6 +134,61 @@ describe('kolizja glos', () => {
   it('nie myli krótkich słów funkcyjnych', () => {
     // „do" ma mniej niż 4 znaki, więc nie może samo spowodować kolizji.
     expect(glossesCollide('iść do szkoły', 'wracać do domu')).toBe(false)
+  })
+})
+
+describe('dobór dystraktorów', () => {
+  const word = (lemma: string, pl: string, band: number): Candidate => ({
+    lemma,
+    surface: lemma,
+    pl,
+    pos: 'adj',
+    band,
+  })
+
+  it('nie wystawia dwóch opcji o tym samym znaczeniu', () => {
+    // `mukava` i `kiva` to po polsku to samo „miły". Każde z osobna jest dobrym
+    // dystraktorem dla `ensimmäinen`, ale obok siebie dają kartę z powtórzoną
+    // odpowiedzią — fiński pokazywał takie zestawy na 1,2% pozycji.
+    const target = word('ensimmäinen', 'pierwszy', 20)
+    const pool = new Map([
+      [
+        'adj',
+        [
+          target,
+          word('kaunis', 'piękny', 22),
+          word('mukava', 'miły', 24),
+          word('kiva', 'miły', 26),
+        ],
+      ],
+    ])
+
+    const glosses = candidatesFor(target, pool, 'edit').map(
+      (lemma) => pool.get('adj')!.find((c) => c.lemma === lemma)!.pl,
+    )
+    expect(new Set(glosses).size).toBe(glosses.length)
+    expect(glosses).not.toContain('pierwszy')
+  })
+
+  it('przegląda całą pulę, nie tylko pierwsze trafienia', () => {
+    // Runtime losuje `n − 1` z ósemki kandydatów, więc duplikat na siódmej pozycji
+    // jest tak samo widoczny jak na drugiej.
+    const target = word('a', 'pierwszy', 100)
+    const pool = new Map([
+      [
+        'adj',
+        [
+          target,
+          ...Array.from({ length: 12 }, (_, i) => word(`w${i}`, `znaczenie${i}`, 100 + i)),
+          word('duplikat', 'znaczenie3', 101),
+        ],
+      ],
+    ])
+
+    const glosses = candidatesFor(target, pool, 'edit').map(
+      (lemma) => pool.get('adj')!.find((c) => c.lemma === lemma)!.pl,
+    )
+    expect(new Set(glosses).size).toBe(glosses.length)
   })
 })
 
